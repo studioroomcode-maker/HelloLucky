@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$raw = [Console]::In.ReadToEnd(); $data = $raw | ConvertFrom-Json; $f = $data.tool_input.file_path; if ($f -match \"\\.(ts|tsx)$\") { Push-Location \"D:\\MakingApps\\Apps\\HelloLucky\"; npx tsc --noEmit 2>&1; Pop-Location; exit 0 }",
+            "shell": "powershell",
+            "timeout": 60,
+            "statusMessage": "TypeScript 타입 검사 중..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "Set-Location \"D:\\MakingApps\\Apps\\HelloLucky\"; npm run lint 2>&1; exit 0",
+            "shell": "powershell",
+            "timeout": 60,
+            "statusMessage": "ESLint 검사 중..."
+          }
+        ]
+      }
+    ]
+  }
+}
