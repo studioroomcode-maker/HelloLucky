@@ -45,7 +45,12 @@ app-example
 /android
 
 # ML training data (too large for git)
-clover_dataset/
+clover_dataset/*
+# ...but keep the class-name config used by label_local.py
+!clover_dataset/predefined_classes.txt
+
+# Python
+__pycache__/
 
 # Gradle cache
 .gradle-home/
