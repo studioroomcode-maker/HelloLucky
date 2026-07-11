@@ -52,6 +52,7 @@ clover_dataset/*
 # Downloaded/merged datasets and trained weights (too large for git)
 training/datasets_raw/
 training/merged/
+training/cutouts/
 *.zip
 *.pt
 *.tflite

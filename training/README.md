@@ -44,6 +44,34 @@ python training/download_datasets.py
 > ⚠️ **라이선스는 데이터셋마다 다릅니다.** 상용화가 목표라면 세 데이터셋 각각의
 > 라이선스(CC BY 4.0 등)를 페이지에서 확인하세요.
 
+### 1.5 (선택·권장) 합성 증강으로 데이터 불리기
+
+라벨링 없이 학습 데이터를 수천 장으로 늘리는 단계입니다. 진짜 네잎 컷아웃을
+진짜 배경(기존 `three_leaf/` 사진)에 붙여 YOLO 박스까지 자동 생성합니다.
+
+> **왜 텍스트→이미지 생성이 아니라 합성인가:** diffusion 모델은 잎 개수를 못
+> 세서 세잎을 네잎으로 라벨한 오염 데이터를 만듭니다. 이 과제의 핵심 신호를
+> 망칩니다. 합성은 진짜 네잎만 쓰므로 개수가 정확하고 박스도 공짜입니다.
+
+```bash
+pip install pillow numpy
+pip install rembg onnxruntime    # 배경 제거용 (무겁습니다)
+
+python training/synthesize_composite.py cutout            # 배경 제거 (1회 캐시)
+python training/synthesize_composite.py compose --count 1500
+# 또는 한 번에:  python training/synthesize_composite.py all --count 1500
+```
+
+- 결과: `training/datasets_raw/synthetic-composite/` → 2단계 병합이 자동 포함
+- `rembg` 없이도 `compose`는 동작합니다. 이미지 편집기로 오린 RGBA png를
+  `training/cutouts/`에 넣으면 됩니다.
+- 튜닝: `--min-scale/--max-scale`(클로버 크기), `--max-per-image`(장당 개수).
+  실사용은 멀리서 보므로 기본값이 작게(4~16%) 잡혀 있습니다.
+
+> ⚠️ **정직한 한계:** 근접샷 컷아웃을 축소해 붙여도 실제 '멀리서 본 밭'과는
+> 도메인 갭이 있습니다. 합성은 보강이지 대체가 아니며, **검증셋은 반드시 진짜
+> 사진**으로 두어야 실제 성능을 알 수 있습니다.
+
 ### 2. 하나로 병합 (클래스 통일)
 
 ```bash
