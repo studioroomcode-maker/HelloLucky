@@ -49,6 +49,16 @@ clover_dataset/*
 # ...but keep the class-name config used by label_local.py
 !clover_dataset/predefined_classes.txt
 
+# Downloaded/merged datasets and trained weights (too large for git)
+training/datasets_raw/
+training/merged/
+*.zip
+*.pt
+*.tflite
+*.onnx
+# ...but keep the model-folder README
+!assets/model/README.md
+
 # Python
 __pycache__/
 
