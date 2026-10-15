@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hello Luck — 행운을 찾아서</title>
+<meta name="description" content="카메라로 클로버 밭을 비추면 AI가 행운을 찾아줘요. Point your camera at clovers and let the AI find your luck.">
+<meta property="og:title" content="🍀 행운을 보내드려요! · Hello Luck">
+<meta property="og:description" content="카메라로 클로버 밭을 비추면 AI가 행운을 찾아줘요.">
+<meta property="og:image" content="https://studioroomcode-maker.github.io/HelloLucky/title.jpg">
+<link rel="icon" href="icon.png">
+<style>
+  :root { --sky:#23BCFC; --green:#1E8A3C; --text:#0F2A18; }
+  * { box-sizing:border-box; }
+  body, p, h1 { word-break:keep-all; }
+  body { margin:0; padding:0 16px 32px; min-height:100vh; font:16px/1.5 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+         color:var(--text); background:var(--sky) url(title.jpg) center top / cover no-repeat; display:flex; align-items:flex-end; justify-content:center; }
+  .card { width:100%; max-width:440px; background:rgba(255,255,255,.92); border-radius:28px; padding:24px 20px;
+          box-shadow:0 12px 40px rgba(0,0,0,.18); text-align:center; }
+  .card img { width:72px; height:72px; border-radius:18px; }
+  h1 { font-size:22px; margin:10px 0 4px; }
+  p { margin:0 0 18px; color:#3d5345; }
+  .btn { display:block; padding:14px; border-radius:16px; font-weight:800; text-decoration:none; margin-top:10px; }
+  .play { background:var(--green); color:#fff; }
+  .ios { background:#111; color:#fff; }
+  .soon { opacity:.45; pointer-events:none; }
+  small { display:block; margin-top:16px; color:#6b7d70; }
+  small a { color:inherit; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <img src="icon.png" alt="Hello Luck">
+    <h1 data-ko="🍀 행운을 보내드려요!" data-en="🍀 Someone sent you luck!">🍀 행운을 보내드려요!</h1>
+    <p data-ko="카메라로 클로버 밭을 비추면 AI가 행운을 찾아줘요. 나도 행운 찾으러 가볼까요?"
+       data-en="Point your camera at a clover patch and the AI finds luck for you. Ready to find yours?">
+      카메라로 클로버 밭을 비추면 AI가 행운을 찾아줘요. 나도 행운 찾으러 가볼까요?</p>
+    <a class="btn play" id="play" href="https://play.google.com/store/apps/details?id=com.sungkyun.HelloLucky">Google Play</a>
+    <!-- Set APP_STORE_URL below once the App Store listing exists. -->
+    <a class="btn ios soon" id="ios" href="#" data-ko="App Store (곧 출시)" data-en="App Store (coming soon)">App Store (곧 출시)</a>
+    <small><a href="privacy-policy.html" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</a> · © 2026 StudioRoom</small>
+  </main>
+<script>
+  const APP_STORE_URL = '';
+  const en = !/^ko/i.test(navigator.language || '');
+  if (en) { document.documentElement.lang = 'en'; document.querySelectorAll('[data-en]').forEach(el => el.textContent = el.dataset.en); }
+  const ios = document.getElementById('ios');
+  if (APP_STORE_URL) { ios.href = APP_STORE_URL; ios.classList.remove('soon'); ios.textContent = 'App Store'; }
+  // Phones go straight to their store; desktops see the card.
+  const ua = navigator.userAgent;
+  if (/Android/i.test(ua)) location.replace(document.getElementById('play').href);
+  else if (/iPhone|iPad|iPod/i.test(ua) && APP_STORE_URL) location.replace(APP_STORE_URL);
+</script>
+</body>
+</html>
