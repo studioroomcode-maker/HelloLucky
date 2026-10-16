@@ -17,7 +17,7 @@
 그 경로를 넘기는 방식이 일반적입니다:
 
 ```env
-EXPO_PUBLIC_ONDEVICE_MODEL_URI=file:///data/user/0/com.sungkyun.HelloLucky/files/clover.tflite
+EXPO_PUBLIC_ONDEVICE_MODEL_URI=file:///data/user/0/com.studioroomkr.HelloLucky/files/clover.tflite
 ```
 
 ### B) require() 로 번들에 포함

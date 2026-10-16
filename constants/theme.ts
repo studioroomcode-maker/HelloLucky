@@ -1,53 +1,63 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import { Platform, useColorScheme } from 'react-native';
 
-import { Platform } from 'react-native';
+import { lang } from '@/src/i18n';
+import { useSettings } from '@/src/services/findsStore';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+const light = {
+  background: '#F5F7F0',
+  surface: '#FFFFFF',
+  surfaceAlt: '#E9F0E2',
+  text: '#16211A',
+  muted: '#5B685D',
+  border: '#DCE5D5',
+  primary: '#2F7D3A',
+  onPrimary: '#FFFFFF',
+  gold: '#E8B931',
+  danger: '#C2410C',
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+const dark: typeof light = {
+  background: '#0D130F',
+  surface: '#172019',
+  surfaceAlt: '#1F2B22',
+  text: '#E8F1E8',
+  muted: '#9CAB9E',
+  border: '#2A372D',
+  primary: '#72CF7E',
+  onPrimary: '#0D130F',
+  gold: '#F2C94C',
+  danger: '#FB923C',
+};
+
+export type Palette = typeof light;
+
+/** Light by default; Settings can switch to dark or follow the system. */
+export function useIsDark() {
+  const system = useColorScheme();
+  const { theme } = useSettings();
+  return theme === 'dark' || (theme === 'system' && system === 'dark');
+}
+
+export function usePalette(): Palette {
+  return useIsDark() ? dark : light;
+}
+
+// Camera UI is always drawn over a live preview, so it uses fixed colors.
+export const CameraColors = {
+  lock: '#8EF14A',
+  candidate: '#FFD76A',
+  scrim: 'rgba(8, 14, 10, 0.62)',
+  chip: 'rgba(255,255,255,0.16)',
+};
+
+/** SD Gothic Neo Round (owner-licensed, assets/fonts), loaded under these names in app/_layout.tsx. */
+export const BRAND_FONT = { body: 'SDRound-Regular', medium: 'SDRound-Medium', cute: 'SDRound-ExtraBold' } as const;
+
+/** Faces carry their own weight, so styles pick one instead of fontWeight. The brand face only has Hangul,
+ * basic Latin and Cyrillic; other languages use system faces of the same weights rather than mixing fonts mid-word. */
+export const FONT: { body: string; medium: string; cute: string } = ['ko', 'en', 'id', 'ru'].includes(lang)
+  ? BRAND_FONT
+  : Platform.select({
+      ios: { body: 'HelveticaNeue', medium: 'HelveticaNeue-Medium', cute: 'HelveticaNeue-Bold' },
+      default: { body: 'sans-serif', medium: 'sans-serif-medium', cute: 'sans-serif-black' },
+    });

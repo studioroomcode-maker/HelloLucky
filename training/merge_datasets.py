@@ -40,6 +40,8 @@ MERGED_DIR = BASE_DIR / "merged"
 
 # 앱 .env(EXPO_PUBLIC_ROBOFLOW_TARGET_LABELS) 와 반드시 일치해야 하는 최종 클래스 이름.
 TARGET_CLASS = "four_leaf"
+# Class 1: three-leaf boxes are kept so the detector learns the contrast (the app only alerts on class 0).
+CLASSES = [TARGET_CLASS, "three_leaf"]
 
 SPLITS = ["train", "valid", "test"]
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
@@ -59,8 +61,8 @@ def is_four_leaf(name: str) -> bool:
     n = normalize(name)
     if n in CLASS_OVERRIDES:
         return CLASS_OVERRIDES[n]
-    # 세잎/배경 계열은 명시적으로 버린다.
-    if "three" in n or "3leaf" in n or n in {"background", "clover3", "3"}:
+    # 세잎·다섯잎/배경 계열은 명시적으로 버린다 (박스가 빠져 '네잎 아님' 예시가 됨).
+    if "three" in n or "3leaf" in n or "five" in n or "5leaf" in n or n in {"background", "clover3", "3"}:
         return False
     # 네잎 신호: 'four' 포함, 또는 클로버 맥락에서 '4' 포함.
     if "four" in n:
@@ -127,8 +129,13 @@ def find_split_dir(dataset_dir: Path, split: str) -> Path | None:
     return None
 
 
-def remap_label_file(src_txt: Path, keep_indices: set[int]) -> list[str]:
-    """YOLO 라벨을 읽어 네잎 박스만 남기고 클래스 인덱스를 0 으로 바꾼다."""
+def is_three_leaf(name: str) -> bool:
+    n = normalize(name)
+    return "three" in n or "3leaf" in n or n in {"clover3", "3"}
+
+
+def remap_label_file(src_txt: Path, class_map: dict[int, int]) -> list[str]:
+    """YOLO 라벨을 읽어 네잎(0)·세잎(1) 박스만 남긴다."""
     out_lines = []
     for line in src_txt.read_text(encoding="utf-8").splitlines():
         parts = line.split()
@@ -138,8 +145,8 @@ def remap_label_file(src_txt: Path, keep_indices: set[int]) -> list[str]:
             cls = int(float(parts[0]))
         except ValueError:
             continue
-        if cls in keep_indices:
-            out_lines.append(" ".join(["0"] + parts[1:]))
+        if cls in class_map:
+            out_lines.append(" ".join([str(class_map[cls])] + parts[1:]))
     return out_lines
 
 
@@ -156,6 +163,7 @@ def process_dataset(dataset_dir: Path, dry_run: bool, counters: dict) -> None:
 
     # 각 클래스 인덱스가 네잎인지 판정.
     keep_indices = set()
+    class_map: dict[int, int] = {}
     print(f"\n📂 {dataset_dir.name}  (클래스 {len(names)}개)")
     for idx, name in enumerate(names):
         four = is_four_leaf(name)
@@ -165,6 +173,10 @@ def process_dataset(dataset_dir: Path, dry_run: bool, counters: dict) -> None:
         print(f"    [{idx}] {name!r:20} → {mark}{warn}")
         if four:
             keep_indices.add(idx)
+            class_map[idx] = 0
+        elif is_three_leaf(name):
+            class_map[idx] = 1
+            print("          ↳ 세잎(three_leaf, 클래스 1)로 유지")
 
     if not keep_indices:
         print("    ⚠️ 네잎으로 판정된 클래스가 없습니다. CLASS_OVERRIDES 로 지정하세요.")
@@ -185,12 +197,13 @@ def process_dataset(dataset_dir: Path, dry_run: bool, counters: dict) -> None:
         images = [p for p in (sdir / "images").iterdir() if p.suffix.lower() in IMAGE_EXTS]
         for img in images:
             label = sdir / "labels" / (img.stem + ".txt")
-            kept_lines = remap_label_file(label, keep_indices) if label.exists() else []
+            kept_lines = remap_label_file(label, class_map) if label.exists() else []
 
             new_stem = f"{src_prefix}__{img.stem}"
             counters[split]["images"] += 1
-            counters[split]["boxes"] += len(kept_lines)
-            if len(kept_lines) == 0:
+            fours = sum(1 for l in kept_lines if l.startswith("0 "))
+            counters[split]["boxes"] += fours
+            if fours == 0:
                 counters[split]["background"] += 1
 
             if dry_run:
@@ -210,8 +223,8 @@ def write_merged_yaml() -> None:
         if (MERGED_DIR / split / "images").is_dir():
             lines.append(f"{key}: {split}/images")
     lines.append("")
-    lines.append("nc: 1")
-    lines.append(f"names: ['{TARGET_CLASS}']")
+    lines.append(f"nc: {len(CLASSES)}")
+    lines.append(f"names: {CLASSES}")
     (MERGED_DIR / "data.yaml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -262,7 +275,7 @@ def main():
 
     write_merged_yaml()
     print(f"\n✅ 완료 → {MERGED_DIR}")
-    print(f"   data.yaml 생성됨 (단일 클래스 '{TARGET_CLASS}')")
+    print(f"   data.yaml 생성됨 (클래스 {CLASSES})")
     print("\n👉 다음 단계: merged/ 폴더를 zip 으로 묶어 Colab(train_yolo.ipynb) 에 업로드")
 
 

@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
+@@ -201,9 +201,12 @@
+         analysis.setTargetFrameRate(fpsRange)
+       }
+       if (format != null) {
+-        Log.i(CameraSession.TAG, "Frame Processor size: ${format.videoSize}")
++        // HelloLucky patch: analyze frames in the photo's aspect ratio (4:3 = the sensor). Some devices (Galaxy S25)
++        // squeeze the whole 4:3 view into a 16:9 analysis size instead of cropping it, which distorts detections.
++        val analysisSize = android.util.Size(1920, 1920 * format.photoSize.height / format.photoSize.width)
++        Log.i(CameraSession.TAG, "Frame Processor size: $analysisSize")
+         val resolutionSelector = ResolutionSelector.Builder()
+-          .forSize(format.videoSize)
++          .forSize(analysisSize)
+           .setAllowedResolutionMode(ResolutionSelector.PREFER_CAPTURE_RATE_OVER_HIGHER_RESOLUTION)
+           .build()
+         analysis.setResolutionSelector(resolutionSelector)

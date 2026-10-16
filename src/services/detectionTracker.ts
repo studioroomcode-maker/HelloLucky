@@ -1,7 +1,16 @@
-import type { CloverDetectionBox } from './cloverDetection';
+/** Center-based box in the upright camera frame's pixel space. */
+export type CloverDetectionBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  confidence: number;
+};
 
 export type DetectionTrackerConfig = {
   requiredStreak: number;
+  /** Smoothed confidence a track needs before it counts as found (candidates show below it). */
+  minLockConfidence: number;
   maxMissedFrames: number;
   iouThreshold: number;
   smoothingFactor: number;
@@ -25,8 +34,6 @@ export type DetectionTrackerSnapshot = {
   tracks: DetectionTrack[];
   stableTracks: DetectionTrack[];
   candidateTracks: DetectionTrack[];
-  summary: string;
-  nextStep: string;
 };
 
 type PairCandidate = {
@@ -52,9 +59,6 @@ export function createEmptyDetectionTrackerSnapshot(): DetectionTrackerSnapshot 
     tracks: [],
     stableTracks: [],
     candidateTracks: [],
-    summary: 'Scanning the patch for four-leaf silhouettes.',
-    nextStep:
-      'Move closer, keep the patch sharp, and let the scanner sample a few frames.',
   };
 }
 
@@ -97,46 +101,6 @@ function blend(previous: number, next: number, factor: number) {
   return previous + (next - previous) * factor;
 }
 
-function buildSummary(
-  stableTracks: DetectionTrack[],
-  candidateTracks: DetectionTrack[],
-  requiredStreak: number,
-) {
-  if (stableTracks.length > 0) {
-    return stableTracks.length === 1
-      ? 'Locked 1 stable four-leaf candidate.'
-      : `Locked ${stableTracks.length} stable four-leaf candidates.`;
-  }
-
-  if (candidateTracks.length > 0) {
-    const bestStreak = candidateTracks.reduce(
-      (currentBest, track) => Math.max(currentBest, track.streak),
-      0,
-    );
-    const remaining = Math.max(requiredStreak - bestStreak, 0);
-
-    return remaining > 0
-      ? `Possible four-leaf clover detected. Hold steady for ${remaining} more scan${remaining === 1 ? '' : 's'}.`
-      : 'Possible four-leaf clover detected.';
-  }
-
-  return 'Scanning the patch for four-leaf silhouettes.';
-}
-
-function buildNextStep(
-  stableTracks: DetectionTrack[],
-  candidateTracks: DetectionTrack[],
-) {
-  if (stableTracks.length > 0) {
-    return 'Move slowly and save while the box stays locked on the same clover.';
-  }
-
-  if (candidateTracks.length > 0) {
-    return 'Keep the same patch centered so the tracker can confirm the box.';
-  }
-
-  return 'Move closer, reduce motion blur, and keep the clover patch inside the guide frame.';
-}
 
 function sortActiveTracks(left: DetectionTrack, right: DetectionTrack) {
   if (left.isStable !== right.isStable) {
@@ -201,22 +165,18 @@ export function advanceDetectionTracker(
 
     if (match) {
       const streak = track.missedFrames === 0 ? track.streak + 1 : 1;
+      const confidence = blend(track.confidence, match.confidence, config.smoothingFactor);
 
       nextTracks.push({
         id: track.id,
-        rawLabel: match.rawLabel || track.rawLabel,
         x: blend(track.x, match.x, config.smoothingFactor),
         y: blend(track.y, match.y, config.smoothingFactor),
         width: blend(track.width, match.width, config.smoothingFactor),
         height: blend(track.height, match.height, config.smoothingFactor),
-        confidence: blend(
-          track.confidence,
-          match.confidence,
-          config.smoothingFactor,
-        ),
+        confidence,
         streak,
         missedFrames: 0,
-        isStable: streak >= config.requiredStreak,
+        isStable: streak >= config.requiredStreak && confidence >= config.minLockConfidence,
       });
 
       return;
@@ -246,7 +206,7 @@ export function advanceDetectionTracker(
       id: `track-${nextTrackId}`,
       streak: 1,
       missedFrames: 0,
-      isStable: config.requiredStreak <= 1,
+      isStable: config.requiredStreak <= 1 && detection.confidence >= config.minLockConfidence,
     });
 
     nextTrackId += 1;
@@ -275,7 +235,5 @@ export function advanceDetectionTracker(
     tracks: activeTracks,
     stableTracks,
     candidateTracks,
-    summary: buildSummary(stableTracks, candidateTracks, config.requiredStreak),
-    nextStep: buildNextStep(stableTracks, candidateTracks),
   };
 }

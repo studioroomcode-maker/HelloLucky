@@ -59,27 +59,15 @@ RAW_DIR = Path(__file__).resolve().parent / "datasets_raw"
 #   "Download this Dataset" 코드 스니펫에서 그대로 복사한 값이어야 정확합니다.
 #   여기 값들은 조사 시점 기준의 추정치이므로, 실패하면 교체하세요.
 DATASETS = [
-    {
-        "name": "hunting-for-four-leaf-clovers",
-        "workspace": "adam-fonagy",
-        "project": "hunting-for-four-leaf-clovers",
-        "version": 2,
-        "note": "약 486장(증강 포함). 라이선스는 페이지에서 확인.",
-    },
-    {
-        "name": "4-leaf-clover-detect",
-        "workspace": "test-ara07",
-        "project": "4-leaf-clover-detect",
-        "version": 1,
-        "note": "약 383장. 라이선스는 페이지에서 확인.",
-    },
-    {
-        "name": "clover-ucups",
-        "workspace": "clover-detection",
-        "project": "clover-ucups",
-        "version": 1,
-        "note": "약 64장. 라이선스는 페이지에서 확인.",
-    },
+    # version=None → 최신 버전 자동 선택. 라이선스는 2026-10 조사 기준.
+    # 제외: nobug/findclover (4-leaf-clover-detect 의 부분 복사본, 클래스 번호만 뒤바뀜),
+    #       workspace-lgnet/four-leaf-clovers (공개 버전 없음 → 다운로드 불가).
+    {"name": "solucky", "workspace": "benn-witt", "project": "solucky", "version": None,
+     "note": "Public Domain"},
+    {"name": "hunting-for-four-leaf-clovers", "workspace": "adam-fonagy", "project": "hunting-for-four-leaf-clovers", "version": None,
+     "note": "CC BY 4.0 (앱 설정 화면에 출처 표기)"},
+    {"name": "4-leaf-clover-detect", "workspace": "test-ara07", "project": "4-leaf-clover-detect", "version": None,
+     "note": "CC BY 4.0 (앱 설정 화면에 출처 표기)"},
 ]
 
 
@@ -108,7 +96,7 @@ def download_one(rf, spec: dict) -> bool:
     """데이터셋 하나를 내려받는다. 성공하면 True."""
     name = spec["name"]
     dest = RAW_DIR / name
-    print(f"\n📦 {name}  (v{spec['version']}) — {spec.get('note', '')}")
+    print(f"\n📦 {name}  (v{spec['version'] or 'latest'}) — {spec.get('note', '')}")
 
     if dest.exists() and any(dest.iterdir()):
         print(f"  ⏭️  이미 존재: {dest}  (건너뜀 — 다시 받으려면 폴더 삭제)")
@@ -119,7 +107,11 @@ def download_one(rf, spec: dict) -> bool:
             rf.workspace(spec["workspace"])
             .project(spec["project"])
         )
-        version = project.version(spec["version"])
+        number = spec["version"]
+        if number is None:
+            # 버전 id 는 "workspace/project/N" 형태 → 가장 큰 N 선택.
+            number = max(int(str(v.version).rstrip("/").split("/")[-1]) for v in project.versions())
+        version = project.version(number)
         version.download(EXPORT_FORMAT, location=str(dest))
         print(f"  ✅ 다운로드 완료 → {dest}")
         return True

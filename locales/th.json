@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "Hello Luck ใช้กล้องเพื่อหาโชคในกอโคลเวอร์ วิดีโอถูกวิเคราะห์ในเครื่องของคุณเท่านั้น",
+    "NSLocationWhenInUseUsageDescription": "Hello Luck บันทึกสถานที่ที่คุณเจอโชค ตำแหน่งจะถูกเปิดเผยก็ต่อเมื่อคุณแชร์ไปยังแผนที่โชคดีเท่านั้น"
+  }
+}

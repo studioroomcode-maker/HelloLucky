@@ -177,6 +177,40 @@ def run_cutout(limit: int):
     print(f"✅ 컷아웃 완료: 신규 {done}장, 캐시 재사용 {skipped}장")
 
 
+def run_polygons():
+    """학습 세트의 다각형(세그멘테이션) 라벨을 그대로 마스크로 써서 컷아웃 생성 (rembg 불필요).
+    valid/test 는 쓰지 않음 → 평가 누수 없음."""
+    from PIL import ImageDraw
+
+    src = BASE_DIR / "merged" / "train"
+    CUTOUTS_DIR.mkdir(parents=True, exist_ok=True)
+    made = 0
+    for label in sorted((src / "labels").glob("*.txt")):
+        polys = [(l.split()[0], list(map(float, l.split()[1:]))) for l in label.read_text().split("\n") if len(l.split()) > 7]
+        if not polys:
+            continue
+        img_path = next((src / "images" / f"{label.stem}{e}" for e in (".jpg", ".jpeg", ".png") if (src / "images" / f"{label.stem}{e}").exists()), None)
+        if img_path is None:
+            continue
+        img = Image.open(img_path).convert("RGB")
+        W, H = img.size
+        for k, (cls, v) in enumerate(polys):
+            pts = [(x * W, y * H) for x, y in zip(v[0::2], v[1::2])]
+            mask = Image.new("L", (W, H), 0)
+            ImageDraw.Draw(mask).polygon(pts, fill=255)
+            rgba = img.copy()
+            rgba.putalpha(mask)
+            bb = alpha_bbox(rgba)
+            if bb is None or min(bb[2] - bb[0], bb[3] - bb[1]) < 40:
+                continue  # 너무 작은 원본은 축소 합성용으로 품질이 낮음
+            if bb[0] <= 2 or bb[1] <= 2 or bb[2] >= W - 2 or bb[3] >= H - 2:
+                continue  # 사진 가장자리에 잘린 잎은 직선 단면이 티가 남
+            # 파일명 앞 클래스: c0_ 네잎, c1_ 세잎
+            rgba.crop(bb).save(CUTOUTS_DIR / f"c{cls}_{label.stem}_{k}.png")
+            made += 1
+    print(f"✅ 다각형 컷아웃 {made}개 → {CUTOUTS_DIR}")
+
+
 # ===========================================================
 # 2) compose — 컷아웃을 배경에 합성 + YOLO 라벨
 # ===========================================================
@@ -309,6 +343,8 @@ def main():
         p.add_argument("--bg-max-dim", type=int, default=1024, help="배경 최대 변(px)")
         p.add_argument("--seed", type=int, default=0, help="랜덤 시드")
 
+    sub.add_parser("polygons", help="학습 세트 다각형 라벨로 컷아웃 생성 (rembg 불필요)")
+
     p_com = sub.add_parser("compose", help="컷아웃을 배경에 합성 + YOLO 라벨")
     add_compose_args(p_com)
 
@@ -318,7 +354,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.cmd == "cutout":
+    if args.cmd == "polygons":
+        run_polygons()
+    elif args.cmd == "cutout":
         run_cutout(args.limit)
     elif args.cmd == "compose":
         run_compose(args)

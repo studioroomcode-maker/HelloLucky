@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "Hello Luck uses the camera to find luck in clover patches. Video is analyzed on your device only.",
+    "NSLocationWhenInUseUsageDescription": "Hello Luck saves where you found luck. It is made public only if you share it to the Lucky Map."
+  }
+}

@@ -1,0 +1,86 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
+# ML training data (too large for git)
+clover_dataset/*
+# ...but keep the class-name config used by label_local.py
+!clover_dataset/predefined_classes.txt
+
+# Downloaded/merged datasets and trained weights (too large for git)
+training/datasets_raw/
+training/merged/
+training/work/
+training/runs/
+training/cutouts/
+*.zip
+*.pt
+*.tflite
+*.onnx
+# ...but keep the model-folder README
+!assets/model/README.md
+# The shipped on-device model must be committed (EAS builds only see tracked files).
+!assets/model/clover.tflite
+
+# Python
+__pycache__/
+
+# Gradle cache
+.gradle-home/
+
+# EAS upload only: the app build needs none of these
+training/
+clover_dataset/
+store-listing/
+docs/
+*.py
+.claude/
+.design/
+.secrets/
+
+training/third_party/
+training/yolox_data/
+training/*.pth
+training/YOLOX_outputs/

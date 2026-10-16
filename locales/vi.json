@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "Hello Luck dùng camera để tìm may mắn trong bãi cỏ ba lá. Video chỉ được phân tích trên máy của bạn.",
+    "NSLocationWhenInUseUsageDescription": "Hello Luck lưu nơi bạn tìm thấy may mắn. Vị trí chỉ được công khai nếu bạn chia sẻ lên Bản đồ May mắn."
+  }
+}

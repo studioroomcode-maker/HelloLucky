@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "Hello Luck 使用相机在三叶草丛中寻找幸运。画面只在你的设备上分析。",
+    "NSLocationWhenInUseUsageDescription": "Hello Luck 会保存你找到幸运的地点。只有当你分享到幸运地图时才会公开。"
+  }
+}

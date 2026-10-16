@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441981661673",
+    "project_id": "helloluck-12185",
+    "storage_bucket": "helloluck-12185.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441981661673:android:e4be550307e710b27fdb78",
+        "android_client_info": {
+          "package_name": "com.studioroomkr.HelloLucky"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB1OFjpTovv6geg4EyRTqrMn7wx2wHV0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

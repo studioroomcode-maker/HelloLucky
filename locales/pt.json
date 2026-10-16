@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "O Hello Luck usa a câmera para encontrar sorte nos trevos. O vídeo é analisado só no seu aparelho.",
+    "NSLocationWhenInUseUsageDescription": "O Hello Luck salva onde você encontrou a sorte. Só fica público se você compartilhar no Mapa da Sorte."
+  }
+}

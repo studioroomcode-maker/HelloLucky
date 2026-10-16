@@ -1,0 +1,52 @@
+{
+  "_comment": "App Store 등록정보 — node ../../../HelloDashboard/tools/apple-signing.mjs listing listing.json (이 폴더에서). 문구 원본은 ../play/listing.md 와 같다. 무료, 앱 안 구입 없음. 스크린샷 폴더가 비어 있으면 올리지 않는다.",
+  "bundleId": "com.studioroomkr.HelloLucky",
+  "version": "1.0.0",
+  "copyright": "2026 Studioroom",
+  "primaryCategory": "LIFESTYLE",
+  "secondaryCategory": "ENTERTAINMENT",
+  "contentRights": "DOES_NOT_USE_THIRD_PARTY_CONTENT",
+  "locales": {
+    "ko": {
+      "name": "Hello Luck: 행운 찾기",
+      "subtitle": "AI가 찾아주는 네잎클로버",
+      "promotionalText": "풀밭에 카메라를 비추면 휴대폰 안의 AI가 행운을 찾아줘요. 찾은 행운은 기록하고, 모르는 누군가에게 보내 보세요.",
+      "description": "산책길 풀밭에서 네잎클로버, 찾아본 적 있나요?\nHello Luck은 카메라를 클로버 밭에 비추기만 하면 휴대폰 안의 AI가 행운 후보를 실시간으로 표시해 주는 앱이에요.\n\n■ 실시간으로 찾기\n• 카메라 화면 위에 행운 후보를 바로 표시해요\n• 손이 흔들려도 위치를 따라가다가, 확실해지면 \"찰칵\" 알려 줘요\n• 넓게 훑기 — 넓은 풀밭을 한 장 찍으면 구석구석 나눠서 꼼꼼히 살펴봐요\n\n■ 행운 기록장\n• 찾은 행운을 사진·장소·메모와 함께 저장해요\n• 행운마다 오늘의 한 줄 운세가 함께 와요\n• 모을수록 행운 화분이 씨앗에서 꽃밭까지 자라고, 숨은 배지도 열려요\n\n■ 행운은 나누는 것\n• 친구에게 행운 카드를 사진으로 보내요\n• \"모르는 누군가에게\" 행운을 보내면 세계 어딘가의 누군가에게 도착해요\n• 받은 행운을 이어 보내면, 내 행운이 어디까지 여행했는지 여정 지도로 볼 수 있어요\n• 행운 지도 — 전 세계 사람들이 찾은 행운 장소를 지도에서 만나요\n\n■ 내 정보는 내 폰에\n• 카메라 영상은 기기 안에서만 분석하고, 어디에도 보내지 않아요\n• 사진과 메모는 기기 밖으로 나가지 않아요\n• 회원가입·광고·결제가 없어요\n• 행운 지도에는 내가 직접 고른 기록의 장소와 날짜만 올라가요. 행운 편지에는 정해진 문구와 도시 이름만 담겨요\n\n※ 인식 정확도는 빛, 거리, 풀 상태에 따라 달라질 수 있어요.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "네잎클로버,클로버,행운,산책,카메라,AI,운세,편지,지도,배지",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "en-US": {
+      "name": "Hello Luck: Find Your Luck",
+      "subtitle": "AI four-leaf clover finder",
+      "promotionalText": "Point your camera at a clover patch and the AI inside your phone spots your luck. Keep your finds and send luck on to a stranger.",
+      "description": "Ever looked for a four-leaf clover on a walk?\nHello Luck lets the AI inside your phone point out likely lucky clovers, live, as you sweep your camera over a clover patch.\n\n■ Find it live\n• Candidates are highlighted right on the camera view\n• The box follows along even when your hand shakes, and lets you know once it is sure\n• Wide scan: take one photo of a big patch and it is checked tile by tile\n\n■ Your lucky journal\n• Save each find with a photo, the place and a note\n• Every find comes with a fortune line for the day\n• Your luck pot grows from a seed to a flower field, and hidden badges unlock as you go\n\n■ Luck is for giving\n• Send a luck card photo to a friend\n• Send luck \"to a stranger\" and it lands with someone somewhere in the world\n• Pass on luck you received and watch how far it travels on the journey map\n• Lucky Map: see where people around the world found their luck\n\n■ Your data stays on your phone\n• The camera feed is analyzed on your device and never uploaded\n• Photos and notes never leave your phone\n• No sign-up, no ads, no purchases\n• Only the place and date of finds you choose go on the Lucky Map; lucky letters carry only a preset message and a city name\n\nDetection accuracy depends on light, distance and the grass.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "four leaf clover,clover,lucky,luck,walk,nature,camera,AI,fortune,charm,shamrock",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    }
+  },
+  "review": {
+    "firstName": "Sungkyun",
+    "lastName": "Bae",
+    "email": "contact@studioroomkr.com",
+    "phone": "+82 10 9309 1419",
+    "demoRequired": false,
+    "notes": "Hello Luck finds four-leaf clovers using an on-device ML model running on the live camera preview. No account is required. Photos and notes never leave the device; only when the user taps \"Share to Lucky Map\" on an AI-confirmed find (after accepting a notice) are its coordinates, area name and date published as a pin on the shared map. No user-written text or images are shared. \"Send luck to a stranger\" delivers only a preset message number, card design and city name to a random user (max 5 sent / 1 received per day); a push notification announces it if allowed. To test without a clover patch, point the camera at a photo of a four-leaf clover on another screen; the shutter button also works without a detection to record a find manually (manual finds cannot be shared to the map)."
+  },
+  "ageRating": {
+    "messagingAndChat": false,
+    "userGeneratedContent": false
+  },
+  "free": true,
+  "screenshots": {
+    "ko": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/ko"
+    },
+    "en-US": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    }
+  }
+}

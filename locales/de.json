@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "Hello Luck nutzt die Kamera, um im Klee Glück zu finden. Das Video wird nur auf deinem Gerät analysiert.",
+    "NSLocationWhenInUseUsageDescription": "Hello Luck speichert, wo du Glück gefunden hast. Der Ort wird nur öffentlich, wenn du ihn auf der Glückskarte teilst."
+  }
+}
