@@ -82,3 +82,16 @@ test('luck pot grows through its stages', async () => {
   assert.deepEqual(potStage(6), { stage: 3, toNext: 6 });
   assert.deepEqual(potStage(99), { stage: 5, toNext: 0 });
 });
+
+test('every badge gets a drawn medal: a known glyph and a tier colour', async () => {
+  const { GLYPHS, TIER_COLORS, badgeLook } = await import('../src/badges.ts');
+  for (const { id } of BADGES) {
+    const { glyph, color } = badgeLook(id);
+    assert.ok((GLYPHS as readonly string[]).includes(glyph), id);
+    assert.ok((TIER_COLORS as readonly string[]).includes(color), id);
+  }
+  assert.equal(badgeLook('count1').color, TIER_COLORS[0], 'first steps are green');
+  assert.equal(badgeLook('count10000').glyph, 'crown', 'the top find counts wear a crown');
+  assert.equal(badgeLook('month4').glyph, 'blossom');
+  assert.equal(badgeLook('month12').glyph, 'snowflake');
+});

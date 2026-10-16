@@ -1,24 +1,22 @@
 import { Modal, StyleSheet, Text, View } from 'react-native';
 
 import { FONT, usePalette } from '@/constants/theme';
-import { BADGES, badgeText, type BadgeId } from '@/src/badges';
+import { badgeText, type BadgeId } from '@/src/badges';
 import { t } from '@/src/i18n';
+import { BadgeMedal } from '@/src/ui/BadgeMedal';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 
 /** Celebrates a freshly earned badge. */
 export function BadgePopup({ badge, onClose }: { badge?: BadgeId; onClose: () => void }) {
   const palette = usePalette();
-  const emoji = BADGES.find((b) => b.id === badge)?.emoji;
   return (
     <Modal visible={!!badge} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <View style={styles.backdrop}>
         {badge ? (
           <View style={[styles.card, { backgroundColor: palette.surface }]}>
             <Text style={[styles.kicker, { color: palette.primary }]}>{t.newBadge}</Text>
-            <View style={styles.medal}>
-              <Text style={styles.emoji}>{emoji}</Text>
-            </View>
+            <BadgeMedal id={badge} size={96} />
             <Text style={[styles.title, { color: palette.text }]}>{badgeText(t, badge, true).title}</Text>
             <Text style={[styles.desc, { color: palette.muted }]}>{badgeText(t, badge, true).desc}</Text>
             <PrimaryButton label={t.yay} onPress={onClose} />
@@ -34,8 +32,6 @@ const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', padding: 32 },
   card: { width: '100%', maxWidth: 340, borderRadius: 28, padding: 24, alignItems: 'center', gap: 10 },
   kicker: { fontSize: 16, fontFamily: FONT.cute },
-  medal: { width: 96, height: 96, borderRadius: 48, backgroundColor: '#FFE9A8', alignItems: 'center', justifyContent: 'center' },
-  emoji: { fontFamily: FONT.body, fontSize: 50 },
   title: { fontSize: 22, fontFamily: FONT.cute },
   desc: { fontFamily: FONT.body, fontSize: 14, textAlign: 'center', marginBottom: 6 },
 });

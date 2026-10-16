@@ -82,108 +82,108 @@ const between = (from: number, to: number) => thrice((d) => d.getHours() >= from
 const season = (d: Date) => Math.floor(((d.getMonth() + 10) % 12) / 3);
 const onDate = (month: number, day: number) => (s: Stats) => s.dates.some((d) => d.getMonth() + 1 === month && d.getDate() === day);
 
-type Badge = { id: string; emoji: string; hidden?: true; test: (s: Stats) => boolean };
+type Badge = { id: string; hidden?: true; test: (s: Stats) => boolean };
 
 export const BADGES: Badge[] = [
   // ── Visible (50) ──
-  { id: 'count1', emoji: '🍀', test: (s) => s.n >= 1 },
-  { id: 'count3', emoji: '🌱', test: (s) => s.n >= 3 },
-  { id: 'count5', emoji: '🧺', test: (s) => s.n >= 5 },
-  { id: 'count10', emoji: '🎒', test: (s) => s.n >= 10 },
-  { id: 'count20', emoji: '🪴', test: (s) => s.n >= 20 },
-  { id: 'count30', emoji: '🧚', test: (s) => s.n >= 30 },
-  { id: 'count50', emoji: '🏅', test: (s) => s.n >= 50 },
-  { id: 'count100', emoji: '💯', test: (s) => s.n >= 100 },
-  { id: 'count200', emoji: '🌳', test: (s) => s.n >= 200 },
-  { id: 'count500', emoji: '👑', test: (s) => s.n >= 500 },
-  { id: 'streak2', emoji: '✌️', test: (s) => s.streak >= 2 },
-  { id: 'streak3', emoji: '🔥', test: (s) => s.streak >= 3 },
-  { id: 'streak5', emoji: '🖐️', test: (s) => s.streak >= 5 },
-  { id: 'streak7', emoji: '📅', test: (s) => s.streak >= 7 },
-  { id: 'streak14', emoji: '🗓️', test: (s) => s.streak >= 14 },
-  { id: 'streak30', emoji: '🌙', test: (s) => s.streak >= 30 },
-  { id: 'days10', emoji: '🔟', test: (s) => s.days >= 10 },
-  { id: 'days30', emoji: '📆', test: (s) => s.days >= 30 },
-  { id: 'days100', emoji: '🎯', test: (s) => s.days >= 100 },
-  { id: 'ai1', emoji: '🤖', test: (s) => s.ai >= 1 },
-  { id: 'ai10', emoji: '🦾', test: (s) => s.ai >= 10 },
-  { id: 'ai50', emoji: '🧠', test: (s) => s.ai >= 50 },
-  { id: 'manual1', emoji: '👀', test: (s) => s.manual >= 1 },
-  { id: 'manual10', emoji: '🔍', test: (s) => s.manual >= 10 },
-  { id: 'city2', emoji: '🚌', test: (s) => s.cities >= 2 },
-  { id: 'city3', emoji: '✈️', test: (s) => s.cities >= 3 },
-  { id: 'city5', emoji: '🗺️', test: (s) => s.cities >= 5 },
-  { id: 'city10', emoji: '🧭', test: (s) => s.cities >= 10 },
-  { id: 'km10', emoji: '🚲', test: (s) => s.maxKm >= 10 },
-  { id: 'km100', emoji: '🚄', test: (s) => s.maxKm >= 100 },
-  { id: 'km1000', emoji: '🌏', test: (s) => s.maxKm >= 1000 },
-  { id: 'note1', emoji: '✏️', test: (s) => s.notes >= 1 },
-  { id: 'note10', emoji: '📓', test: (s) => s.notes >= 10 },
-  { id: 'note30', emoji: '📚', test: (s) => s.notes >= 30 },
-  { id: 'pin1', emoji: '📍', test: (s) => s.pins >= 1 },
-  { id: 'pin5', emoji: '📌', test: (s) => s.pins >= 5 },
-  { id: 'pin20', emoji: '🗾', test: (s) => s.pins >= 20 },
-  { id: 'send1', emoji: '💌', test: (s) => s.sent >= 1 },
-  { id: 'send5', emoji: '📮', test: (s) => s.sent >= 5 },
-  { id: 'send20', emoji: '🕊️', test: (s) => s.sent >= 20 },
-  { id: 'send50', emoji: '💝', test: (s) => s.sent >= 50 },
-  { id: 'recv1', emoji: '🎁', test: (s) => s.received >= 1 },
-  { id: 'recv5', emoji: '📬', test: (s) => s.received >= 5 },
-  { id: 'recv20', emoji: '🌠', test: (s) => s.received >= 20 },
-  { id: 'fortune10', emoji: '🔮', test: (s) => s.fortunesSeen >= 10 },
-  { id: 'fortune25', emoji: '🧿', test: (s) => s.fortunesSeen >= 25 },
-  { id: 'spring', emoji: '🌸', test: thrice((d) => season(d) === 0) },
-  { id: 'summer', emoji: '🌻', test: thrice((d) => season(d) === 1) },
-  { id: 'autumn', emoji: '🍁', test: thrice((d) => season(d) === 2) },
-  { id: 'winter', emoji: '❄️', test: thrice((d) => season(d) === 3) },
+  { id: 'count1', test: (s) => s.n >= 1 },
+  { id: 'count3', test: (s) => s.n >= 3 },
+  { id: 'count5', test: (s) => s.n >= 5 },
+  { id: 'count10', test: (s) => s.n >= 10 },
+  { id: 'count20', test: (s) => s.n >= 20 },
+  { id: 'count30', test: (s) => s.n >= 30 },
+  { id: 'count50', test: (s) => s.n >= 50 },
+  { id: 'count100', test: (s) => s.n >= 100 },
+  { id: 'count200', test: (s) => s.n >= 200 },
+  { id: 'count500', test: (s) => s.n >= 500 },
+  { id: 'streak2', test: (s) => s.streak >= 2 },
+  { id: 'streak3', test: (s) => s.streak >= 3 },
+  { id: 'streak5', test: (s) => s.streak >= 5 },
+  { id: 'streak7', test: (s) => s.streak >= 7 },
+  { id: 'streak14', test: (s) => s.streak >= 14 },
+  { id: 'streak30', test: (s) => s.streak >= 30 },
+  { id: 'days10', test: (s) => s.days >= 10 },
+  { id: 'days30', test: (s) => s.days >= 30 },
+  { id: 'days100', test: (s) => s.days >= 100 },
+  { id: 'ai1', test: (s) => s.ai >= 1 },
+  { id: 'ai10', test: (s) => s.ai >= 10 },
+  { id: 'ai50', test: (s) => s.ai >= 50 },
+  { id: 'manual1', test: (s) => s.manual >= 1 },
+  { id: 'manual10', test: (s) => s.manual >= 10 },
+  { id: 'city2', test: (s) => s.cities >= 2 },
+  { id: 'city3', test: (s) => s.cities >= 3 },
+  { id: 'city5', test: (s) => s.cities >= 5 },
+  { id: 'city10', test: (s) => s.cities >= 10 },
+  { id: 'km10', test: (s) => s.maxKm >= 10 },
+  { id: 'km100', test: (s) => s.maxKm >= 100 },
+  { id: 'km1000', test: (s) => s.maxKm >= 1000 },
+  { id: 'note1', test: (s) => s.notes >= 1 },
+  { id: 'note10', test: (s) => s.notes >= 10 },
+  { id: 'note30', test: (s) => s.notes >= 30 },
+  { id: 'pin1', test: (s) => s.pins >= 1 },
+  { id: 'pin5', test: (s) => s.pins >= 5 },
+  { id: 'pin20', test: (s) => s.pins >= 20 },
+  { id: 'send1', test: (s) => s.sent >= 1 },
+  { id: 'send5', test: (s) => s.sent >= 5 },
+  { id: 'send20', test: (s) => s.sent >= 20 },
+  { id: 'send50', test: (s) => s.sent >= 50 },
+  { id: 'recv1', test: (s) => s.received >= 1 },
+  { id: 'recv5', test: (s) => s.received >= 5 },
+  { id: 'recv20', test: (s) => s.received >= 20 },
+  { id: 'fortune10', test: (s) => s.fortunesSeen >= 10 },
+  { id: 'fortune25', test: (s) => s.fortunesSeen >= 25 },
+  { id: 'spring', test: thrice((d) => season(d) === 0) },
+  { id: 'summer', test: thrice((d) => season(d) === 1) },
+  { id: 'autumn', test: thrice((d) => season(d) === 2) },
+  { id: 'winter', test: thrice((d) => season(d) === 3) },
   // ── Hidden (50) ──
-  { id: 'count7', emoji: '🎰', hidden: true, test: (s) => s.n >= 7 },
-  { id: 'count13', emoji: '🐈‍⬛', hidden: true, test: (s) => s.n >= 13 },
-  { id: 'count44', emoji: '4️⃣', hidden: true, test: (s) => s.n >= 44 },
-  { id: 'count77', emoji: '🎲', hidden: true, test: (s) => s.n >= 77 },
-  { id: 'count777', emoji: '🎊', hidden: true, test: (s) => s.n >= 777 },
-  { id: 'count1000', emoji: '🌌', hidden: true, test: (s) => s.n >= 1000 },
-  { id: 'streak100', emoji: '🏆', hidden: true, test: (s) => s.streak >= 100 },
-  { id: 'days365', emoji: '🎂', hidden: true, test: (s) => s.days >= 365 },
-  { id: 'ai100', emoji: '🛰️', hidden: true, test: (s) => s.ai >= 100 },
-  { id: 'city20', emoji: '🌍', hidden: true, test: (s) => s.cities >= 20 },
-  { id: 'km5000', emoji: '🚀', hidden: true, test: (s) => s.maxKm >= 5000 },
-  { id: 'fortuneAll', emoji: '📜', hidden: true, test: (s) => s.fortunesSeen >= 50 },
-  { id: 'allSeasons', emoji: '🔄', hidden: true, test: (s) => s.seasons.size === 4 },
-  { id: 'allMonths', emoji: '🗓', hidden: true, test: (s) => s.months.size === 12 },
-  { id: 'allWeekdays', emoji: '🌈', hidden: true, test: (s) => s.weekdays.size === 7 },
-  { id: 'monday', emoji: '😪', hidden: true, test: thrice((d) => d.getDay() === 1) },
-  { id: 'friday', emoji: '🎉', hidden: true, test: thrice((d) => d.getDay() === 5) },
-  { id: 'weekend', emoji: '🎈', hidden: true, test: (s) => s.weekdays.has(0) && s.weekdays.has(6) },
-  { id: 'earlyBird', emoji: '🌅', hidden: true, test: between(6, 8) },
-  { id: 'lunch', emoji: '🍱', hidden: true, test: between(12, 13) },
-  { id: 'goldenHour', emoji: '🌇', hidden: true, test: between(17, 19) },
-  { id: 'time707', emoji: '⏰', hidden: true, test: at(7, 7) },
-  { id: 'time1111', emoji: '✨', hidden: true, test: at(11, 11) },
-  { id: 'time1234', emoji: '🔢', hidden: true, test: at(12, 34) },
-  { id: 'time444', emoji: '🍀', hidden: true, test: (s) => at(4, 44)(s) || at(16, 44)(s) },
-  { id: 'newYear', emoji: '🎍', hidden: true, test: onDate(1, 1) },
-  { id: 'valentine', emoji: '💘', hidden: true, test: onDate(2, 14) },
-  { id: 'leapDay', emoji: '🐸', hidden: true, test: onDate(2, 29) },
-  { id: 'patrick', emoji: '☘️', hidden: true, test: onDate(3, 17) },
-  { id: 'cloverDay', emoji: '🔆', hidden: true, test: onDate(4, 4) },
-  { id: 'earthDay', emoji: '🌎', hidden: true, test: onDate(4, 22) },
-  { id: 'childrensDay', emoji: '🎠', hidden: true, test: onDate(5, 5) },
-  { id: 'luckySeven', emoji: '🎋', hidden: true, test: onDate(7, 7) },
-  { id: 'halloween', emoji: '🎃', hidden: true, test: onDate(10, 31) },
-  { id: 'elevenEleven', emoji: '🥢', hidden: true, test: onDate(11, 11) },
-  { id: 'christmas', emoji: '🎄', hidden: true, test: onDate(12, 25) },
-  { id: 'yearEnd', emoji: '🎆', hidden: true, test: onDate(12, 31) },
-  { id: 'friday13', emoji: '🪄', hidden: true, test: (s) => s.dates.some((d) => d.getDate() === 13 && d.getDay() === 5) },
-  { id: 'double', emoji: '👯', hidden: true, test: (s) => s.days2 >= AMBIENT },
-  { id: 'triple', emoji: '🥉', hidden: true, test: (s) => s.days3 >= AMBIENT },
-  { id: 'jackpot', emoji: '💰', hidden: true, test: (s) => s.maxPerDay >= 5 },
-  { id: 'quickPair', emoji: '⚡', hidden: true, test: (s) => s.quickDays >= AMBIENT },
-  { id: 'comeback', emoji: '🔙', hidden: true, test: (s) => s.comeback },
-  { id: 'sameSpot', emoji: '🏡', hidden: true, test: (s) => s.sameSpot },
-  { id: 'novelist', emoji: '📝', hidden: true, test: (s) => s.longNote },
-  { id: 'southern', emoji: '🦘', hidden: true, test: (s) => s.lats.some((v) => v < 0) },
-  { id: 'farNorth', emoji: '🐻‍❄️', hidden: true, test: (s) => s.lats.some((v) => v >= 60) },
+  { id: 'count7', hidden: true, test: (s) => s.n >= 7 },
+  { id: 'count13', hidden: true, test: (s) => s.n >= 13 },
+  { id: 'count44', hidden: true, test: (s) => s.n >= 44 },
+  { id: 'count77', hidden: true, test: (s) => s.n >= 77 },
+  { id: 'count777', hidden: true, test: (s) => s.n >= 777 },
+  { id: 'count1000', hidden: true, test: (s) => s.n >= 1000 },
+  { id: 'streak100', hidden: true, test: (s) => s.streak >= 100 },
+  { id: 'days365', hidden: true, test: (s) => s.days >= 365 },
+  { id: 'ai100', hidden: true, test: (s) => s.ai >= 100 },
+  { id: 'city20', hidden: true, test: (s) => s.cities >= 20 },
+  { id: 'km5000', hidden: true, test: (s) => s.maxKm >= 5000 },
+  { id: 'fortuneAll', hidden: true, test: (s) => s.fortunesSeen >= 50 },
+  { id: 'allSeasons', hidden: true, test: (s) => s.seasons.size === 4 },
+  { id: 'allMonths', hidden: true, test: (s) => s.months.size === 12 },
+  { id: 'allWeekdays', hidden: true, test: (s) => s.weekdays.size === 7 },
+  { id: 'monday', hidden: true, test: thrice((d) => d.getDay() === 1) },
+  { id: 'friday', hidden: true, test: thrice((d) => d.getDay() === 5) },
+  { id: 'weekend', hidden: true, test: (s) => s.weekdays.has(0) && s.weekdays.has(6) },
+  { id: 'earlyBird', hidden: true, test: between(6, 8) },
+  { id: 'lunch', hidden: true, test: between(12, 13) },
+  { id: 'goldenHour', hidden: true, test: between(17, 19) },
+  { id: 'time707', hidden: true, test: at(7, 7) },
+  { id: 'time1111', hidden: true, test: at(11, 11) },
+  { id: 'time1234', hidden: true, test: at(12, 34) },
+  { id: 'time444', hidden: true, test: (s) => at(4, 44)(s) || at(16, 44)(s) },
+  { id: 'newYear', hidden: true, test: onDate(1, 1) },
+  { id: 'valentine', hidden: true, test: onDate(2, 14) },
+  { id: 'leapDay', hidden: true, test: onDate(2, 29) },
+  { id: 'patrick', hidden: true, test: onDate(3, 17) },
+  { id: 'cloverDay', hidden: true, test: onDate(4, 4) },
+  { id: 'earthDay', hidden: true, test: onDate(4, 22) },
+  { id: 'childrensDay', hidden: true, test: onDate(5, 5) },
+  { id: 'luckySeven', hidden: true, test: onDate(7, 7) },
+  { id: 'halloween', hidden: true, test: onDate(10, 31) },
+  { id: 'elevenEleven', hidden: true, test: onDate(11, 11) },
+  { id: 'christmas', hidden: true, test: onDate(12, 25) },
+  { id: 'yearEnd', hidden: true, test: onDate(12, 31) },
+  { id: 'friday13', hidden: true, test: (s) => s.dates.some((d) => d.getDate() === 13 && d.getDay() === 5) },
+  { id: 'double', hidden: true, test: (s) => s.days2 >= AMBIENT },
+  { id: 'triple', hidden: true, test: (s) => s.days3 >= AMBIENT },
+  { id: 'jackpot', hidden: true, test: (s) => s.maxPerDay >= 5 },
+  { id: 'quickPair', hidden: true, test: (s) => s.quickDays >= AMBIENT },
+  { id: 'comeback', hidden: true, test: (s) => s.comeback },
+  { id: 'sameSpot', hidden: true, test: (s) => s.sameSpot },
+  { id: 'novelist', hidden: true, test: (s) => s.longNote },
+  { id: 'southern', hidden: true, test: (s) => s.lats.some((v) => v < 0) },
+  { id: 'farNorth', hidden: true, test: (s) => s.lats.some((v) => v >= 60) },
 ];
 
 const HAND_NAMED = BADGES.length;
@@ -193,7 +193,6 @@ const upTo = (n: number) => steps(0, n - 1, 1);
 
 type Family = {
   key: string;
-  emoji: readonly string[];
   /** Tiered family: the stat that must reach n. */
   value?: (s: Stats) => number;
   /** Parametric family (month / hour / weekday): n is the parameter. */
@@ -206,48 +205,44 @@ type Family = {
 // Hand-named time-of-day badges (3 days) grow into 10- and 30-day tiers. Daylight hours only: nothing rewards
 // being out in the dark, which is not safe everywhere.
 const WINDOWS = [
-  ['earlyBird', 6, 8, '🌅'],
-  ['lunch', 12, 13, '🍱'],
-  ['goldenHour', 17, 19, '🌇'],
+  ['earlyBird', 6, 8],
+  ['lunch', 12, 13],
+  ['goldenHour', 17, 19],
 ] as const;
-const MONTH_EMOJI = ['⛄', '💝', '🌱', '🌸', '🌷', '☔', '🍉', '🌻', '🍂', '🎃', '🍁', '🎄'];
-const CLOCK = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚'];
-const WEEKDAY_EMOJI = ['☀️', '🌙', '🔥', '💧', '🌳', '⭐', '🪐'];
 
 // Each family starts beyond what a first day can reach; the count family absorbs the rest so the total is exactly 500.
 const FAMILIES: Family[] = [
-  { key: 'ai', emoji: ['🤖', '🦾', '🧠', '🛰️'], value: (s) => s.ai, ns: [15, 20, 25, 30, 35, 40, 45, 60, 70, 77, 80, 90, 150, 200, 250, 300, 400, 500, 600, 700, 777, 800, 900, 1000, 2000] },
-  { key: 'manual', emoji: ['👀', '🔍', '🧐'], value: (s) => s.manual, ns: [20, 30, 50, 100, 200] },
-  { key: 'days', emoji: ['📅', '🗓️', '📆'], value: (s) => s.days, ns: [3, 5, 7, 15, 20, 25, 40, 50, 60, 70, 80, 90, 120, 150, 200, 250, 300, 400, 500, 730, 1000] },
-  { key: 'streak', emoji: ['🔥', '✨', '⚡'], value: (s) => s.streak, ns: [4, 6, 8, 10, 12, 15, 18, 21, 25, 28, 35, 40, 45, 50, 60, 77, 90, 120, 150, 200, 365] },
-  { key: 'city', emoji: ['🚌', '✈️', '🗺️'], value: (s) => s.cities, ns: [4, 6, 7, 8, 9, 12, 15, 25, 30, 35, 40, 50, 60, 70, 77, 80, 90, 100] },
-  { key: 'km', emoji: ['🚲', '🚄', '🌏', '🚀'], value: (s) => s.maxKm, ns: [20, 30, 50, 70, 150, 200, 300, 500, 700, 1500, 2000, 3000, 8000, 10000, 12000, 15000, 20000] },
-  { key: 'note', emoji: ['✏️', '📓', '📚'], value: (s) => s.notes, ns: [15, 20, 40, 50, 60, 77, 100, 150, 200, 250, 300, 400, 500] },
-  { key: 'pin', emoji: ['📍', '📌', '🗾'], value: (s) => s.pins, ns: [10, 15, 30, 40, 50, 60, 77, 100, 150, 200, 300] },
-  { key: 'send', emoji: ['💌', '📮', '🕊️', '💝'], value: (s) => s.sent, ns: [10, 15, 30, 40, 60, 77, 100, 150, 200, 300, 500, 777, 1000] },
-  { key: 'recv', emoji: ['🎁', '📬', '🌠'], value: (s) => s.received, ns: [10, 15, 30, 40, 50, 60, 70, 77, 100, 150, 200, 300, 365, 500] },
-  { key: 'fortune', emoji: ['🔮', '🧿'], value: (s) => s.fortunesSeen, ns: [15, 20, 30, 35, 40, 45] },
-  { key: 'best', emoji: ['🎯', '💥'], value: (s) => s.maxPerDay, ns: [7, 10, 15, 20], hidden: true },
-  { key: 'months', emoji: ['🌙', '🗓'], value: (s) => s.monthsActive, ns: [2, 3, 4, 5, 6, 9, 10, 12, 18, 24, 30, 36, 48, 60, 72, 84, 96, 120] },
-  { key: 'month', emoji: MONTH_EMOJI, test: (s, n) => s.monthDays[n - 1] >= AMBIENT, ns: steps(1, 12, 1) },
-  { key: 'hour', emoji: CLOCK, test: (s, n) => s.hourDays[n] >= AMBIENT, ns: steps(6, 19, 1), hidden: true },
-  { key: 'wday', emoji: WEEKDAY_EMOJI, test: (s, n) => s.weekdayDays[n] >= 5, ns: upTo(7) },
-  { key: 'year', emoji: ['🎂', '🎉', '🏆'], value: (s) => s.yearsSpan, ns: [1, 2, 3, 5, 10], hidden: true },
-  { key: 'relay', emoji: ['🏃', '🏅', '🌐'], value: (s) => s.relayed, ns: [1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 77, 100, 150, 200, 300, 500] },
-  { key: 'thanked', emoji: ['💚', '🥰', '💖'], value: (s) => s.thanksGot, ns: [1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 77, 100, 150, 200, 300, 500] },
-  { key: 'thank', emoji: ['🙏', '🤗', '💐'], value: (s) => s.thanksGiven, ns: [1, 3, 5, 10, 20, 30, 50, 77, 100, 200, 300] },
-  { key: 'home', emoji: ['🏠', '🎉', '🌈'], value: (s) => s.homecomings, ns: [1, 2, 3, 5, 10], hidden: true },
-  { key: 'spot', emoji: ['🏡', '🌳'], value: (s) => s.spotDays, ns: [3, 5, 7, 10, 15, 20, 30, 40, 50, 77, 100] },
-  { key: 'essay', emoji: ['📝', '📜'], value: (s) => s.longNotes, ns: [3, 5, 10, 20, 30, 50] },
+  { key: 'ai', value: (s) => s.ai, ns: [15, 20, 25, 30, 35, 40, 45, 60, 70, 77, 80, 90, 150, 200, 250, 300, 400, 500, 600, 700, 777, 800, 900, 1000, 2000] },
+  { key: 'manual', value: (s) => s.manual, ns: [20, 30, 50, 100, 200] },
+  { key: 'days', value: (s) => s.days, ns: [3, 5, 7, 15, 20, 25, 40, 50, 60, 70, 80, 90, 120, 150, 200, 250, 300, 400, 500, 730, 1000] },
+  { key: 'streak', value: (s) => s.streak, ns: [4, 6, 8, 10, 12, 15, 18, 21, 25, 28, 35, 40, 45, 50, 60, 77, 90, 120, 150, 200, 365] },
+  { key: 'city', value: (s) => s.cities, ns: [4, 6, 7, 8, 9, 12, 15, 25, 30, 35, 40, 50, 60, 70, 77, 80, 90, 100] },
+  { key: 'km', value: (s) => s.maxKm, ns: [20, 30, 50, 70, 150, 200, 300, 500, 700, 1500, 2000, 3000, 8000, 10000, 12000, 15000, 20000] },
+  { key: 'note', value: (s) => s.notes, ns: [15, 20, 40, 50, 60, 77, 100, 150, 200, 250, 300, 400, 500] },
+  { key: 'pin', value: (s) => s.pins, ns: [10, 15, 30, 40, 50, 60, 77, 100, 150, 200, 300] },
+  { key: 'send', value: (s) => s.sent, ns: [10, 15, 30, 40, 60, 77, 100, 150, 200, 300, 500, 777, 1000] },
+  { key: 'recv', value: (s) => s.received, ns: [10, 15, 30, 40, 50, 60, 70, 77, 100, 150, 200, 300, 365, 500] },
+  { key: 'fortune', value: (s) => s.fortunesSeen, ns: [15, 20, 30, 35, 40, 45] },
+  { key: 'best', value: (s) => s.maxPerDay, ns: [7, 10, 15, 20], hidden: true },
+  { key: 'months', value: (s) => s.monthsActive, ns: [2, 3, 4, 5, 6, 9, 10, 12, 18, 24, 30, 36, 48, 60, 72, 84, 96, 120] },
+  { key: 'month', test: (s, n) => s.monthDays[n - 1] >= AMBIENT, ns: steps(1, 12, 1) },
+  { key: 'hour', test: (s, n) => s.hourDays[n] >= AMBIENT, ns: steps(6, 19, 1), hidden: true },
+  { key: 'wday', test: (s, n) => s.weekdayDays[n] >= 5, ns: upTo(7) },
+  { key: 'year', value: (s) => s.yearsSpan, ns: [1, 2, 3, 5, 10], hidden: true },
+  { key: 'relay', value: (s) => s.relayed, ns: [1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 77, 100, 150, 200, 300, 500] },
+  { key: 'thanked', value: (s) => s.thanksGot, ns: [1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 77, 100, 150, 200, 300, 500] },
+  { key: 'thank', value: (s) => s.thanksGiven, ns: [1, 3, 5, 10, 20, 30, 50, 77, 100, 200, 300] },
+  { key: 'home', value: (s) => s.homecomings, ns: [1, 2, 3, 5, 10], hidden: true },
+  { key: 'spot', value: (s) => s.spotDays, ns: [3, 5, 7, 10, 15, 20, 30, 40, 50, 77, 100] },
+  { key: 'essay', value: (s) => s.longNotes, ns: [3, 5, 10, 20, 30, 50] },
   // Days with a find in a season / on weekends / in a time window.
   ...(['spring', 'summer', 'autumn', 'winter'] as const).map((key, i) => ({
     key,
-    emoji: [['🌸', '🌷'], ['🌻', '🍉'], ['🍁', '🍂'], ['❄️', '⛄']][i],
     value: (s: Stats) => s.seasonDays[i],
     ns: [5, 10, 20, 30, 50],
   })),
-  { key: 'weekend', emoji: ['🎈', '🧺'], value: (s) => s.weekendDays, ns: [5, 10, 20, 50, 100] },
-  ...WINDOWS.map(([key, , , emoji]) => ({ key, emoji: [emoji], value: (s: Stats) => s.windowDays[key], ns: [10, 30] })),
+  { key: 'weekend', value: (s) => s.weekendDays, ns: [5, 10, 20, 50, 100] },
+  ...WINDOWS.map(([key]) => ({ key, value: (s: Stats) => s.windowDays[key], ns: [10, 30] })),
 ];
 // Thresholds a hand-named badge already covers (e.g. ai50) are not repeated.
 for (const f of FAMILIES) f.ns = f.ns.filter((n) => !BADGES.some((b) => b.id === `${f.key}${n}`));
@@ -258,7 +253,6 @@ const countSlots = 500 - BADGES.length - FAMILIES.reduce((sum, f) => sum + f.ns.
 if (countTiers.length < countSlots) throw new Error('not enough count tiers');
 FAMILIES.unshift({
   key: 'count',
-  emoji: ['🍀', '🌿', '🌳', '🏞️', '🌏'],
   value: (s) => s.n,
   // Keep the climb even: spread the available slots over the whole tier list.
   ns: Array.from({ length: countSlots }, (_, i) => countTiers[Math.round((i * (countTiers.length - 1)) / Math.max(1, countSlots - 1))]),
@@ -270,7 +264,6 @@ for (const f of FAMILIES) {
     if (BADGES.some((b) => b.id === id)) throw new Error(`duplicate badge ${id}`);
     BADGES.push({
       id,
-      emoji: f.emoji[f.key === 'hour' ? n % 12 : f.test ? (n - (f.key === 'month' ? 1 : 0)) % f.emoji.length : Math.min(i, f.emoji.length - 1)],
       hidden: f.hidden,
       test: f.test ? (s) => f.test!(s, n) : (s) => f.value!(s) >= n,
     });
@@ -437,3 +430,66 @@ export function badgeText(
 /** Family keys of the 400 tiered badges; every language provides a title/desc builder for each. */
 export const BADGE_FAMILIES = FAMILIES.map((f) => f.key);
 export const HAND_NAMED_BADGES = HAND_NAMED;
+
+/**
+ * How a badge medal looks: one white glyph per kind of badge on a medal whose colour climbs with the tier.
+ * Pure, so every one of the 500 badges is checked to get a real glyph (tests/badges.test.mts).
+ */
+export const GLYPHS = [
+  'clover', 'sprout', 'crown', 'flame', 'calendar', 'robot', 'eye', 'pin', 'globe', 'pencil', 'book', 'letter', 'gift',
+  'sparkle', 'trophy', 'clock', 'cake', 'arrows', 'heart', 'house', 'blossom', 'sun', 'leaf', 'snowflake', 'star',
+  'bolt', 'return',
+] as const;
+export type Glyph = (typeof GLYPHS)[number];
+
+/** Medal colours from first steps to the rarest tiers. */
+export const TIER_COLORS = ['#5FB86B', '#3FA7A0', '#E9B23B', '#EE8A5A', '#9B7BD8', '#E06C9F'] as const;
+
+const SEASON_OF_MONTH: Glyph[] = ['snowflake', 'snowflake', 'blossom', 'blossom', 'blossom', 'sun', 'sun', 'sun', 'leaf', 'leaf', 'leaf', 'snowflake'];
+
+const BY_PREFIX: Record<string, Glyph> = {
+  count: 'clover', ai: 'robot', manual: 'eye', days: 'calendar', streak: 'flame', city: 'pin', km: 'globe',
+  note: 'pencil', pin: 'pin', send: 'letter', recv: 'gift', fortune: 'sparkle', best: 'trophy', months: 'calendar',
+  hour: 'clock', wday: 'calendar', year: 'cake', relay: 'arrows', thanked: 'heart', thank: 'heart', home: 'house',
+  spot: 'house', essay: 'book', spring: 'blossom', summer: 'sun', autumn: 'leaf', winter: 'snowflake', weekend: 'sun',
+  earlyBird: 'sun', lunch: 'clock', goldenHour: 'sun', time: 'clock',
+};
+
+const BY_ID: Record<string, Glyph> = {
+  newYear: 'star', valentine: 'heart', leapDay: 'calendar', patrick: 'clover', cloverDay: 'clover', earthDay: 'globe',
+  childrensDay: 'star', luckySeven: 'star', halloween: 'star', elevenEleven: 'star', christmas: 'star', yearEnd: 'sparkle',
+  friday13: 'sparkle', double: 'trophy', triple: 'trophy', jackpot: 'trophy', quickPair: 'bolt', comeback: 'return',
+  sameSpot: 'house', novelist: 'book', southern: 'globe', farNorth: 'globe', allSeasons: 'leaf', allMonths: 'calendar',
+  allWeekdays: 'calendar', monday: 'calendar', friday: 'calendar', count3: 'sprout', note10: 'book', note30: 'book',
+};
+
+const split = (id: string) => {
+  const m = /^([a-zA-Z]+?)(\d+)$/.exec(id);
+  return m ? { prefix: m[1], n: Number(m[2]) } : { prefix: id, n: NaN };
+};
+
+// Tier rank within each numbered kind (count1 … count10000), computed once.
+const RANK = new Map<string, number>();
+{
+  const groups = new Map<string, { id: string; n: number }[]>();
+  for (const { id } of BADGES) {
+    const { prefix, n } = split(id);
+    if (Number.isNaN(n) || prefix === 'month' || prefix === 'hour' || prefix === 'wday' || prefix === 'time') continue;
+    groups.set(prefix, [...(groups.get(prefix) ?? []), { id, n }]);
+  }
+  for (const list of groups.values()) {
+    list.sort((a, b) => a.n - b.n).forEach(({ id }, i) => RANK.set(id, list.length > 1 ? i / (list.length - 1) : 0));
+  }
+}
+
+export function badgeLook(id: string): { glyph: Glyph; color: string } {
+  const { prefix, n } = split(id);
+  const rank = RANK.get(id);
+  let glyph: Glyph = BY_ID[id] ?? (prefix === 'month' ? SEASON_OF_MONTH[(n - 1) % 12] : BY_PREFIX[prefix]) ?? 'star';
+  if (glyph === 'clover' && rank !== undefined && rank >= 0.85) glyph = 'crown'; // the top find counts
+  const color =
+    rank !== undefined
+      ? TIER_COLORS[Math.min(TIER_COLORS.length - 1, Math.floor(rank * TIER_COLORS.length))]
+      : TIER_COLORS[[...id].reduce((h, c) => h + c.charCodeAt(0), 0) % TIER_COLORS.length];
+  return { glyph, color };
+}

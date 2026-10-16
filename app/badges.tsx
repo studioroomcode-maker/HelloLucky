@@ -6,6 +6,7 @@ import { FONT, usePalette } from '@/constants/theme';
 import { BADGES, badgeCounters, badgeText, earnedBadges } from '@/src/badges';
 import { t } from '@/src/i18n';
 import { useFinds, useSettings } from '@/src/services/findsStore';
+import { BadgeMedal } from '@/src/ui/BadgeMedal';
 import { ScreenHeader } from '@/src/ui/ScreenHeader';
 
 const COLUMNS = 3;
@@ -67,7 +68,7 @@ export default function Badges() {
             </View>
           </>
         }
-        renderItem={({ item: { id, emoji, hidden } }) => {
+        renderItem={({ item: { id, hidden } }) => {
           const has = earned.has(id);
           const text = badgeText(t, id, has);
           return (
@@ -76,9 +77,9 @@ export default function Badges() {
               accessible
               accessibilityLabel={`${text.title}. ${has ? text.desc : t.badgeLocked}`}
             >
-              <View style={[styles.medal, { backgroundColor: has ? '#FFE9A8' : palette.border }]}>
+              <View style={[styles.medal, { backgroundColor: has ? 'transparent' : palette.border }]}>
                 {has ? (
-                  <Text style={styles.emoji}>{emoji}</Text>
+                  <BadgeMedal id={id} size={56} />
                 ) : hidden ? (
                   <Text style={[styles.mystery, { color: palette.muted }]}>?</Text>
                 ) : (
@@ -121,7 +122,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   medal: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  emoji: { fontFamily: FONT.body, fontSize: 28 },
   mystery: { fontSize: 26, fontFamily: FONT.cute },
   segment: { flexDirection: 'row', borderRadius: 14, padding: 4, marginBottom: 16 },
   segItem: { flex: 1, minHeight: 40, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
