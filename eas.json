@@ -6,14 +6,29 @@
   "build": {
     "preview": {
       "distribution": "internal",
-      "android": { "buildType": "apk" }
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "autoIncrement": true,
-      "android": { "buildType": "app-bundle" }
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "credentialsSource": "local"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleTeamId": "P3SL2XQSZL",
+        "ascApiKeyPath": "D:/keys/_shared/AuthKey_9LYTR52568.p8",
+        "ascApiKeyId": "9LYTR52568",
+        "ascApiKeyIssuerId": "1551e3eb-ffd3-499b-94f2-75d7f7c6f751",
+        "ascAppId": "6823739884"
+      }
+    }
   }
 }

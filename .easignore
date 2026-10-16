@@ -84,3 +84,6 @@ training/third_party/
 training/yolox_data/
 training/*.pth
 training/YOLOX_outputs/
+
+# iOS 로컬 서명 설정 (비밀번호 포함) — HelloDashboard/tools/apple-key.ps1
+credentials.json
