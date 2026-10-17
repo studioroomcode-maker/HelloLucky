@@ -1,0 +1,12 @@
+diff --git a/node_modules/vision-camera-resize-plugin/android/CMakeLists.txt b/node_modules/vision-camera-resize-plugin/android/CMakeLists.txt
+--- a/node_modules/vision-camera-resize-plugin/android/CMakeLists.txt
++++ b/node_modules/vision-camera-resize-plugin/android/CMakeLists.txt
+@@ -5,6 +5,8 @@ set (PACKAGE_NAME "VisionCameraResizePlugin")
+ set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
+ set (CMAKE_VERBOSE_MAKEFILE ON)
+ set (CMAKE_CXX_STANDARD 17)
++# Google Play requires 16 KB page alignment (NDK r27 still defaults to 4 KB); applies to libyuv too
++set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=16384")
+ 
+ # Third party libraries (Prefabs)
+ find_package(fbjni REQUIRED CONFIG)
