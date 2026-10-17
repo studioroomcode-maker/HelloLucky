@@ -4,6 +4,7 @@
     "NSCameraUsageDescription": "Hello Luck uses the camera to find luck in clover patches. Video is analyzed on your device only.",
     "NSLocationWhenInUseUsageDescription": "Hello Luck saves where you found luck. It is made public only if you share it to the Lucky Map.",
     "NSPhotoLibraryUsageDescription": "Hello Luck uses your photos only when you share a luck card to an app like Instagram, so the card can be passed along.",
-    "NSPhotoLibraryAddUsageDescription": "Hello Luck saves your luck card to your photos when you choose Save Image."
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck saves your luck card to your photos when you choose Save Image.",
+    "NSMotionUsageDescription": "Hello Luck uses the motion sensors to keep the detection box steady while you move the camera."
   }
 }

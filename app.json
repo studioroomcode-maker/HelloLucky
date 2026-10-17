@@ -123,7 +123,7 @@
         }
       ],
       ["expo-audio", { "microphonePermission": false, "recordAudioAndroid": false }],
-      ["expo-sensors", { "motionPermission": false }]
+      ["expo-sensors", { "motionPermission": "Hello Luck uses the motion sensors to keep the detection box steady while you move the camera." }]
     ],
     "experiments": {
       "typedRoutes": true,

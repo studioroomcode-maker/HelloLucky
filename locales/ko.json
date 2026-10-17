@@ -4,6 +4,7 @@
     "NSCameraUsageDescription": "클로버 밭에서 행운을 찾기 위해 카메라를 사용해요. 영상은 기기 안에서만 분석돼요.",
     "NSLocationWhenInUseUsageDescription": "행운을 찾은 장소를 기록해요. 행운 지도에 공유를 선택한 경우에만 공개돼요.",
     "NSPhotoLibraryUsageDescription": "행운 카드를 인스타그램 같은 앱으로 보낼 때만 사진 보관함을 사용해요.",
-    "NSPhotoLibraryAddUsageDescription": "'이미지 저장'을 고르면 행운 카드를 사진 보관함에 저장해요."
+    "NSPhotoLibraryAddUsageDescription": "'이미지 저장'을 고르면 행운 카드를 사진 보관함에 저장해요.",
+    "NSMotionUsageDescription": "카메라를 움직일 때 행운 표시가 흔들리지 않도록 움직임 센서를 사용해요."
   }
 }
