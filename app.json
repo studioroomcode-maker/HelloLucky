@@ -31,7 +31,9 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleAllowMixedLocalizations": true,
-        "NSCameraUsageDescription": "Hello Luck uses the camera to find luck in clover patches. Video is analyzed on your device only."
+        "NSCameraUsageDescription": "Hello Luck uses the camera to find luck in clover patches. Video is analyzed on your device only.",
+        "NSPhotoLibraryUsageDescription": "Hello Luck uses your photos only when you share a luck card to an app like Instagram, so the card can be passed along.",
+        "NSPhotoLibraryAddUsageDescription": "Hello Luck saves your luck card to your photos when you choose Save Image."
       },
       "config": {
         "googleMapsApiKey": "AIzaSyBik2AW9yiW0K4V4cui2fxzgWs37flJe84"
@@ -120,7 +122,8 @@
           "color": "#20893C"
         }
       ],
-      ["expo-audio", { "microphonePermission": false, "recordAudioAndroid": false }]
+      ["expo-audio", { "microphonePermission": false, "recordAudioAndroid": false }],
+      ["expo-sensors", { "motionPermission": false }]
     ],
     "experiments": {
       "typedRoutes": true,
