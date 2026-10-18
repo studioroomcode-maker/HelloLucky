@@ -56,7 +56,7 @@ Hello Luck은 카메라를 클로버 밭에 비추기만 하면 휴대폰 안의
 
 ■ 내 정보는 내 폰에
 • 카메라 영상은 기기 안에서만 분석하고, 어디에도 보내지 않아요
-• 사진과 메모는 기기 밖으로 나가지 않아요
+• 원본 사진과 메모는 기기 밖으로 나가지 않아요 (행운 지도에는 클로버 부분만 잘라낸 작은 사진이 올라가요)
 • 회원가입·광고·결제가 없어요
 • 행운 지도에는 내가 직접 고른 기록의 장소와 날짜만 올라가요. 행운 편지에는 정해진 문구와 도시 이름만 담겨요
 
@@ -87,7 +87,7 @@ Hello Luck lets the AI inside your phone point out likely lucky clovers, live, a
 
 ■ Your data stays on your phone
 • The camera feed is analyzed on your device and never uploaded
-• Photos and notes never leave your phone
+• Original photos and notes never leave your phone (the Lucky Map shows only a small close-up of the clover)
 • No sign-up, no ads, no purchases
 • Only the place and date of finds you choose go on the Lucky Map; lucky letters carry only a preset message and a city name
 

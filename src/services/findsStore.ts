@@ -11,6 +11,8 @@ export type Find = {
   createdAt: string;
   /** Absolute file:// URI of the photo inside the app sandbox. */
   photoUri: string;
+  /** Square close-up of the clover cut around the AI box (src/services/cloverCrop.ts); absent without a box. */
+  cloverUri?: string;
   latitude?: number;
   longitude?: number;
   place?: string;
@@ -28,8 +30,11 @@ export type Find = {
 export type Settings = {
   onboarded: boolean;
   saveLocation: boolean;
-  /** Accepted the Lucky Map notice (the exact spot becomes public). */
-  sharingAgreed: boolean;
+  /** Version of the Lucky Map notice the user accepted (MAP_RULES: 2 = spot + clover close-up). */
+  mapRules: number;
+  /** Lucky Map pins hidden after reporting them, and people whose pins are hidden (map ⋯ menu). */
+  hiddenPins: string[];
+  blockedUsers: string[];
   /** Times the user sent luck (share sheet completed); feeds the courier badge. */
   sentLuck: number;
   /** Lucky letters opened from strangers; feeds the recv* badges. */
@@ -53,7 +58,7 @@ type Data = { version: 1; finds: Find[]; settings: Settings };
 const ROOT = FileSystem.documentDirectory ?? '';
 const DATA_FILE = `${ROOT}hellolucky.json`;
 const PHOTO_DIR = `${ROOT}finds/`;
-const DEFAULT_SETTINGS: Settings = { onboarded: false, saveLocation: true, sharingAgreed: false, sentLuck: 0, receivedLuck: 0, relayed: 0, thanksGot: 0, thanksGiven: 0, homecomings: 0, memoryClosed: '', rainShown: '', seenBadges: [], theme: 'light' };
+const DEFAULT_SETTINGS: Settings = { onboarded: false, saveLocation: true, mapRules: 0, hiddenPins: [], blockedUsers: [], sentLuck: 0, receivedLuck: 0, relayed: 0, thanksGot: 0, thanksGiven: 0, homecomings: 0, memoryClosed: '', rainShown: '', seenBadges: [], theme: 'light' };
 
 let data: Data = { version: 1, finds: [], settings: DEFAULT_SETTINGS };
 let loaded = false;
@@ -79,13 +84,20 @@ async function persist(next: Data) {
   emit();
 }
 
+/** Current Lucky Map notice; a higher number asks again before the next pin (1.0's `sharingAgreed` was version 1). */
+export const MAP_RULES = 2;
+
 export function parseData(raw: string): Data {
   const parsed = JSON.parse(raw);
   return {
     version: 1,
     // iOS moves the app container on updates, so rebuild photo paths from the file name.
     finds: Array.isArray(parsed?.finds)
-      ? parsed.finds.map((find: Find) => ({ ...find, photoUri: `${PHOTO_DIR}${String(find.photoUri ?? '').split('/').pop()}` }))
+      ? parsed.finds.map((find: Find) => ({
+          ...find,
+          photoUri: `${PHOTO_DIR}${String(find.photoUri ?? '').split('/').pop()}`,
+          cloverUri: find.cloverUri ? `${PHOTO_DIR}${find.cloverUri.split('/').pop()}` : undefined,
+        }))
       : [],
     settings: { ...DEFAULT_SETTINGS, ...(parsed?.settings ?? {}) },
   };
@@ -133,16 +145,21 @@ export function getFind(id: string) {
   return data.finds.find((find) => find.id === id);
 }
 
-export async function addFind(input: Omit<Find, 'id' | 'createdAt' | 'photoUri' | 'note'> & { tempPhotoUri: string }) {
+export async function addFind(
+  input: Omit<Find, 'id' | 'createdAt' | 'photoUri' | 'cloverUri' | 'note'> & { tempPhotoUri: string; tempCloverUri?: string },
+) {
   const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
   await FileSystem.makeDirectoryAsync(PHOTO_DIR, { intermediates: true });
   const photoUri = `${PHOTO_DIR}${id}.jpg`;
   await FileSystem.copyAsync({ from: input.tempPhotoUri, to: photoUri });
-  const { tempPhotoUri: _ignored, ...rest } = input;
+  const cloverUri = input.tempCloverUri ? `${PHOTO_DIR}${id}-clover.jpg` : undefined;
+  if (input.tempCloverUri && cloverUri) await FileSystem.copyAsync({ from: input.tempCloverUri, to: cloverUri });
+  const { tempPhotoUri: _ignored, tempCloverUri: _ignoredClover, ...rest } = input;
   const find: Find = {
     ...rest,
     id,
     photoUri,
+    cloverUri,
     note: '',
     createdAt: new Date().toISOString(),
     fortune: Math.floor(Math.random() * 1_000_000),
@@ -162,6 +179,7 @@ export async function deleteFind(id: string) {
   const find = getFind(id);
   await persist({ ...data, finds: data.finds.filter((item) => item.id !== id) });
   if (find) await FileSystem.deleteAsync(find.photoUri, { idempotent: true });
+  if (find?.cloverUri) await FileSystem.deleteAsync(find.cloverUri, { idempotent: true });
 }
 
 export async function deleteAllFinds() {

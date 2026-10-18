@@ -20,7 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePalette, FONT } from '@/constants/theme';
 import { formatDate, t } from '@/src/i18n';
-import { bumpCounters, deleteFind, updateFind, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
+import { bumpCounters, deleteFind, MAP_RULES, updateFind, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
 import { canShare, shareFind, sharingAvailable, unshareFind } from '@/src/services/sharing';
 import { SHARE_URL } from '@/src/config/links';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
@@ -94,13 +94,13 @@ export default function FindDetail() {
   };
 
   const shareToMap = () => {
-    if (settings.sharingAgreed) return publish();
+    if (settings.mapRules >= MAP_RULES) return publish();
     Alert.alert(t.rulesTitle, t.rulesBody, [
       { text: t.cancel, style: 'cancel' },
       {
         text: t.rulesAgree,
         onPress: async () => {
-          await updateSettings({ sharingAgreed: true });
+          await updateSettings({ mapRules: MAP_RULES });
           publish();
         },
       },
@@ -212,7 +212,12 @@ export default function FindDetail() {
               <View
                 style={[styles.card, { backgroundColor: palette.surfaceAlt, borderColor: palette.border }]}
               >
-                <Ionicons name="earth" size={20} color={palette.primary} />
+                {/* What the map shows: the clover close-up, never this photo. */}
+                {find.cloverUri ? (
+                  <Image source={{ uri: find.cloverUri }} style={styles.cloverThumb} contentFit="cover" />
+                ) : (
+                  <Ionicons name="earth" size={20} color={palette.primary} />
+                )}
                 <Text style={[styles.cardText, { color: palette.text }]}>{t.sharedOnMap}</Text>
                 <Pressable onPress={stopSharing} disabled={mapBusy} hitSlop={8} accessibilityRole="button">
                   <Text style={[styles.link, { color: palette.danger }]}>{t.unshare}</Text>
@@ -350,6 +355,7 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   cardText: { fontFamily: FONT.body, flex: 1, fontSize: 15 },
+  cloverThumb: { width: 40, height: 40, borderRadius: 10 },
   link: { fontSize: 15, fontFamily: FONT.cute },
   label: { fontFamily: FONT.medium, fontSize: 14, marginTop: 4 },
   hint: { fontFamily: FONT.body, fontSize: 13, lineHeight: 18 },

@@ -1,10 +1,11 @@
 /**
- * Lucky Map: the spot (pin) of AI-confirmed finds a user chooses to publish. Photos never leave the device.
- * Anonymous Supabase account per install, created on first share; no login UI.
- * Server rules live in supabase/schema.sql.
+ * Lucky Map: the spot (pin) of AI-confirmed finds a user chooses to publish, with the find's small clover
+ * close-up (never the original photo). Anonymous Supabase account per install, created on first share; no login UI.
+ * Server rules live in supabase/schema.sql and supabase/clover_photos.sql.
  */
 import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system/legacy';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendars } from 'expo-localization';
 
@@ -25,7 +26,28 @@ export type SharedFind = {
   longitude: number;
   place: string | null;
   found_at: string;
+  has_photo: boolean;
+  /** Hidden for everyone after enough reports (report_find). */
+  hidden: boolean;
 };
+
+const BUCKET = 'clovers';
+
+/** Public URL of a pin's clover close-up, or undefined when it has none or was hidden by reports. */
+export function cloverPhotoUrl(item: SharedFind) {
+  return item.has_photo && !item.hidden
+    ? `${BACKEND.url}/storage/v1/object/public/${BUCKET}/${item.user_id}/${item.id}.jpg`
+    : undefined;
+}
+
+/** Random v4 id, so the photo can be uploaded under the pin's id before the (immutable) row exists. */
+function uuid() {
+  const hex = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16));
+  hex[12] = '4';
+  hex[16] = ((parseInt(hex[16], 16) & 3) | 8).toString(16);
+  const h = hex.join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
 
 export type Bounds = { south: number; north: number; west: number; east: number };
 
@@ -49,36 +71,55 @@ export async function currentUserId(): Promise<string | undefined> {
 
 export async function shareFind(find: Find): Promise<string> {
   if (!canShare(find)) throw new Error('sharing: find is not shareable');
-  await myUserId();
-  const { data, error } = await supabase
-    .from('shared_finds')
-    .insert({
-      latitude: find.latitude,
-      longitude: find.longitude,
-      place: find.place?.slice(0, 120) ?? null,
-      found_at: find.createdAt,
-    })
-    .select('id')
-    .single();
-  if (error) throw error;
-  await updateFind(find.id, { sharedId: data.id });
-  return data.id;
+  const uid = await myUserId();
+  const id = uuid();
+  const photoPath = `${uid}/${id}.jpg`;
+  if (find.cloverUri) {
+    const base64 = await FileSystem.readAsStringAsync(find.cloverUri, { encoding: FileSystem.EncodingType.Base64 });
+    const bytes = Uint8Array.from(globalThis.atob(base64), (c) => c.charCodeAt(0));
+    const { error } = await supabase.storage.from(BUCKET).upload(photoPath, bytes, { contentType: 'image/jpeg' });
+    if (error) throw error;
+  }
+  const { error } = await supabase.from('shared_finds').insert({
+    id,
+    latitude: find.latitude,
+    longitude: find.longitude,
+    place: find.place?.slice(0, 120) ?? null,
+    found_at: find.createdAt,
+    has_photo: Boolean(find.cloverUri),
+  });
+  if (error) {
+    if (find.cloverUri) await supabase.storage.from(BUCKET).remove([photoPath]).catch(() => {});
+    throw error;
+  }
+  await updateFind(find.id, { sharedId: id });
+  return id;
 }
 
 export async function unshareFind(find: Find) {
   if (!find.sharedId) return;
-  await myUserId();
+  const uid = await myUserId();
   const { error } = await supabase.from('shared_finds').delete().eq('id', find.sharedId);
   if (error) throw error;
+  // Older pins have no photo; removing a missing object is not an error.
+  await supabase.storage.from(BUCKET).remove([`${uid}/${find.sharedId}.jpg`]);
   if (getFind(find.id)) await updateFind(find.id, { sharedId: undefined });
 }
 
-/** Removes every pin of this install from the server (settings → remove my pins / delete all). */
+/** Removes every pin and clover photo of this install from the server (settings → remove my pins / delete all). */
 export async function unshareAll(finds: Find[]) {
   const uid = await currentUserId();
   if (uid) {
     const { error } = await supabase.from('shared_finds').delete().eq('user_id', uid);
     if (error) throw error;
+    for (;;) {
+      const { data: files, error: listError } = await supabase.storage.from(BUCKET).list(uid, { limit: 100 });
+      if (listError) throw listError;
+      if (!files?.length) break;
+      const { data: removed, error: removeError } = await supabase.storage.from(BUCKET).remove(files.map((f) => `${uid}/${f.name}`));
+      if (removeError) throw removeError;
+      if (!removed?.length) break; // storage policy refused silently; don't loop forever
+    }
   }
   for (const find of finds) if (find.sharedId && getFind(find.id)) await updateFind(find.id, { sharedId: undefined });
 }
@@ -87,7 +128,7 @@ export async function fetchShared(bounds: Bounds, limit = 500): Promise<SharedFi
   const query = (west: number, east: number) =>
     supabase
       .from('shared_finds')
-      .select('id, user_id, latitude, longitude, place, found_at')
+      .select('id, user_id, latitude, longitude, place, found_at, has_photo, hidden')
       .gte('latitude', bounds.south)
       .lte('latitude', bounds.north)
       .gte('longitude', west)
@@ -103,6 +144,13 @@ export async function fetchShared(bounds: Bounds, limit = 500): Promise<SharedFi
   const failed = results.find((r) => r.error);
   if (failed?.error) throw failed.error;
   return results.flatMap((r) => (r.data ?? []) as SharedFind[]);
+}
+
+/** Reports a pin's photo; the server hides it for everyone after a few reports (supabase/clover_photos.sql). */
+export async function reportFind(id: string) {
+  await myUserId();
+  const { error } = await supabase.rpc('report_find', { p_find: id });
+  if (error) throw error;
 }
 
 // ── Lucky letters: curated luck to a random stranger (supabase/lucky_letters.sql) ──

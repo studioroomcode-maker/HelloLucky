@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import MapView, { Marker, PROVIDER_GOOGLE, type Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
@@ -8,7 +9,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePalette, FONT } from '@/constants/theme';
 import { formatDate, t } from '@/src/i18n';
-import { currentUserId, fetchShared, sharingAvailable, type SharedFind } from '@/src/services/sharing';
+import { getSettings, updateSettings, useSettings } from '@/src/services/findsStore';
+import { cloverPhotoUrl, currentUserId, fetchShared, reportFind, sharingAvailable, type SharedFind } from '@/src/services/sharing';
 
 const PIN_GREEN = require('@/assets/map/pin-green.png');
 const PIN_GOLD = require('@/assets/map/pin-gold.png');
@@ -31,6 +33,7 @@ export default function LuckyMap() {
   const router = useRouter();
   const palette = usePalette();
   const insets = useSafeAreaInsets();
+  const { hiddenPins, blockedUsers } = useSettings();
   const [initial, setInitial] = useState<Region>();
   const [showUser, setShowUser] = useState(false);
   const [items, setItems] = useState<SharedFind[]>([]);
@@ -70,6 +73,35 @@ export default function LuckyMap() {
     }
   }, []);
 
+  const visible = items.filter((item) => !hiddenPins.includes(item.id) && !blockedUsers.includes(item.user_id));
+  const photo = selected && cloverPhotoUrl(selected);
+
+  // Report / block for other people's pins (Apple guideline 1.2); both hide on this device right away.
+  const openMenu = (item: SharedFind) => {
+    const hide = (patch: Parameters<typeof updateSettings>[0]) => {
+      setSelected(undefined);
+      updateSettings(patch).catch(() => {});
+    };
+    Alert.alert(t.mapMore, undefined, [
+      ...(cloverPhotoUrl(item)
+        ? [
+            {
+              text: t.reportPhoto,
+              style: 'destructive' as const,
+              onPress: () => {
+                hide({ hiddenPins: [...getSettings().hiddenPins, item.id] });
+                reportFind(item.id)
+                  .then(() => Alert.alert(t.reported))
+                  .catch(() => Alert.alert(t.shareError));
+              },
+            },
+          ]
+        : []),
+      { text: t.blockUser, onPress: () => hide({ blockedUsers: [...getSettings().blockedUsers, item.user_id] }) },
+      { text: t.cancel, style: 'cancel' },
+    ]);
+  };
+
   const onRegionChangeComplete = (region: Region) => {
     clearTimeout(debounce.current);
     debounce.current = setTimeout(() => load(region), 400);
@@ -97,9 +129,9 @@ export default function LuckyMap() {
           onMapReady={() => load(initial)}
           onRegionChangeComplete={onRegionChangeComplete}
           onPress={() => setSelected(undefined)}
-          mapPadding={{ top: insets.top + 64, right: 0, bottom: selected ? 180 : 0, left: 0 }}
+          mapPadding={{ top: insets.top + 64, right: 0, bottom: selected ? 190 : 0, left: 0 }}
         >
-          {items.map((item) => (
+          {visible.map((item) => (
             <Marker
               key={item.id}
               coordinate={{ latitude: item.latitude, longitude: item.longitude }}
@@ -135,7 +167,7 @@ export default function LuckyMap() {
             {t.mapTitle}
           </Text>
           <Text style={[styles.subtitle, { color: palette.muted }]}>
-            {failed ? t.mapError : !loading && items.length === 0 ? t.mapEmpty : t.mapSubtitle}
+            {failed ? t.mapError : !loading && visible.length === 0 ? t.mapEmpty : t.mapSubtitle}
           </Text>
         </View>
         {loading ? (
@@ -157,6 +189,15 @@ export default function LuckyMap() {
 
       {selected ? (
         <View style={[styles.card, { backgroundColor: palette.surface, paddingBottom: insets.bottom + 16 }]}>
+          {photo ? (
+            <Image
+              source={{ uri: photo }}
+              style={[styles.photo, { backgroundColor: palette.background }]}
+              contentFit="cover"
+              transition={150}
+              accessibilityLabel={t.mapPhoto}
+            />
+          ) : null}
           <View style={styles.cardBody}>
             <Text style={[styles.cardDate, { color: palette.text }]}>{formatDate(selected.found_at)}</Text>
             {selected.place ? (
@@ -182,6 +223,11 @@ export default function LuckyMap() {
               </Pressable>
             </View>
           </View>
+          {selected.user_id !== me ? (
+            <Pressable onPress={() => openMenu(selected)} hitSlop={10} accessibilityRole="button" accessibilityLabel={t.mapMore} style={styles.more}>
+              <Ionicons name="ellipsis-horizontal" size={22} color={palette.muted} />
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
     </View>
@@ -226,12 +272,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 16,
+    flexDirection: 'row',
+    gap: 14,
     elevation: 8,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 12,
   },
-  cardBody: { flex: 1, gap: 4 },
+  cardBody: { flex: 1, gap: 4, paddingRight: 24 },
+  photo: { width: 112, height: 112, borderRadius: 16 },
+  more: { position: 'absolute', top: 12, right: 14, padding: 4 },
   cardDate: { fontSize: 17, fontFamily: FONT.cute },
   cardPlace: { fontFamily: FONT.body, fontSize: 14 },
   mine: { fontSize: 13, fontFamily: FONT.cute },

@@ -23,7 +23,7 @@ export type WideCandidate = { x: number; y: number; width: number; height: numbe
 export type WideResult = { candidates: WideCandidate[]; uri: string };
 
 /** Reads just the JPEG header and returns the clockwise turn its EXIF asks for. */
-async function photoRotation(uri: string) {
+export async function photoRotation(uri: string) {
   const head = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64, position: 0, length: 65536 });
   return exifRotation(Uint8Array.from(globalThis.atob(head), (c) => c.charCodeAt(0)));
 }

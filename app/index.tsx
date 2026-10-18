@@ -232,7 +232,7 @@ export default function Home() {
               style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
             >
               <Image
-                source={{ uri: item.photoUri }}
+                source={{ uri: item.cloverUri ?? item.photoUri }}
                 style={[styles.tile, { width: tile, height: tile, backgroundColor: palette.surfaceAlt }]}
                 contentFit="cover"
                 recyclingKey={item.id}

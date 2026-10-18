@@ -59,3 +59,17 @@ export function mergeBoxes(boxes: CloverDetectionBox[], iouThreshold = 0.4): Clo
   }
   return kept;
 }
+
+/** A box as fractions (0–1) of the upright image, centre-based like the detector's. */
+export type FractionBox = { x: number; y: number; width: number; height: number };
+
+/**
+ * Square close-up around a four-leaf: `pad`× the box's longer side (at least `minSide` of the short image side)
+ * so a little aim drift between lock and shutter still keeps the whole clover, shifted to stay inside the image.
+ */
+export function cloverSquare(box: FractionBox, width: number, height: number, pad = 1.8, minSide = 0.2) {
+  const short = Math.min(width, height);
+  const side = Math.round(Math.min(short, Math.max(Math.max(box.width * width, box.height * height) * pad, short * minSide)));
+  const clamp = (v: number, hi: number) => Math.round(Math.min(Math.max(v, 0), hi));
+  return { left: clamp(box.x * width - side / 2, width - side), top: clamp(box.y * height - side / 2, height - side), side };
+}

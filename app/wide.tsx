@@ -60,7 +60,9 @@ export default function WideScan() {
     setSaving(true);
     try {
       // Keep the upright image the boxes were drawn on.
-      const id = await saveCapture(uri ?? path, true);
+      // Close-up of the candidate the user looked at, else the most confident one.
+      const box = pick ?? [...(candidates ?? [])].sort((a, b) => b.confidence - a.confidence)[0];
+      const id = await saveCapture(uri ?? path, true, box);
       router.replace({ pathname: '/find/[id]', params: { id, fresh: '1' } });
     } catch (error) {
       console.warn('wide: save failed', error);

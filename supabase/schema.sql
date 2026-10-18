@@ -1,4 +1,4 @@
--- Hello Luck shared map: only the spot (pin) of AI-confirmed finds, no photos or text from users.
+-- Hello Luck shared map: the spot (pin) of AI-confirmed finds; clover close-ups are in clover_photos.sql. No user text.
 -- Apply once to a fresh Supabase project (scripts/setup_supabase.py does it).
 
 create table if not exists public.shared_finds (

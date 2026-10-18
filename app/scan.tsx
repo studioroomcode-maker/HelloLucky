@@ -238,7 +238,10 @@ function Scanner() {
     try {
       // The torch already lights the scene; a capture flash would fight it.
       const photo = await camera.current.takePhoto({ flash: 'off', enableShutterSound: false });
-      const id = await saveCapture(photo.path, locked);
+      // Close-up of the strongest locked clover, as fractions of the upright frame (the photo shares its 4:3).
+      const best = frame.width ? [...tracking.stableTracks].sort((a, b) => b.confidence - a.confidence)[0] : undefined;
+      const box = best && { x: best.x / frame.width, y: best.y / frame.height, width: best.width / frame.width, height: best.height / frame.height };
+      const id = await saveCapture(photo.path, locked, box);
       router.replace({ pathname: '/find/[id]', params: { id, fresh: '1' } });
     } catch (error) {
       console.warn('scan: capture failed', error);
