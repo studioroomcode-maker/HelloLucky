@@ -279,7 +279,8 @@ function Scanner() {
     <View style={styles.container}>
       {/* The whole 4:3 frame, uncropped like a camera app: sharper (the preview stream is ~1440×1080) and exactly
           what the AI analyzes and the photo keeps. The controls sit on the dark margins. */}
-      <View style={styles.viewfinder} onLayout={onLayout}>
+      {/* A real native view (not flattened): on iOS the camera preview otherwise lost this box's offset and sat at the top. */}
+      <View style={styles.viewfinder} onLayout={onLayout} collapsable={false}>
         <Camera
           key={cameraKey}
           ref={camera}
@@ -394,7 +395,7 @@ function Scanner() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000', justifyContent: 'center' },
-  viewfinder: { width: '100%', aspectRatio: 3 / 4 },
+  viewfinder: { width: '100%', aspectRatio: 3 / 4, overflow: 'hidden' },
   gate: { flex: 1, backgroundColor: '#0D130F', paddingHorizontal: 24 },
   gateBody: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
   gateTitle: { color: '#fff', fontSize: 22, fontFamily: FONT.cute, textAlign: 'center' },

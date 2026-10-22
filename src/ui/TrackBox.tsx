@@ -65,13 +65,14 @@ export function TrackBox({
 
 /**
  * Four white corner brackets around a clover found on a photo, drawn like the app icon's viewfinder: short rounded
- * arms with round ends, over a faint dark line so they read on bright grass too. Same breathing room as on the preview.
+ * arms with round ends, over a faint dark line so they read on bright grass too. Snugger than the live box.
  */
 export function CornerFrame({ rect }: { rect: Rect }) {
-  const width = rect.width * (1 + 2 * PAD);
-  const height = rect.height * (1 + 2 * PAD);
+  const pad = 0.08;
+  const width = rect.width * (1 + 2 * pad);
+  const height = rect.height * (1 + 2 * pad);
   const stroke = 3;
-  const arm = Math.max(12, Math.min(width, height) * 0.22);
+  const arm = Math.max(10, Math.min(width, height) * 0.15);
   const bend = arm * 0.45;
   const i = stroke; // keep the round caps and the shadow line inside the view
   const [l, t, r, b] = [i, i, width - i, height - i];
@@ -86,7 +87,7 @@ export function CornerFrame({ rect }: { rect: Rect }) {
       pointerEvents="none"
       width={width}
       height={height}
-      style={[styles.box, { left: rect.left - rect.width * PAD, top: rect.top - rect.height * PAD }]}
+      style={[styles.box, { left: rect.left - rect.width * pad, top: rect.top - rect.height * pad }]}
     >
       <Path d={d} stroke="rgba(0,0,0,0.28)" strokeWidth={stroke + 2.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
       <Path d={d} stroke="#fff" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" fill="none" />
