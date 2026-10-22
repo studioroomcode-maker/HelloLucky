@@ -63,13 +63,24 @@ export function mergeBoxes(boxes: CloverDetectionBox[], iouThreshold = 0.4): Clo
 /** A box as fractions (0–1) of the upright image, centre-based like the detector's. */
 export type FractionBox = { x: number; y: number; width: number; height: number };
 
+const clamp = (v: number, hi: number) => Math.round(Math.min(Math.max(v, 0), hi));
+
 /**
- * Square close-up around a four-leaf: `pad`× the box's longer side (at least `minSide` of the short image side)
- * so a little aim drift between lock and shutter still keeps the whole clover, shifted to stay inside the image.
+ * Square close-up around a four-leaf: `pad`× the box's longer side (at least `minSide` of the short image side),
+ * shifted to stay inside the image. The box comes from the photo itself, so the margin only frames the clover.
  */
-export function cloverSquare(box: FractionBox, width: number, height: number, pad = 1.8, minSide = 0.2) {
+export function cloverSquare(box: FractionBox, width: number, height: number, pad = 1.4, minSide = 0.08) {
   const short = Math.min(width, height);
   const side = Math.round(Math.min(short, Math.max(Math.max(box.width * width, box.height * height) * pad, short * minSide)));
-  const clamp = (v: number, hi: number) => Math.round(Math.min(Math.max(v, 0), hi));
   return { left: clamp(box.x * width - side / 2, width - side), top: clamp(box.y * height - side / 2, height - side), side };
+}
+
+/**
+ * The square of a photo the live detector looks at: the short side, like the frame's center crop, but centred on
+ * `around` (the live lock) when given, so the clover is seen at the same scale it was locked at.
+ */
+export function photoWindow(width: number, height: number, around?: { x: number; y: number }) {
+  const side = Math.min(width, height);
+  const { x = 0.5, y = 0.5 } = around ?? {};
+  return { left: clamp(x * width - side / 2, width - side), top: clamp(y * height - side / 2, height - side), side };
 }

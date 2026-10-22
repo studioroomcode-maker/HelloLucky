@@ -22,7 +22,9 @@
       "ru": "./locales/ru.json",
       "id": "./locales/id.json",
       "vi": "./locales/vi.json",
-      "th": "./locales/th.json"
+      "th": "./locales/th.json",
+      "ar": "./locales/ar.json",
+      "sw": "./locales/sw.json"
     },
     "ios": {
       "bundleIdentifier": "com.studioroomkr.HelloLucky",
@@ -53,7 +55,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
         "android.permission.ACTIVITY_RECOGNITION",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "android.permission.READ_PHONE_STATE"
@@ -76,7 +78,16 @@
     },
     "plugins": [
       "expo-router",
-      "expo-localization",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Hello Luck uses your photos only when you share a luck card to an app like Instagram, so the card can be passed along.",
+          "savePhotosPermission": "Hello Luck saves your luck card or journey video to your photos when you choose to save it.",
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": []
+        }
+      ],
+      ["expo-localization", { "supportsRTL": true }],
       [
         "react-native-vision-camera",
         {

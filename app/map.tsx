@@ -8,7 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePalette, FONT } from '@/constants/theme';
-import { formatDate, t } from '@/src/i18n';
+import { CHEVRON_BACK, formatDate, t } from '@/src/i18n';
 import { getSettings, updateSettings, useSettings } from '@/src/services/findsStore';
 import { cloverPhotoUrl, currentUserId, fetchShared, reportFind, sharingAvailable, type SharedFind } from '@/src/services/sharing';
 
@@ -16,6 +16,8 @@ const PIN_GREEN = require('@/assets/map/pin-green.png');
 const PIN_GOLD = require('@/assets/map/pin-gold.png');
 
 const WORLD: Region = { latitude: 30, longitude: 127, latitudeDelta: 80, longitudeDelta: 80 };
+
+type Filter = 'mine' | 'world';
 
 function regionBounds(r: Region) {
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -43,6 +45,7 @@ export default function LuckyMap() {
   const [me, setMe] = useState<string>();
   const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);
   const lastRegion = useRef<Region>(WORLD);
+  const [filter, setFilter] = useState<Filter>('world');
 
   useEffect(() => {
     currentUserId().then(setMe).catch(() => {});
@@ -59,19 +62,33 @@ export default function LuckyMap() {
     })();
   }, []);
 
-  const load = useCallback(async (region: Region) => {
-    lastRegion.current = region;
-    setLoading(true);
-    try {
-      setItems(await fetchShared(regionBounds(region)));
-      setFailed(false);
-    } catch (error) {
-      console.warn('map: load failed', error);
-      setFailed(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const load = useCallback(
+    async (region: Region, only: Filter = filter) => {
+      lastRegion.current = region;
+      // Without an account (nothing pinned yet) none of the pins are mine.
+      if (only === 'mine' && !me) {
+        setItems([]);
+        setFailed(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        setItems(await fetchShared(regionBounds(region), only === 'mine' ? me : undefined));
+        setFailed(false);
+      } catch (error) {
+        console.warn('map: load failed', error);
+        setFailed(true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filter, me],
+  );
+
+  const filters: [Filter, string][] = [
+    ['mine', t.mapFilterMine],
+    ['world', t.mapFilterWorld],
+  ];
 
   const visible = items.filter((item) => !hiddenPins.includes(item.id) && !blockedUsers.includes(item.user_id));
   const photo = selected && cloverPhotoUrl(selected);
@@ -129,7 +146,7 @@ export default function LuckyMap() {
           onMapReady={() => load(initial)}
           onRegionChangeComplete={onRegionChangeComplete}
           onPress={() => setSelected(undefined)}
-          mapPadding={{ top: insets.top + 64, right: 0, bottom: selected ? 190 : 0, left: 0 }}
+          mapPadding={{ top: insets.top + 112, right: 0, bottom: selected ? 190 : 0, left: 0 }}
         >
           {visible.map((item) => (
             <Marker
@@ -154,13 +171,13 @@ export default function LuckyMap() {
 
       <View style={[styles.topBar, { top: insets.top + 8 }]} pointerEvents="box-none">
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel={t.close}
           style={[styles.roundBtn, { backgroundColor: palette.surface }]}
         >
-          <Ionicons name="chevron-back" size={24} color={palette.text} />
+          <Ionicons name={CHEVRON_BACK} size={24} color={palette.text} />
         </Pressable>
         <View style={[styles.titleChip, { backgroundColor: palette.surface }]}>
           <Text style={[styles.title, { color: palette.text }]} accessibilityRole="header">
@@ -185,6 +202,27 @@ export default function LuckyMap() {
             <Ionicons name="refresh" size={22} color={palette.text} />
           </Pressable>
         )}
+      </View>
+
+      <View style={[styles.filters, { top: insets.top + 64 }]} accessibilityRole="radiogroup">
+        {filters.map(([key, label]) => {
+          const on = filter === key;
+          return (
+            <Pressable
+              key={key}
+              onPress={() => {
+                setFilter(key);
+                setSelected(undefined);
+                load(lastRegion.current, key);
+              }}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: on }}
+              style={[styles.filter, { backgroundColor: on ? palette.primary : palette.surface }]}
+            >
+              <Text style={[styles.filterText, { color: on ? palette.onPrimary : palette.text }]}>{label}</Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {selected ? (
@@ -263,6 +301,19 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   title: { fontSize: 16, fontFamily: FONT.cute },
+  filters: { position: 'absolute', left: 16, right: 16, flexDirection: 'row', gap: 8 },
+  filter: {
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    minHeight: 36,
+    justifyContent: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  filterText: { fontSize: 14, fontFamily: FONT.cute },
   subtitle: { fontFamily: FONT.body, fontSize: 12 },
   card: {
     position: 'absolute',

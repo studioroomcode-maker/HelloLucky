@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck ใช้กล้องเพื่อหาโชคในกอโคลเวอร์ วิดีโอถูกวิเคราะห์ในเครื่องของคุณเท่านั้น",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck บันทึกสถานที่ที่คุณเจอโชค ตำแหน่งจะถูกเปิดเผยก็ต่อเมื่อคุณแชร์ไปยังแผนที่โชคดีเท่านั้น"
+    "NSLocationWhenInUseUsageDescription": "Hello Luck บันทึกสถานที่ที่คุณเจอโชค ตำแหน่งจะถูกเปิดเผยก็ต่อเมื่อคุณแชร์ไปยังแผนที่โชคดีเท่านั้น",
+    "NSPhotoLibraryUsageDescription": "Hello Luck ใช้รูปภาพของคุณเฉพาะตอนแชร์การ์ดโชคไปยังแอปอย่าง Instagram เท่านั้น",
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck จะบันทึกการ์ดโชคหรือวิดีโอการเดินทางลงในรูปภาพเมื่อคุณเลือกบันทึก"
   }
 }

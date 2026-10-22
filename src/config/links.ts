@@ -1,2 +1,5 @@
-/** Landing page shared with every photo (docs/index.html on GitHub Pages): picks the right store per device. */
-export const SHARE_URL = 'https://studioroomcode-maker.github.io/HelloLucky/';
+/**
+ * Link shared with every photo and journey card: the site's /go page sends a phone to its store, where the listing
+ * offers Install, or Open when the app is already there (desktops get both store buttons).
+ */
+export const SHARE_URL = 'https://helloluck.studioroomkr.com/go';

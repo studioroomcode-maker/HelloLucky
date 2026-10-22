@@ -18,7 +18,7 @@ const units = (text: string) => [...text].reduce((n, c) => n + (/[\u3000-\u9fff\
 function titleSize(title: string) {
   const word = Math.max(...title.split(/[\s-]+/).map(units));
   const total = units(title);
-  return word > 15 || total > 30 ? 10 : word > 12 || total > 24 ? 11.5 : 13;
+  return word > 12 || total > 30 ? 10 : word > 9 || total > 24 ? 11.5 : 13;
 }
 
 export default function Badges() {

@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck はクローバー畑から幸運を見つけるためにカメラを使います。映像は端末の中だけで分析されます。",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck は幸運を見つけた場所を保存します。幸運マップに共有した場合にのみ公開されます。"
+    "NSLocationWhenInUseUsageDescription": "Hello Luck は幸運を見つけた場所を保存します。幸運マップに共有した場合にのみ公開されます。",
+    "NSPhotoLibraryUsageDescription": "Hello Luck は幸運カードを Instagram などのアプリで共有するときだけ写真を使います。",
+    "NSPhotoLibraryAddUsageDescription": "保存を選ぶと、幸運カードや旅の動画を写真に保存します。"
   }
 }

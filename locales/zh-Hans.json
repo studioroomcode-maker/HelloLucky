@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck 使用相机在三叶草丛中寻找幸运。画面只在你的设备上分析。",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck 会保存你找到幸运的地点。只有当你分享到幸运地图时才会公开。"
+    "NSLocationWhenInUseUsageDescription": "Hello Luck 会保存你找到幸运的地点。只有当你分享到幸运地图时才会公开。",
+    "NSPhotoLibraryUsageDescription": "仅在你把幸运卡片分享到 Instagram 等应用时，Hello Luck 才会使用你的照片。",
+    "NSPhotoLibraryAddUsageDescription": "选择保存时，Hello Luck 会把幸运卡片或旅程视频存到你的相册。"
   }
 }

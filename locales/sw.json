@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "Hello Luck inatumia kamera kutafuta bahati kwenye klova. Video inachambuliwa kwenye kifaa chako tu.",
+    "NSLocationWhenInUseUsageDescription": "Hello Luck inahifadhi mahali ulipopata bahati. Panawekwa hadharani tu ukiishiriki kwenye Ramani ya Bahati.",
+    "NSPhotoLibraryUsageDescription": "Hello Luck inatumia picha zako tu unaposhiriki kadi ya bahati kwenye programu kama Instagram, ili kadi iweze kupitishwa.",
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck inahifadhi kadi yako ya bahati au video ya safari kwenye picha zako unapochagua kuhifadhi.",
+    "NSMotionUsageDescription": "Hello Luck inatumia vihisi vya mwendo ili kisanduku cha utambuzi kitulie unaposogeza kamera."
+  }
+}

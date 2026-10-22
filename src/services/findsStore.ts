@@ -6,6 +6,8 @@
 import { useSyncExternalStore } from 'react';
 import * as FileSystem from 'expo-file-system/legacy';
 
+import type { FractionBox } from './detector/tiles';
+
 export type Find = {
   id: string;
   createdAt: string;
@@ -13,6 +15,9 @@ export type Find = {
   photoUri: string;
   /** Square close-up of the clover cut around the AI box (src/services/cloverCrop.ts); absent without a box. */
   cloverUri?: string;
+  /** Where the clover is in the upright photo (fractions) and that photo's width / height; drawn on the detail photo. */
+  cloverBox?: FractionBox;
+  photoAspect?: number;
   latitude?: number;
   longitude?: number;
   place?: string;
@@ -51,6 +56,10 @@ export type Settings = {
   seenBadges: string[];
   /** Appearance; the app is designed light-first. */
   theme: 'light' | 'dark' | 'system';
+  /** Name id letters are sent under (src/nicknames.ts; -1 until first needed). */
+  nickname: number;
+  /** Journeys I started (chain id) → the find they were sent from, for the photo on the journey card. */
+  journeyFinds: Record<string, string>;
 };
 
 type Data = { version: 1; finds: Find[]; settings: Settings };
@@ -58,7 +67,7 @@ type Data = { version: 1; finds: Find[]; settings: Settings };
 const ROOT = FileSystem.documentDirectory ?? '';
 const DATA_FILE = `${ROOT}hellolucky.json`;
 const PHOTO_DIR = `${ROOT}finds/`;
-const DEFAULT_SETTINGS: Settings = { onboarded: false, saveLocation: true, mapRules: 0, hiddenPins: [], blockedUsers: [], sentLuck: 0, receivedLuck: 0, relayed: 0, thanksGot: 0, thanksGiven: 0, homecomings: 0, memoryClosed: '', rainShown: '', seenBadges: [], theme: 'light' };
+const DEFAULT_SETTINGS: Settings = { onboarded: false, saveLocation: true, mapRules: 0, hiddenPins: [], blockedUsers: [], sentLuck: 0, receivedLuck: 0, relayed: 0, thanksGot: 0, thanksGiven: 0, homecomings: 0, memoryClosed: '', rainShown: '', seenBadges: [], theme: 'light', nickname: -1, journeyFinds: {} };
 
 let data: Data = { version: 1, finds: [], settings: DEFAULT_SETTINGS };
 let loaded = false;
@@ -198,4 +207,17 @@ export async function bumpCounters(add: Partial<Record<Counter, number>>) {
   const next = { ...data.settings };
   for (const [key, n] of Object.entries(add) as [Counter, number][]) next[key] = (next[key] ?? 0) + n;
   await persist({ ...data, settings: next });
+}
+
+/** The whole journal as stored, for a backup (src/services/backup.ts). */
+export function journalSnapshot() {
+  return data;
+}
+
+/** Swaps in a restored journal whose photos are already written to `stagedDir`; a bad journal throws before anything changes. */
+export async function replaceJournal(raw: string, stagedDir: string) {
+  const next = parseData(raw);
+  await FileSystem.deleteAsync(PHOTO_DIR, { idempotent: true });
+  await FileSystem.moveAsync({ from: stagedDir, to: PHOTO_DIR });
+  await persist(next);
 }

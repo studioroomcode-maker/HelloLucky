@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck usa la cámara para encontrar suerte entre los tréboles. El vídeo se analiza solo en tu dispositivo.",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck guarda dónde encontraste la suerte. Solo se hace público si lo compartes en el Mapa de la suerte."
+    "NSLocationWhenInUseUsageDescription": "Hello Luck guarda dónde encontraste la suerte. Solo se hace público si lo compartes en el Mapa de la suerte.",
+    "NSPhotoLibraryUsageDescription": "Hello Luck usa tus fotos solo cuando compartes una tarjeta de la suerte en apps como Instagram.",
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck guarda tu tarjeta de la suerte o el vídeo del viaje en tus fotos cuando eliges guardarlos."
   }
 }

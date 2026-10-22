@@ -1,12 +1,16 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { FONT, usePalette, type Palette } from '@/constants/theme';
-import { t } from '@/src/i18n';
+import { CHEVRON_FORWARD, lang, t } from '@/src/i18n';
+import { nickname, randomNickname } from '@/src/nicknames';
+import { exportBackup, restoreBackup } from '@/src/services/backup';
 import { deleteAllFinds, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
 import { unshareAll } from '@/src/services/sharing';
+import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { ScreenHeader } from '@/src/ui/ScreenHeader';
 
 // License notices for the bundled detector; kept in English like the license texts themselves.
@@ -38,7 +42,7 @@ function Row({
     >
       <Ionicons name={icon} size={22} color={danger ? palette.danger : palette.muted} />
       <Text style={[styles.rowLabel, { color }]}>{label}</Text>
-      {right ?? (onPress ? <Ionicons name="chevron-forward" size={18} color={palette.muted} /> : null)}
+      {right ?? (onPress ? <Ionicons name={CHEVRON_FORWARD} size={18} color={palette.muted} /> : null)}
     </Pressable>
   );
 }
@@ -54,6 +58,8 @@ export default function SettingsScreen() {
   const palette = usePalette();
   const settings = useSettings();
   const finds = useFinds();
+  // The name being picked in the edit sheet; the setting only changes on save.
+  const [nickDraft, setNickDraft] = useState<number>();
   const card = [styles.card, { backgroundColor: palette.surface, borderColor: palette.border }];
 
   const confirmDeleteAll = () => {
@@ -66,6 +72,38 @@ export default function SettingsScreen() {
           // Best effort: offline deletes still wipe the device; pins can be removed later from here.
           await unshareAll(finds).catch((error) => console.warn('settings: unshareAll failed', error));
           await deleteAllFinds();
+        },
+      },
+    ]);
+  };
+
+  const [backingUp, setBackingUp] = useState<'export' | 'import'>();
+
+  const backUp = async () => {
+    setBackingUp('export');
+    await exportBackup().catch((error) => {
+      console.warn('settings: backup failed', error);
+      Alert.alert(t.shareError);
+    });
+    setBackingUp(undefined);
+  };
+
+  const confirmRestore = () => {
+    Alert.alert(t.backupImport, t.backupImportConfirm, [
+      { text: t.cancel, style: 'cancel' },
+      {
+        text: t.backupImport,
+        style: 'destructive',
+        onPress: async () => {
+          setBackingUp('import');
+          try {
+            const result = await restoreBackup();
+            if (result !== 'cancelled') Alert.alert(result === 'restored' ? t.backupRestored : t.backupNoLetters);
+          } catch (error) {
+            console.warn('settings: restore failed', error);
+            Alert.alert(t.backupFailed);
+          }
+          setBackingUp(undefined);
         },
       },
     ]);
@@ -103,6 +141,49 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={card}>
+          <Row
+            palette={palette}
+            icon="happy-outline"
+            label={t.nicknameLabel}
+            onPress={() => setNickDraft(settings.nickname >= 0 ? settings.nickname : randomNickname())}
+            right={
+              <View style={styles.nick}>
+                <Text style={[styles.rowHint, { color: palette.text }]} numberOfLines={1}>
+                  {nickname(settings.nickname, lang)}
+                </Text>
+                <Text style={[styles.edit, { color: palette.primary }]}>{t.nicknameEdit}</Text>
+              </View>
+            }
+          />
+        </View>
+        <Modal visible={nickDraft !== undefined} transparent animationType="fade" onRequestClose={() => setNickDraft(undefined)} statusBarTranslucent>
+          <View style={styles.backdrop}>
+            <View style={[styles.sheet, { backgroundColor: palette.surface }]}>
+              <Text style={[styles.sheetKicker, { color: palette.muted }]}>{t.nicknameLabel}</Text>
+              <Text style={[styles.sheetName, { color: palette.text }]}>{nickname(nickDraft, lang)}</Text>
+              <Pressable
+                onPress={() => setNickDraft(randomNickname())}
+                accessibilityRole="button"
+                style={({ pressed }) => [styles.dice, { backgroundColor: palette.surfaceAlt, opacity: pressed ? 0.7 : 1 }]}
+              >
+                <Ionicons name="dice-outline" size={20} color={palette.primary} />
+                <Text style={[styles.edit, { color: palette.primary }]}>{t.nicknameReroll}</Text>
+              </Pressable>
+              <View style={styles.sheetButtons}>
+                <PrimaryButton
+                  label={t.nicknameSave}
+                  onPress={() => {
+                    if (nickDraft !== undefined) updateSettings({ nickname: nickDraft });
+                    setNickDraft(undefined);
+                  }}
+                />
+                <PrimaryButton variant="secondary" label={t.cancel} onPress={() => setNickDraft(undefined)} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         <View style={[card, styles.themeCard]}>
           <View style={styles.themeHead}>
             <Ionicons name="contrast-outline" size={22} color={palette.muted} />
@@ -130,6 +211,24 @@ export default function SettingsScreen() {
           <Row palette={palette} icon="help-circle-outline" label={t.howItWorks} onPress={() => router.push('/onboarding')} />
           <View style={[styles.divider, { backgroundColor: palette.border }]} />
           <Row palette={palette} icon="shield-checkmark-outline" label={t.privacy} onPress={() => router.push('/privacy')} />
+        </View>
+
+        <View style={card}>
+          <Row
+            palette={palette}
+            icon="cloud-upload-outline"
+            label={t.backupExport}
+            onPress={backingUp ? undefined : backUp}
+            right={backingUp === 'export' ? <ActivityIndicator color={palette.primary} /> : undefined}
+          />
+          <View style={[styles.divider, { backgroundColor: palette.border }]} />
+          <Row
+            palette={palette}
+            icon="cloud-download-outline"
+            label={t.backupImport}
+            onPress={backingUp ? undefined : confirmRestore}
+            right={backingUp === 'import' ? <ActivityIndicator color={palette.primary} /> : undefined}
+          />
         </View>
 
         {finds.length > 0 ? (
@@ -163,6 +262,14 @@ const styles = StyleSheet.create({
   rowHint: { fontFamily: FONT.body, fontSize: 13, marginTop: 2 },
   divider: { height: StyleSheet.hairlineWidth, marginLeft: 52 },
   themeCard: { padding: 16, gap: 12 },
+  nick: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+  edit: { fontFamily: FONT.cute, fontSize: 14 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', padding: 32 },
+  sheet: { width: '100%', maxWidth: 340, borderRadius: 28, padding: 24, alignItems: 'center', gap: 12 },
+  sheetKicker: { fontFamily: FONT.medium, fontSize: 14 },
+  sheetName: { fontFamily: FONT.cute, fontSize: 24, textAlign: 'center' },
+  dice: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 999, paddingHorizontal: 16, minHeight: 44 },
+  sheetButtons: { alignSelf: 'stretch', gap: 8, marginTop: 4 },
   themeHead: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   segment: { flexDirection: 'row', borderRadius: 14, padding: 4 },
   segItem: { flex: 1, minHeight: 40, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },

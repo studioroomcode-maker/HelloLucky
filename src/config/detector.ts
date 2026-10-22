@@ -33,4 +33,7 @@ export const DETECTOR = {
     smoothingFactor: 0.7,
     maxTracks: 5,
   } satisfies DetectionTrackerConfig,
+  // The live "maybe" hint (? box + status): single-frame hits flickered it on and off over grass while walking,
+  // so a candidate shows only once it has held for ~0.5 s with some confidence.
+  hint: { minStreak: 3, minConfidence: 0.3 },
 } as const;

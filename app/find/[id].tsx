@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
+  LayoutChangeEvent,
   Linking,
   Platform,
   Pressable,
@@ -19,14 +20,17 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePalette, FONT } from '@/constants/theme';
-import { formatDate, t } from '@/src/i18n';
-import { bumpCounters, deleteFind, MAP_RULES, updateFind, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
+import { CHEVRON_BACK, formatDate, t } from '@/src/i18n';
+import { bumpCounters, deleteFind, getSettings, MAP_RULES, updateFind, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
 import { canShare, shareFind, sharingAvailable, unshareFind } from '@/src/services/sharing';
+import { projectToView } from '@/src/services/detector/frameMapping';
 import { SHARE_URL } from '@/src/config/links';
+import { copyShareText } from '@/src/shareText';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { fortuneFor } from '@/src/fortune';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { SendLuckSheet } from '@/src/ui/SendLuckSheet';
+import { CornerFrame } from '@/src/ui/TrackBox';
 
 function mapUrl(latitude: number, longitude: number) {
   return Platform.OS === 'ios'
@@ -46,6 +50,7 @@ export default function FindDetail() {
   const settings = useSettings();
   const [mapBusy, setMapBusy] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  const [photoView, setPhotoView] = useState({ width: 0, height: 0 });
 
   const goHome = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
@@ -69,10 +74,12 @@ export default function FindDetail() {
     setSendOpen(false);
     try {
       const uri = await captureRef(photoRef, { format: 'jpg', quality: 0.92, result: 'tmpfile' });
+      const message = [note, t.shareLink(SHARE_URL)].filter(Boolean).join('\n\n');
+      await copyShareText(message);
       const result = await Share.open({
         url: uri.startsWith('file://') ? uri : `file://${uri}`,
         type: 'image/jpeg',
-        message: [note, t.shareLink(SHARE_URL)].filter(Boolean).join('\n\n'),
+        message,
         failOnCancel: false,
       });
       if (result.success) bumpCounters({ sentLuck: 1 }).catch(() => {});
@@ -147,13 +154,36 @@ export default function FindDetail() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View ref={photoRef} collapsable={false} style={styles.photo}>
+        <View
+          ref={photoRef}
+          collapsable={false}
+          style={styles.photo}
+          onLayout={(event: LayoutChangeEvent) => setPhotoView(event.nativeEvent.layout)}
+        >
           <Image
             source={{ uri: find.photoUri }}
             style={StyleSheet.absoluteFill}
             contentFit="cover"
             transition={200}
           />
+          {find.cloverBox && find.photoAspect && photoView.width ? (
+            // Where the AI saw the clover, on the photo as it is drawn ("cover"); shared images keep it too.
+            <CornerFrame
+              rect={projectToView(
+                {
+                  x: find.cloverBox.x * find.photoAspect,
+                  y: find.cloverBox.y,
+                  width: find.cloverBox.width * find.photoAspect,
+                  height: find.cloverBox.height,
+                  confidence: 1,
+                },
+                find.photoAspect,
+                1,
+                photoView.width,
+                photoView.height,
+              )}
+            />
+          ) : null}
           <Image
             source={require('@/assets/logo.png')}
             style={styles.watermark}
@@ -256,7 +286,7 @@ export default function FindDetail() {
           />
 
           <View style={styles.actions}>
-            <View style={styles.flex}>
+            <View style={styles.action}>
               <PrimaryButton
                 icon="paper-plane-outline"
                 label={t.share}
@@ -264,7 +294,7 @@ export default function FindDetail() {
                 variant="secondary"
               />
             </View>
-            <View style={styles.flex}>
+            <View style={styles.done}>
               <PrimaryButton
                 icon="checkmark"
                 label={t.done}
@@ -293,15 +323,20 @@ export default function FindDetail() {
         accessibilityLabel={t.close}
         style={[styles.back, { top: insets.top + 8 }]}
       >
-        <Ionicons name="chevron-back" size={26} color="#fff" />
+        <Ionicons name={CHEVRON_BACK} size={26} color="#fff" />
       </Pressable>
       {/* A fresh find gets one more pop of clovers on arrival. */}
       <LuckBurst trigger={fresh ? 1 : 0} />
       <SendLuckSheet
         photoUri={find.photoUri}
+        cloverUri={find.cloverUri}
         fortune={fortuneFor(find)}
         place={{ city: find.city, lat: find.latitude, lng: find.longitude }}
-        onStrangerSent={() => bumpCounters({ sentLuck: 1 }).catch(() => {})}
+        onStrangerSent={(chain) => {
+          bumpCounters({ sentLuck: 1 }).catch(() => {});
+          // Remember which find started this journey, so its card can show the clover.
+          updateSettings({ journeyFinds: { ...getSettings().journeyFinds, [chain]: find.id } }).catch(() => {});
+        }}
         visible={sendOpen}
         onClose={() => setSendOpen(false)}
         onSend={share}
@@ -372,6 +407,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   actions: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  // Each button starts at its label's width and both grow to fill, so a long Send label wraps between words.
+  action: { flexGrow: 1, flexShrink: 1 },
+  // Done is one short word: it keeps its width and only Send wraps.
+  done: { flexGrow: 1, flexShrink: 0 },
   deleteBtn: {
     flexDirection: 'row',
     alignItems: 'center',

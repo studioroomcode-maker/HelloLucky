@@ -6,7 +6,7 @@ import { FlatList, Pressable, StyleSheet, Text, View, useWindowDimensions } from
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePalette, FONT } from '@/constants/theme';
-import { lang, t } from '@/src/i18n';
+import { CHEVRON_FORWARD, lang, t } from '@/src/i18n';
 import { BADGES, badgeCounters, earnedBadges, type BadgeId } from '@/src/badges';
 import { potStage } from '@/src/pot';
 import { bumpCounters, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
@@ -176,7 +176,7 @@ export default function Home() {
           <View style={[styles.badgeChip, { backgroundColor: palette.surface }]}>
             <Ionicons name="ribbon" size={14} color={palette.gold} />
             <Text style={[styles.badgeChipText, { color: palette.text }]}>{t.badgesCount(earned.size, BADGES.length)}</Text>
-            <Ionicons name="chevron-forward" size={14} color={palette.muted} />
+            <Ionicons name={CHEVRON_FORWARD} size={14} color={palette.muted} />
           </View>
         </View>
       </Pressable>

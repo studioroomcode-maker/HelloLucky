@@ -10,7 +10,7 @@ import { DETECTOR } from '../../config/detector';
 import type { CloverDetectionBox } from '../detectionTracker';
 import { exifRotation } from './exif';
 import { loadDetector } from './model';
-import { mergeBoxes, tilePlan, toModelInput } from './tiles';
+import { mergeBoxes, photoWindow, tilePlan, toModelInput, type FractionBox } from './tiles';
 import { decodeYolo } from './yoloDecode';
 
 /** Photo is scaled to ~2/3 first: 4032×3024 → 12 tiles of 960, about 1–2 s on a recent phone. */
@@ -28,14 +28,41 @@ export async function photoRotation(uri: string) {
   return exifRotation(Uint8Array.from(globalThis.atob(head), (c) => c.charCodeAt(0)));
 }
 
-export async function wideScan(path: string, onProgress: (done: number, total: number) => void): Promise<WideResult> {
-  const model = await loadDetector();
+/** Loads a photo (path or file://) upright, as the user saw it. */
+export async function loadUpright(path: string) {
   const uri = path.startsWith('file://') ? path : `file://${path}`;
-  let image = await Images.loadFromFileAsync(uri.replace(/^file:\/\//, ''));
+  const image = await Images.loadFromFileAsync(uri.replace(/^file:\/\//, ''));
   // The camera writes sensor-landscape pixels plus an EXIF turn; the decoder ignores EXIF, so apply it here.
   // With outputOrientation="preview" that turn always matches what the user saw on screen.
   const rotation = await photoRotation(uri);
-  if (rotation) image = await image.rotateAsync(rotation);
+  return rotation ? image.rotateAsync(rotation) : image;
+}
+
+/**
+ * Second look at a shutter photo, so a find is judged on what was actually saved: a live lock can be a passing
+ * false hit (grass flickering by while walking). Runs the detector once on the window the live scanner saw,
+ * near `around`, and returns the four-leaf it confirms as fractions of the upright photo, or undefined.
+ */
+export async function findInPhoto(path: string, around?: { x: number; y: number }): Promise<FractionBox | undefined> {
+  const model = await loadDetector();
+  const image = await loadUpright(path);
+  const { width, height } = image;
+  const size = DETECTOR.inputSize;
+  const { left, top, side } = photoWindow(width, height, around);
+  const square = await (await image.cropAsync(left, top, left + side, top + side)).resizeAsync(size, size);
+  const [output] = await model.run([toModelInput(await square.toRawPixelDataAsync(), size).buffer as ArrayBuffer]);
+  const k = side / size;
+  const found = decodeYolo(new Float32Array(output), DETECTOR.decode)
+    .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
+    .map((b) => ({ x: (left + b.x * k) / width, y: (top + b.y * k) / height, width: (b.width * k) / width, height: (b.height * k) / height }));
+  // The one the user locked onto, else the most confident (decodeYolo sorts by confidence).
+  const distance = (b: FractionBox) => (around ? Math.hypot(b.x - around.x, b.y - around.y) : 0);
+  return found.sort((a, b) => distance(a) - distance(b))[0];
+}
+
+export async function wideScan(path: string, onProgress: (done: number, total: number) => void): Promise<WideResult> {
+  const model = await loadDetector();
+  let image = await loadUpright(path);
   image = await image.resizeAsync(Math.round(image.width * SCALE), Math.round(image.height * SCALE));
   const { width, height } = image;
   const saved = image.saveToTemporaryFileAsync('jpg', 92);

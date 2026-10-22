@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Hello Luck",
+    "NSCameraUsageDescription": "يستخدم Hello Luck الكاميرا للعثور على الحظ بين البرسيم. يُحلَّل الفيديو على جهازك فقط.",
+    "NSLocationWhenInUseUsageDescription": "يحفظ Hello Luck المكان الذي وجدت فيه الحظ. لا يُنشر إلا إذا شاركته على خريطة الحظ.",
+    "NSPhotoLibraryUsageDescription": "يستخدم Hello Luck صورك فقط عندما تشارك بطاقة حظ في تطبيق مثل Instagram، كي تنتقل البطاقة.",
+    "NSPhotoLibraryAddUsageDescription": "يحفظ Hello Luck بطاقة الحظ أو فيديو الرحلة في صورك عندما تختار الحفظ.",
+    "NSMotionUsageDescription": "يستخدم Hello Luck مستشعرات الحركة لإبقاء مربع الاكتشاف ثابتًا أثناء تحريك الكاميرا."
+  }
+}

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { cheerKey, letterMessage, myPlace, randomKey, routeCities } from '../src/letters.ts';
+import { cheerKey, flagEmoji, letterMessage, myPlace, passportStamps, randomKey, routeCities } from '../src/letters.ts';
 
 const s = {
   fortunes: Array.from({ length: 50 }, (_, i) => `f${i}`),
@@ -39,4 +39,32 @@ test('my place is the newest find with a city', () => {
   ];
   assert.deepEqual(myPlace(finds), { city: 'Busan', lat: undefined, lng: undefined });
   assert.equal(myPlace([]), undefined);
+});
+
+test('passport stamps one city once, counts later passes, numbers by first arrival', () => {
+  const journeys = [
+    { route: [{ c: 'Tokyo' }, { c: 'Seoul' }, { c: 'Seoul' }], card_key: 2, updated_at: '2026-10-05T00:00:00Z' },
+    { route: [{ c: 'Seoul' }, {}, { c: 'Paris' }], card_key: 1, updated_at: '2026-10-01T00:00:00Z' },
+  ];
+  assert.deepEqual(passportStamps(journeys), [
+    { city: 'Seoul', visits: 2, card: 1, n: 1 },
+    { city: 'Paris', visits: 1, card: 1, n: 2 },
+    { city: 'Tokyo', visits: 1, card: 2, n: 3 },
+  ]);
+  assert.deepEqual(passportStamps([]), []);
+});
+
+test('a stamp keeps the first known point of its city', () => {
+  const [seoul] = passportStamps([
+    { route: [{ c: 'Seoul' }, { c: 'Seoul', la: 37.6, lo: 127 }], card_key: 0, updated_at: '2026-10-01T00:00:00Z' },
+    { route: [{ c: 'Seoul', la: 37.5, lo: 126.9 }], card_key: 0, updated_at: '2026-10-02T00:00:00Z' },
+  ]);
+  assert.deepEqual(seoul, { city: 'Seoul', visits: 2, card: 0, n: 1, la: 37.6, lo: 127 });
+});
+
+test('country codes become flag emoji', () => {
+  assert.equal(flagEmoji('KR'), '🇰🇷');
+  assert.equal(flagEmoji('jp'), '🇯🇵');
+  assert.equal(flagEmoji(undefined), '');
+  assert.equal(flagEmoji('KOR'), '');
 });

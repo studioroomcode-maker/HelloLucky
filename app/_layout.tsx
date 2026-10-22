@@ -49,6 +49,7 @@ export default function RootLayout() {
         <Stack.Screen name="letters" />
         <Stack.Screen name="wide" options={{ animation: 'fade', contentStyle: { backgroundColor: '#000' } }} />
         <Stack.Screen name="journey/[chain]" />
+        <Stack.Screen name="passport" />
       </Stack>
       {showTitle ? (
         <TitleScreen onShown={() => SplashScreen.hideAsync().catch(() => {})} onDone={() => setShowTitle(false)} />

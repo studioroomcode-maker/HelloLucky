@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck dùng camera để tìm may mắn trong bãi cỏ ba lá. Video chỉ được phân tích trên máy của bạn.",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck lưu nơi bạn tìm thấy may mắn. Vị trí chỉ được công khai nếu bạn chia sẻ lên Bản đồ May mắn."
+    "NSLocationWhenInUseUsageDescription": "Hello Luck lưu nơi bạn tìm thấy may mắn. Vị trí chỉ được công khai nếu bạn chia sẻ lên Bản đồ May mắn.",
+    "NSPhotoLibraryUsageDescription": "Hello Luck chỉ dùng ảnh của bạn khi bạn chia sẻ thẻ may mắn sang ứng dụng như Instagram.",
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck lưu thẻ may mắn hoặc video hành trình vào thư viện ảnh khi bạn chọn lưu."
   }
 }

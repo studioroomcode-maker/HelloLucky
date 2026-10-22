@@ -3,7 +3,7 @@ import { AccessibilityInfo, Alert, Animated, Easing, Modal, Pressable, StyleShee
 import * as Haptics from 'expo-haptics';
 
 import { FONT, usePalette } from '@/constants/theme';
-import { t } from '@/src/i18n';
+import { ARROW, t } from '@/src/i18n';
 import { letterMessage, routeCities } from '@/src/letters';
 import { Envelope, Sticker, STICKER_COUNT } from '@/src/ui/art';
 import { playChime } from '@/src/services/chime';
@@ -136,7 +136,7 @@ export function LetterPopup({
                   <Text style={[styles.routeLead, { color: palette.text }]}>
                     {letter.homecoming ? t.homecomingBody(letter.hops) : t.relayCount(letter.hops)}
                   </Text>
-                  <Text style={[styles.routeCities, { color: palette.muted }]}>{cities.join(' → ')}</Text>
+                  <Text style={[styles.routeCities, { color: palette.muted }]}>{cities.join(` ${ARROW} `)}</Text>
                 </View>
               ) : null}
 

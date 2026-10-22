@@ -41,13 +41,15 @@ alter table public.lucky_letters add constraint lucky_letters_message_key_check
 alter table public.lucky_letters
   add column if not exists chain uuid,                       -- first letter of the relay chain
   add column if not exists hops smallint not null default 0,  -- 0 = original, n = relayed n times
-  add column if not exists route jsonb not null default '[]', -- [{c: city, la: lat, lo: lng}] oldest first
+  add column if not exists route jsonb not null default '[]', -- [{c: city, la: lat, lo: lng, n: sender name id}] oldest first
   add column if not exists deliver_at timestamptz,
   add column if not exists homecoming boolean not null default false,
   add column if not exists relayed_at timestamptz,
   add column if not exists thanks_key smallint check (thanks_key between 0 and 5),
   add column if not exists thanks_city text check (char_length(thanks_city) <= 60),
   add column if not exists thanked_at timestamptz,
+  -- The sender's clover close-up in the public clovers bucket (<user>/<uuid>.jpg); relays carry it on.
+  add column if not exists photo text check (photo ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}\.jpg$'),
   add column if not exists thanks_seen_at timestamptz;
 update public.lucky_letters set chain = id where chain is null;
 create index if not exists lucky_letters_pending on public.lucky_letters (created_at) where recipient is null;
@@ -136,17 +138,24 @@ language sql immutable as $$
 $$;
 
 drop function if exists public.send_lucky_letter(smallint, smallint, text);
+-- p_nick: the sender's name id (src/nicknames.ts, 0–2499); old apps leave it out.
+drop function if exists public.send_lucky_letter(smallint, smallint, text, double precision, double precision, uuid);
+-- p_photo: my clover close-up already uploaded to clovers/<me>/…; a relay keeps its parent's.
+drop function if exists public.send_lucky_letter(smallint, smallint, text, double precision, double precision, uuid, smallint);
 create or replace function public.send_lucky_letter(p_message smallint, p_card smallint, p_origin text,
-  p_lat double precision default null, p_lng double precision default null, p_parent uuid default null)
+  p_lat double precision default null, p_lng double precision default null, p_parent uuid default null,
+  p_nick smallint default null, p_photo text default null)
 returns uuid language plpgsql security definer set search_path = public as $$
 declare
   me uuid := auth.uid();
   parent lucky_letters;
   letter uuid := gen_random_uuid();
   hop jsonb := jsonb_strip_nulls(jsonb_build_object('c', left(p_origin, 60),
-    'la', round(p_lat::numeric, 1), 'lo', round(p_lng::numeric, 1)));
+    'la', round(p_lat::numeric, 1), 'lo', round(p_lng::numeric, 1),
+    'n', case when p_nick between 0 and 2499 then p_nick end));
   v_chain uuid; v_hops smallint := 0; v_route jsonb; v_message smallint := p_message; v_card smallint := p_card;
   root uuid; target uuid; home boolean := false; tz text;
+  v_photo text := case when p_photo like auth.uid()::text || '/%' then p_photo end;
 begin
   if me is null then raise exception 'not_signed_in'; end if;
   if (select count(*) from lucky_letters where sender = me and created_at > now() - interval '1 day') >= 5 then
@@ -163,6 +172,7 @@ begin
     update lucky_letters set relayed_at = now() where id = parent.id;
     v_chain := parent.chain; v_hops := parent.hops + 1; v_message := parent.message_key; v_card := parent.card_key;
     v_route := parent.route || hop;
+    v_photo := coalesce(v_photo, parent.photo);
     if jsonb_array_length(v_route) > 30 then v_route := v_route - 1; end if;
   end if;
   -- After 4+ hops a chain sometimes finds its way home to whoever started it (rarer the further it goes).
@@ -175,9 +185,9 @@ begin
     target := pick_recipient(me);
   end if;
   select lm.tz into tz from luck_members lm where lm.user_id = target;
-  insert into lucky_letters (id, sender, message_key, card_key, origin, recipient, deliver_at, chain, hops, route, homecoming)
+  insert into lucky_letters (id, sender, message_key, card_key, origin, recipient, deliver_at, chain, hops, route, homecoming, photo)
   values (letter, me, v_message, v_card, left(p_origin, 60), target,
-          case when target is null then null else cozy_time(tz) end, v_chain, v_hops, v_route, home);
+          case when target is null then null else cozy_time(tz) end, v_chain, v_hops, v_route, home, v_photo);
   return letter;
 end $$;
 
@@ -254,10 +264,11 @@ language sql security definer set search_path = public as $$
 $$;
 
 -- Letters that reached me, newest first (the keepsake box).
+drop function if exists public.my_letters();
 create or replace function public.my_letters() returns table (letter uuid, message_key smallint, card_key smallint,
-  origin text, hops smallint, route jsonb, homecoming boolean, delivered_at timestamptz, relayed boolean, thanked boolean)
+  origin text, hops smallint, route jsonb, homecoming boolean, delivered_at timestamptz, relayed boolean, thanked boolean, photo text)
 language sql stable security definer set search_path = public as $$
-  select id, message_key, card_key, origin, hops, route, homecoming, delivered_at, relayed_at is not null, thanked_at is not null
+  select id, message_key, card_key, origin, hops, route, homecoming, delivered_at, relayed_at is not null, thanked_at is not null, photo
     from lucky_letters where recipient = auth.uid() and delivered_at is not null
    order by delivered_at desc limit 200
 $$;
@@ -293,6 +304,6 @@ $$;
 
 revoke execute on function public.notify_letter(uuid), public.pick_recipient(uuid), public.push(text, text, text, jsonb),
   public.deliver_due(), public.is_free(uuid), public.cozy_time(text) from public, anon, authenticated;
-grant execute on function public.send_lucky_letter(smallint, smallint, text, double precision, double precision, uuid),
+grant execute on function public.send_lucky_letter(smallint, smallint, text, double precision, double precision, uuid, smallint, text),
   public.check_mailbox(text, text), public.open_letter(uuid), public.thank_letter(uuid, smallint, text),
   public.my_thanks(), public.my_letters(), public.my_journeys(), public.my_echo(), public.luck_today(), public.set_push_token(text, text) to authenticated;

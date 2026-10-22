@@ -33,17 +33,14 @@ import {
 import { focalLength, integrate, motionAt, type MotionSample } from '@/src/services/detector/cameraMotion';
 import { projectToView } from '@/src/services/detector/frameMapping';
 import { useCloverFrameProcessor, type FrameDetections } from '@/src/services/detector/useCloverFrameProcessor';
+import { findInPhoto } from '@/src/services/detector/wideScan';
 import { saveCapture } from '@/src/services/capture';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { TrackBox } from '@/src/ui/TrackBox';
 
 // The OS takes the camera away when the app is hidden or another app grabs it; just reopen it.
-const TRANSIENT_CAMERA_ERRORS = new Set([
-  'system/camera-is-restricted',
-  'device/camera-already-in-use',
-  'system/max-cameras-in-use',
-]);
+const TRANSIENT_CAMERA_ERRORS = new Set(['system/camera-is-restricted', 'device/camera-already-in-use', 'system/max-cameras-in-use']);
 
 function useAppActive() {
   const [active, setActive] = useState(AppState.currentState === 'active');
@@ -155,7 +152,7 @@ function Scanner() {
     setTracking(next);
   }, []);
 
-  const { frameProcessor, modelState } = useCloverFrameProcessor(onDetections);
+  const { frameProcessor, modelState, paused } = useCloverFrameProcessor(onDetections);
 
   const zoomPresets = useMemo(() => {
     if (!device) return [];
@@ -185,6 +182,9 @@ function Scanner() {
   }, [isFocused, appActive, motion]);
 
   const locked = tracking.stableTracks.length > 0;
+  const shown = tracking.tracks.filter(
+    (track) => track.isStable || (track.streak >= DETECTOR.hint.minStreak && track.confidence >= DETECTOR.hint.minConfidence),
+  );
   const status =
     modelState === 'loading'
       ? t.scanLoadingModel
@@ -192,18 +192,19 @@ function Scanner() {
         ? t.scanModelError
         : locked
           ? t.scanLocked
-          : tracking.candidateTracks.length > 0
+          : shown.length > 0
             ? t.scanCandidate
             : t.scanIdle;
 
-  const overlay = frame.width && view.width
-    ? tracking.tracks.map((track) => ({
-        track,
-        rect: (({ left, top, width, height }) => ({ left: left - anchor.x, top: top - anchor.y, width, height }))(
-          projectToView(track, frame.width, frame.height, view.width, view.height),
-        ),
-      }))
-    : [];
+  const overlay =
+    frame.width && view.width
+      ? shown.map((track) => ({
+          track,
+          rect: (({ left, top, width, height }) => ({ left: left - anchor.x, top: top - anchor.y, width, height }))(
+            projectToView(track, frame.width, frame.height, view.width, view.height),
+          ),
+        }))
+      : [];
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -238,14 +239,27 @@ function Scanner() {
     try {
       // The torch already lights the scene; a capture flash would fight it.
       const photo = await camera.current.takePhoto({ flash: 'off', enableShutterSound: false });
-      // Close-up of the strongest locked clover, as fractions of the upright frame (the photo shares its 4:3).
+      // The strongest locked clover, as fractions of the upright frame (the photo shares its 4:3).
       const best = frame.width ? [...tracking.stableTracks].sort((a, b) => b.confidence - a.confidence)[0] : undefined;
-      const box = best && { x: best.x / frame.width, y: best.y / frame.height, width: best.width / frame.width, height: best.height / frame.height };
-      const id = await saveCapture(photo.path, locked, box);
+      const live = best && {
+        x: best.x / frame.width,
+        y: best.y / frame.height,
+        width: best.width / frame.width,
+        height: best.height / frame.height,
+      };
+      // The saved photo decides: a lock it doesn't confirm was a passing false hit, and its own box sits on the clover.
+      // Loading the photo takes far longer than one live inference, so a frame already running finishes first.
+      paused.value = true;
+      const box = await findInPhoto(photo.path, live).catch((error) => {
+        console.warn('scan: photo check failed', error);
+        return live;
+      });
+      const id = await saveCapture(photo.path, box !== undefined, box);
       router.replace({ pathname: '/find/[id]', params: { id, fresh: '1' } });
     } catch (error) {
       console.warn('scan: capture failed', error);
       Alert.alert(t.saveError);
+      paused.value = false;
       setSaving(false);
     }
   };
@@ -262,42 +276,52 @@ function Scanner() {
   }
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
-      <Camera
-        key={cameraKey}
-        ref={camera}
-        style={StyleSheet.absoluteFill}
-        device={device}
-        format={format}
-        isActive={isFocused && appActive}
-        photo
-        video={false}
-        zoom={zoom}
-        torch={torch && device.hasTorch ? 'on' : 'off'}
-        resizeMode="cover"
-        // Photos follow the portrait preview, not how the phone happens to be tilted (flat over a patch).
-        outputOrientation="preview"
-        androidPreviewViewType="texture-view"
-        photoQualityBalance="balanced"
-        frameProcessor={frameProcessor}
-        onError={(error) => {
-          console.warn('scan: camera error', error);
-          if (TRANSIENT_CAMERA_ERRORS.has(error.code)) {
-            setTimeout(() => setCameraKey((k) => k + 1), 1000);
-            return;
-          }
-          Alert.alert(t.cameraError, error.message);
-        }}
-      />
+    <View style={styles.container}>
+      {/* The whole 4:3 frame, uncropped like a camera app: sharper (the preview stream is ~1440×1080) and exactly
+          what the AI analyzes and the photo keeps. The controls sit on the dark margins. */}
+      <View style={styles.viewfinder} onLayout={onLayout}>
+        <Camera
+          key={cameraKey}
+          ref={camera}
+          style={StyleSheet.absoluteFill}
+          device={device}
+          format={format}
+          isActive={isFocused && appActive}
+          photo
+          video={false}
+          zoom={zoom}
+          torch={torch && device.hasTorch ? 'on' : 'off'}
+          resizeMode="cover"
+          // Photos follow the portrait preview, not how the phone happens to be tilted (flat over a patch).
+          outputOrientation="preview"
+          androidPreviewViewType="texture-view"
+          photoQualityBalance="balanced"
+          frameProcessor={frameProcessor}
+          onError={(error) => {
+            console.warn('scan: camera error', error);
+            if (TRANSIENT_CAMERA_ERRORS.has(error.code)) {
+              setTimeout(() => setCameraKey((k) => k + 1), 1000);
+              return;
+            }
+            Alert.alert(t.cameraError, error.message);
+          }}
+        />
 
-      <Pressable style={StyleSheet.absoluteFill} onPress={onTapToFocus} accessible={false} />
-      <LuckBurst trigger={burst} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={onTapToFocus} accessible={false} />
 
-      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-        {overlay.map(({ track, rect }) => (
-          <TrackBox key={track.id} rect={rect} motion={motion} stable={track.isStable} label={track.isStable ? `${Math.round(track.confidence * 100)}%` : '?'} />
-        ))}
+        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+          {overlay.map(({ track, rect }) => (
+            <TrackBox
+              key={track.id}
+              rect={rect}
+              motion={motion}
+              stable={track.isStable}
+              label={track.isStable ? `${Math.round(track.confidence * 100)}%` : '?'}
+            />
+          ))}
+        </View>
       </View>
+      <LuckBurst trigger={burst} />
 
       <View style={[styles.top, { paddingTop: insets.top + 8 }]} pointerEvents="box-none">
         <CloseButton onPress={() => router.back()} />
@@ -346,11 +370,7 @@ function Scanner() {
             accessibilityLabel={t.shutter}
             style={({ pressed }) => [styles.shutter, locked && styles.shutterLocked, pressed && styles.shutterPressed]}
           >
-            {saving ? (
-              <ActivityIndicator color="#10210F" />
-            ) : (
-              <View style={[styles.shutterInner, locked && styles.shutterInnerLocked]} />
-            )}
+            {saving ? <ActivityIndicator color="#10210F" /> : <View style={[styles.shutterInner, locked && styles.shutterInnerLocked]} />}
           </Pressable>
           <Pressable
             onPress={wideCapture}
@@ -373,7 +393,8 @@ function Scanner() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: { flex: 1, backgroundColor: '#000', justifyContent: 'center' },
+  viewfinder: { width: '100%', aspectRatio: 3 / 4 },
   gate: { flex: 1, backgroundColor: '#0D130F', paddingHorizontal: 24 },
   gateBody: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
   gateTitle: { color: '#fff', fontSize: 22, fontFamily: FONT.cute, textAlign: 'center' },
@@ -388,16 +409,7 @@ const styles = StyleSheet.create({
   },
   roundBtnActive: { backgroundColor: CameraColors.lock },
   disabled: { opacity: 0.4 },
-  top: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 16,
-    gap: 10,
-  },
+  top: { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, gap: 10 },
   status: {
     flex: 1,
     minHeight: 44,
@@ -428,19 +440,18 @@ const styles = StyleSheet.create({
   zoomChipSelected: { backgroundColor: 'rgba(255,255,255,0.9)' },
   zoomText: { color: '#fff', fontSize: 14, fontFamily: FONT.cute },
   zoomTextSelected: { color: '#10210F' },
-  shutter: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
-    borderColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  shutter: { width: 80, height: 80, borderRadius: 40, borderWidth: 4, borderColor: '#fff', alignItems: 'center', justifyContent: 'center' },
   shutterLocked: { borderColor: CameraColors.lock },
   shutterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 },
   side: { width: 76, alignItems: 'center', gap: 4 },
-  wideIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: CameraColors.scrim, alignItems: 'center', justifyContent: 'center' },
+  wideIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: CameraColors.scrim,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   wideText: {
     fontFamily: FONT.medium,
     color: '#fff',

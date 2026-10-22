@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FONT, usePalette } from '@/constants/theme';
-import { t } from '@/src/i18n';
+import { lang, t } from '@/src/i18n';
 import { letterMessage, randomKey } from '@/src/letters';
+import { nickname } from '@/src/nicknames';
+import { useSettings } from '@/src/services/findsStore';
 import { notificationsGranted, enableLuckNotifications } from '@/src/services/notifications';
-import { sendLuckyLetter, sharingAvailable, type Place } from '@/src/services/sharing';
+import { myNickname, sendLuckyLetter, sharingAvailable, type Place } from '@/src/services/sharing';
 import { EVERYDAY_CARDS, LuckCard } from '@/src/ui/LuckCard';
 import { SPECIAL_CARD, specialDay } from '@/src/warm';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
@@ -22,10 +24,11 @@ const pickCard = () => {
 
 /**
  * "Send luck" sheet. Friend mode: photo preview + an editable message, handed to the system share sheet.
- * Stranger mode: a curated luck line or cheer on a random card flies to a random Hello Luck user (no photo, city only).
+ * Stranger mode: a curated luck line or cheer on a random card flies to a random Hello Luck user (only the clover close-up and city).
  */
 export function SendLuckSheet({
   photoUri,
+  cloverUri,
   fortune,
   place,
   visible,
@@ -34,12 +37,15 @@ export function SendLuckSheet({
   onStrangerSent,
 }: {
   photoUri: string;
+  /** The find's clover close-up, which travels with a stranger letter. */
+  cloverUri?: string;
   fortune: string;
   place?: Place;
   visible: boolean;
   onClose: () => void;
   onSend: (note: string) => Promise<void>;
-  onStrangerSent: () => void;
+  /** Gets the new letter's id (its journey). */
+  onStrangerSent: (letter: string) => void;
 }) {
   const palette = usePalette();
   const insets = useSafeAreaInsets();
@@ -50,6 +56,11 @@ export function SendLuckSheet({
   const [message, setMessage] = useState(() => randomKey(t, -1));
   const [card, setCard] = useState(pickCard);
   const [busy, setBusy] = useState(false);
+  const { nickname: nick } = useSettings();
+
+  useEffect(() => {
+    if (visible) myNickname().catch(() => {});
+  }, [visible]);
 
   const sendFriend = async () => {
     setBusy(true);
@@ -64,8 +75,7 @@ export function SendLuckSheet({
   const sendStranger = async () => {
     setBusy(true);
     try {
-      await sendLuckyLetter(message, card, place);
-      onStrangerSent();
+      onStrangerSent(await sendLuckyLetter(message, card, place, undefined, cloverUri));
       onClose();
       setMessage(randomKey(t, topic));
       setCard(pickCard());
@@ -90,9 +100,11 @@ export function SendLuckSheet({
       onPress={() => setMode(value)}
       accessibilityRole="tab"
       accessibilityState={{ selected: mode === value }}
-      style={[styles.tab, mode === value && { backgroundColor: palette.surface }]}
+      style={[styles.tab, { flex: value === 'stranger' ? 1.5 : 1 }, mode === value && { backgroundColor: palette.surface }]}
     >
-      <Text style={[styles.tabText, { color: mode === value ? palette.text : palette.muted }]}>{label}</Text>
+      <Text style={[styles.tabText, { color: mode === value ? palette.text : palette.muted }]} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.85}>
+        {label}
+      </Text>
     </Pressable>
   );
 
@@ -169,6 +181,13 @@ export function SendLuckSheet({
                 <Ionicons name="shuffle" size={18} color={palette.primary} />
                 <Text style={[styles.shuffleText, { color: palette.primary }]}>{t.shuffle}</Text>
               </Pressable>
+              {/* The name saved in Settings; it is changed only there. */}
+              <View style={[styles.nick, { backgroundColor: palette.surfaceAlt }]}>
+                <Text style={[styles.nickLabel, { color: palette.muted }]}>{t.nicknameLabel}</Text>
+                <Text style={[styles.nickName, { color: palette.text }]} numberOfLines={1}>
+                  {nickname(nick, lang)}
+                </Text>
+              </View>
               <Text style={[styles.intro, { color: palette.muted }]}>{t.strangerIntro}</Text>
               <PrimaryButton icon="balloon" label={t.sendStranger} onPress={sendStranger} loading={busy} />
             </>
@@ -185,8 +204,12 @@ const styles = StyleSheet.create({
   grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3 },
   title: { fontSize: 20, fontFamily: FONT.cute, textAlign: 'center' },
   tabs: { flexDirection: 'row', borderRadius: 16, padding: 4 },
-  tab: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12 },
-  tabText: { fontSize: 15, fontFamily: FONT.cute },
+  tab: { alignItems: 'center', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12 },
+  // Long labels (most languages) wrap to two centred lines instead of shrinking.
+  tabText: { fontSize: 14, lineHeight: 18, textAlign: 'center', fontFamily: FONT.cute },
+  nick: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
+  nickLabel: { fontFamily: FONT.body, fontSize: 13 },
+  nickName: { flex: 1, fontFamily: FONT.medium, fontSize: 15 },
   preview: { alignSelf: 'center', width: 150, aspectRatio: 3 / 4, borderRadius: 18, overflow: 'hidden', backgroundColor: '#000' },
   watermark: { position: 'absolute', right: 8, bottom: 8, width: '15%', aspectRatio: 366 / 290, opacity: 0.55 },
   input: { fontFamily: FONT.body, minHeight: 64, borderRadius: 16, padding: 14, fontSize: 16, textAlignVertical: 'top' },

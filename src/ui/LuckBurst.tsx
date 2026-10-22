@@ -5,19 +5,22 @@ import { Confetti } from '@/src/ui/art';
 
 const COUNT = 14;
 
-/** A pop of little clovers from the centre of the parent. Re-fires whenever `trigger` changes (0 = idle). */
-export function LuckBurst({ trigger }: { trigger: number }) {
+/**
+ * A pop of little clovers from the centre of the parent. Re-fires whenever `trigger` changes (0 = idle).
+ * `scale` shrinks the spread and pieces (a small pop around an icon); `color` replaces the green.
+ */
+export function LuckBurst({ trigger, scale = 1, color = '#3DAA4E' }: { trigger: number; scale?: number; color?: string }) {
   const progress = useRef(new Animated.Value(0)).current;
   const particles = useMemo(
     () =>
       Array.from({ length: COUNT }, (_, i) => {
         const angle = (i / COUNT) * Math.PI * 2 + Math.random() * 0.4;
-        const distance = 110 + Math.random() * 90;
+        const distance = (110 + Math.random() * 90) * scale;
         return {
           dx: Math.cos(angle) * distance,
-          dy: Math.sin(angle) * distance - 30,
+          dy: Math.sin(angle) * distance - 30 * scale,
           spin: `${(Math.random() - 0.5) * 540}deg`,
-          size: 20 + Math.random() * 14,
+          size: (20 + Math.random() * 14) * Math.max(scale, 0.45),
           gold: Math.random() < 0.25,
         };
       }),
@@ -50,13 +53,13 @@ export function LuckBurst({ trigger }: { trigger: number }) {
               transform: [
                 { translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [0, p.dx] }) },
                 // Rise then sink a little, like confetti.
-                { translateY: progress.interpolate({ inputRange: [0, 0.6, 1], outputRange: [0, p.dy, p.dy + 40] }) },
+                { translateY: progress.interpolate({ inputRange: [0, 0.6, 1], outputRange: [0, p.dy, p.dy + 40 * scale] }) },
                 { rotate: progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', p.spin] }) },
                 { scale: progress.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0.3, 1.15, 0.9] }) },
               ],
             }}
           >
-            <Confetti kind="clover" size={p.size} color={p.gold ? '#F5C431' : '#3DAA4E'} />
+            <Confetti kind="clover" size={p.size} color={p.gold ? '#F5C431' : color} />
           </Animated.View>
         ))}
       </View>

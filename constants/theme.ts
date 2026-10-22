@@ -10,7 +10,7 @@ const light = {
   text: '#16211A',
   muted: '#5B685D',
   border: '#DCE5D5',
-  primary: '#2F7D3A',
+  primary: '#38A34A', // same key green as the website (helloluck.studioroomkr.com), 2026-10-21
   onPrimary: '#FFFFFF',
   gold: '#E8B931',
   danger: '#C2410C',

@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck utilise la caméra pour trouver la chance parmi les trèfles. La vidéo est analysée uniquement sur ton appareil.",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck enregistre l'endroit où tu as trouvé la chance. Il n'est rendu public que si tu le partages sur la Carte de la chance."
+    "NSLocationWhenInUseUsageDescription": "Hello Luck enregistre l'endroit où tu as trouvé la chance. Il n'est rendu public que si tu le partages sur la Carte de la chance.",
+    "NSPhotoLibraryUsageDescription": "Hello Luck utilise tes photos uniquement quand tu partages une carte porte-bonheur dans une app comme Instagram.",
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck enregistre ta carte porte-bonheur ou la vidéo du voyage dans tes photos quand tu choisis de les enregistrer."
   }
 }

@@ -164,7 +164,8 @@ export function advanceDetectionTracker(
     const match = matches.get(trackIndex);
 
     if (match) {
-      const streak = track.missedFrames === 0 ? track.streak + 1 : 1;
+      // A frame or two lost to flicker (screen moiré, a leaf in motion) pauses the streak instead of restarting it.
+      const streak = track.streak + 1;
       const confidence = blend(track.confidence, match.confidence, config.smoothingFactor);
 
       nextTracks.push({
@@ -187,7 +188,6 @@ export function advanceDetectionTracker(
     if (missedFrames <= config.maxMissedFrames) {
       nextTracks.push({
         ...track,
-        streak: 0,
         missedFrames,
         isStable: false,
       });

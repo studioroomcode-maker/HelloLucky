@@ -5,7 +5,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { runAtTargetFps, useFrameProcessor } from 'react-native-vision-camera';
-import { useRunOnJS } from 'react-native-worklets-core';
+import { useRunOnJS, useSharedValue } from 'react-native-worklets-core';
 import { NitroModules } from 'react-native-nitro-modules';
 import type { TensorflowModel } from 'react-native-fast-tflite';
 import { useResizePlugin } from 'vision-camera-resize-plugin';
@@ -48,11 +48,13 @@ export function useCloverFrameProcessor(onDetections: (result: FrameDetections) 
 
   const boxedModel = useMemo(() => (model ? NitroModules.box(model) : undefined), [model]);
   const deliver = useRunOnJS(onDetections, [onDetections]);
+  // The live scanner and the shutter's photo check share one interpreter; it must not run twice at once.
+  const paused = useSharedValue(false);
 
   const frameProcessor = useFrameProcessor(
     (frame) => {
       'worklet';
-      if (boxedModel == null) return;
+      if (boxedModel == null || paused.value) return;
 
       // Sync on purpose: runAsync crashes (SIGSEGV in worklets-core 1.6 on the new architecture).
       runAtTargetFps(DETECTOR.targetFps, () => {
@@ -73,7 +75,7 @@ export function useCloverFrameProcessor(onDetections: (result: FrameDetections) 
         deliver({ boxes, imageWidth: size.width, imageHeight: size.height });
       });
     },
-    [boxedModel, resize, deliver],
+    [boxedModel, resize, deliver, paused],
   );
 
   return {
@@ -81,5 +83,6 @@ export function useCloverFrameProcessor(onDetections: (result: FrameDetections) 
     // Until the model is ready the worklet just returns.
     frameProcessor,
     modelState: state,
+    paused,
   };
 }

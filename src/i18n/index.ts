@@ -1,5 +1,7 @@
 import { getLocales } from 'expo-localization';
+import { I18nManager } from 'react-native';
 
+import { ar } from './ar';
 import { de } from './de';
 import { en } from './en';
 import { es } from './es';
@@ -10,6 +12,7 @@ import { ja } from './ja';
 import { ko, type Strings } from './ko';
 import { pt } from './pt';
 import { ru } from './ru';
+import { sw } from './sw';
 import { th } from './th';
 import { vi } from './vi';
 import { zhHans } from './zh-Hans';
@@ -17,7 +20,7 @@ import { zhHant } from './zh-Hant';
 
 export type { Strings };
 
-const BY_LANGUAGE: Record<string, Strings> = { de, en, es, fr, id, it, ja, ko, pt, ru, th, vi };
+const BY_LANGUAGE: Record<string, Strings> = { ar, de, en, es, fr, id, it, ja, ko, pt, ru, sw, th, vi };
 
 const locale = getLocales()[0];
 
@@ -34,6 +37,12 @@ function pickLanguage(): string {
 /** Active UI language code (also sent to the server so pushes arrive in a fitting language). */
 export const lang = pickLanguage();
 export const t: Strings = lang === 'zh-Hant' ? zhHant : lang === 'zh-Hans' ? zhHans : BY_LANGUAGE[lang];
+
+/** Arabic lays the app out right to left (React Native mirrors the layout); arrows and chevrons follow the reading direction. */
+export const rtl = I18nManager.isRTL;
+export const ARROW = rtl ? '←' : '→';
+export const CHEVRON_BACK = rtl ? 'chevron-forward' : 'chevron-back';
+export const CHEVRON_FORWARD = rtl ? 'chevron-back' : 'chevron-forward';
 
 export function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(locale?.languageTag ?? 'en-US', {

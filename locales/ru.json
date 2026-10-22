@@ -2,6 +2,8 @@
   "ios": {
     "CFBundleDisplayName": "Hello Luck",
     "NSCameraUsageDescription": "Hello Luck использует камеру, чтобы искать удачу в клевере. Видео анализируется только на твоём устройстве.",
-    "NSLocationWhenInUseUsageDescription": "Hello Luck сохраняет места находок. Они станут видны всем, только если ты отметишь их на Карте удачи."
+    "NSLocationWhenInUseUsageDescription": "Hello Luck сохраняет места находок. Они станут видны всем, только если ты отметишь их на Карте удачи.",
+    "NSPhotoLibraryUsageDescription": "Hello Luck использует ваши фото, только когда вы делитесь карточкой удачи в приложениях вроде Instagram.",
+    "NSPhotoLibraryAddUsageDescription": "Hello Luck сохраняет карточку удачи или видео путешествия в ваши фото, когда вы выбираете «Сохранить»."
   }
 }

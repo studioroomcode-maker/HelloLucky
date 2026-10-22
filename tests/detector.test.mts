@@ -103,6 +103,13 @@ test('tracker locks after the required streak and drops stale tracks', () => {
   assert.equal(snap.tracks.length, 0, 'missed frame hides the track');
   snap = advanceDetectionTracker(state, [], config);
   assert.equal(snap.state.tracks.length, 0, 'second miss removes it');
+  // One dropped frame pauses the streak: hit, hit, miss, hit locks at requiredStreak 3.
+  state = createDetectionTrackerState();
+  for (const frame of [[det], [det], [], [det]]) {
+    snap = advanceDetectionTracker(state, frame, config);
+    state = snap.state;
+  }
+  assert.equal(snap.stableTracks.length, 1, 'a single miss does not restart the streak');
   // A steady but unsure box stays a candidate.
   state = createDetectionTrackerState();
   for (let i = 0; i < 5; i++) {

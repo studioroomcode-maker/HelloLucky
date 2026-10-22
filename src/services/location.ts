@@ -40,3 +40,23 @@ export async function captureLocation() {
     return null;
   }
 }
+
+const countries = new Map<string, Promise<string | undefined>>();
+
+/**
+ * ISO country code at a point, from the OS geocoder (cached per point). Never asks for permission or throws:
+ * Android's geocoder needs location access already granted, so without it the answer is just undefined.
+ */
+export function countryCodeAt(latitude: number, longitude: number): Promise<string | undefined> {
+  const key = `${latitude.toFixed(1)},${longitude.toFixed(1)}`;
+  let code = countries.get(key);
+  if (!code) {
+    code = withTimeout(Location.reverseGeocodeAsync({ latitude, longitude }), TIMEOUT_MS)
+      .then((results) => results?.[0]?.isoCountryCode ?? undefined)
+      .catch(() => undefined);
+    // A miss (offline, no permission yet) is tried again next time.
+    code.then((found) => found === undefined && countries.delete(key));
+    countries.set(key, code);
+  }
+  return code;
+}

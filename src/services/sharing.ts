@@ -11,7 +11,9 @@ import { getCalendars } from 'expo-localization';
 
 import { BACKEND } from '../config/backend';
 import type { Hop } from '../letters';
-import { getFind, updateFind, type Find } from './findsStore';
+import { getFind, getSettings, updateFind, updateSettings, type Find } from './findsStore';
+import { randomNickname } from '../nicknames';
+import { OWNER_USER_ID, SAMPLE_JOURNEYS, SAMPLE_LETTER, WORLD_JOURNEY } from '../sampleJourneys';
 
 export const sharingAvailable = Boolean(BACKEND.url && BACKEND.anonKey);
 
@@ -40,6 +42,17 @@ export function cloverPhotoUrl(item: SharedFind) {
     : undefined;
 }
 
+/** Public URL of the clover close-up a letter carries (`<user>/<uuid>.jpg`). */
+export const letterPhotoUrl = (path: string) => `${BACKEND.url}/storage/v1/object/public/${BUCKET}/${path}`;
+
+/** Uploads a clover close-up to my folder of the public clovers bucket. */
+async function uploadClover(uri: string, path: string) {
+  const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+  const bytes = Uint8Array.from(globalThis.atob(base64), (c) => c.charCodeAt(0));
+  const { error } = await supabase.storage.from(BUCKET).upload(path, bytes, { contentType: 'image/jpeg' });
+  if (error) throw error;
+}
+
 /** Random v4 id, so the photo can be uploaded under the pin's id before the (immutable) row exists. */
 function uuid() {
   const hex = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16));
@@ -63,6 +76,21 @@ async function myUserId(): Promise<string> {
   return signedIn.user.id;
 }
 
+/** This install's anonymous account tokens, for a backup; undefined if it never signed in. */
+export async function exportSession() {
+  const { data } = await supabase.auth.getSession();
+  return data.session ? { access_token: data.session.access_token, refresh_token: data.session.refresh_token } : undefined;
+}
+
+/**
+ * Signs this install into a backed-up account. Needs the network, and fails once the old phone has refreshed
+ * its tokens (Supabase rotates refresh tokens), so a backup should be restored soon after it is made.
+ */
+export async function importSession(tokens: { access_token: string; refresh_token: string }) {
+  const { error } = await supabase.auth.setSession(tokens);
+  if (error) throw error;
+}
+
 /** Signed-in user id if a session exists, without creating an account. */
 export async function currentUserId(): Promise<string | undefined> {
   const { data } = await supabase.auth.getSession();
@@ -74,12 +102,7 @@ export async function shareFind(find: Find): Promise<string> {
   const uid = await myUserId();
   const id = uuid();
   const photoPath = `${uid}/${id}.jpg`;
-  if (find.cloverUri) {
-    const base64 = await FileSystem.readAsStringAsync(find.cloverUri, { encoding: FileSystem.EncodingType.Base64 });
-    const bytes = Uint8Array.from(globalThis.atob(base64), (c) => c.charCodeAt(0));
-    const { error } = await supabase.storage.from(BUCKET).upload(photoPath, bytes, { contentType: 'image/jpeg' });
-    if (error) throw error;
-  }
+  if (find.cloverUri) await uploadClover(find.cloverUri, photoPath);
   const { error } = await supabase.from('shared_finds').insert({
     id,
     latitude: find.latitude,
@@ -124,17 +147,19 @@ export async function unshareAll(finds: Find[]) {
   for (const find of finds) if (find.sharedId && getFind(find.id)) await updateFind(find.id, { sharedId: undefined });
 }
 
-export async function fetchShared(bounds: Bounds, limit = 500): Promise<SharedFind[]> {
-  const query = (west: number, east: number) =>
-    supabase
+/** Pins in `bounds`, optionally only one person's (`user`). */
+export async function fetchShared(bounds: Bounds, user?: string, limit = 500): Promise<SharedFind[]> {
+  const query = (west: number, east: number) => {
+    let q = supabase
       .from('shared_finds')
       .select('id, user_id, latitude, longitude, place, found_at, has_photo, hidden')
       .gte('latitude', bounds.south)
       .lte('latitude', bounds.north)
       .gte('longitude', west)
-      .lte('longitude', east)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+      .lte('longitude', east);
+    if (user) q = q.eq('user_id', user);
+    return q.order('created_at', { ascending: false }).limit(limit);
+  };
   // A view crossing the antimeridian (west > east) is two longitude ranges.
   const parts =
     bounds.west <= bounds.east
@@ -169,18 +194,46 @@ export type LuckyLetter = {
 /** Where the sender is: city name plus a point the server rounds to 0.1° (≈11 km). */
 export type Place = { city?: string; lat?: number; lng?: number };
 
-/** A new letter, or with `parent` a relay of a letter I received (the server keeps its card and message). */
-export async function sendLuckyLetter(messageKey: number, cardKey: number, place?: Place, parent?: string) {
-  await myUserId();
-  const { error } = await supabase.rpc('send_lucky_letter', {
+/** The name id my letters go out under, picked at random the first time it is needed. */
+export async function myNickname() {
+  const { nickname } = getSettings();
+  if (nickname >= 0) return nickname;
+  const picked = randomNickname();
+  await updateSettings({ nickname: picked });
+  return picked;
+}
+
+/**
+ * A new letter, or with `parent` a relay of a letter I received (the server keeps its card, message and clover).
+ * `cloverUri`: the find's clover close-up, sent along with a new letter.
+ * Returns the new letter's id, which for a new letter is also its journey (chain) id.
+ */
+export async function sendLuckyLetter(messageKey: number, cardKey: number, place?: Place, parent?: string, cloverUri?: string): Promise<string> {
+  const uid = await myUserId();
+  let photo: string | null = null;
+  if (cloverUri) {
+    const path = `${uid}/${uuid()}.jpg`;
+    // The letter still goes out without its clover if the upload fails.
+    photo = await uploadClover(cloverUri, path).then(
+      () => path,
+      (error) => {
+        console.warn('letter: clover upload failed', error);
+        return null;
+      },
+    );
+  }
+  const { data, error } = await supabase.rpc('send_lucky_letter', {
     p_message: messageKey,
     p_card: cardKey,
     p_origin: place?.city ?? null,
     p_lat: place?.lat ?? null,
     p_lng: place?.lng ?? null,
     p_parent: parent ?? null,
+    p_nick: await myNickname(),
+    p_photo: photo,
   });
   if (error) throw error;
+  return data as string;
 }
 
 /** Marks this install as present (so it can receive), adopts a waiting letter, and returns arrived unopened mail. */
@@ -223,13 +276,20 @@ export type KeptLetter = {
   delivered_at: string;
   relayed: boolean;
   thanked: boolean;
+  /** The sender's clover close-up (letterPhotoUrl), if the letter carries one. */
+  photo?: string | null;
 };
 
+/** The clover a received letter shows; the samples borrow `latest`, my newest clover. */
+export const letterClover = (item: KeptLetter, latest?: string) =>
+  item.letter.startsWith('sample-') ? latest : item.photo ? letterPhotoUrl(item.photo) : undefined;
+
 export async function myLetters(): Promise<KeptLetter[]> {
-  await myUserId();
+  const me = await myUserId();
   const { data, error } = await supabase.rpc('my_letters');
   if (error) throw error;
-  return (data ?? []) as KeptLetter[];
+  const letters = (data ?? []) as KeptLetter[];
+  return __DEV__ || me === OWNER_USER_ID ? [SAMPLE_LETTER, ...letters] : letters;
 }
 
 export type Journey = {
@@ -245,10 +305,13 @@ export type Journey = {
 
 /** Every relay chain I took part in, at its furthest point. */
 export async function myJourneys(): Promise<Journey[]> {
-  await myUserId();
+  const me = await myUserId();
   const { data, error } = await supabase.rpc('my_journeys');
   if (error) throw error;
-  return ((data ?? []) as Journey[]).sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+  const journeys = (data ?? []) as Journey[];
+  if (__DEV__ || me === OWNER_USER_ID) journeys.push(WORLD_JOURNEY);
+  if (__DEV__) journeys.push(...SAMPLE_JOURNEYS);
+  return journeys.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 }
 
 /** People my luck has reached so far (every delivery along chains I sent or relayed into). */
