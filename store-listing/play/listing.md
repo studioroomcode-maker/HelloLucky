@@ -99,9 +99,19 @@ AI model trained in part on "4 Leaf Clover Detect" by test-ara07 and "Hunting fo
 ## 5. 버전 출시 노트 (500자)
 **ko**
 ```
-Hello Luck 첫 출시! 풀밭에서 행운을 찾고, 모르는 누군가에게 보내 보세요 🍀
+🍀 1.0.1 업데이트
+· 행운의 여정을 영상(배경음악 포함)과 이미지로 저장할 수 있어요
+· 보내는 이름(귀여운 동물 닉네임)과 내가 찾은 클로버 사진이 행운과 함께 여행해요
+· 받은 응원에 클로버 사진이 보이고, 클로버 여권 도장을 누르면 그 도시의 클로버를 볼 수 있어요
+· 카메라 화면이 더 선명해졌어요
+· 아랍어·스와힐리어 추가, 여러 언어 화면 다듬기
 ```
 **en**
 ```
-Hello Luck is here! Find luck in the grass and send it on to someone 🍀
+🍀 What's new in 1.0.1
+· Save your luck's journey as a video (with music) or an image
+· A cute animal sender name and your clover photo now travel with your luck
+· See clover photos on cheers you received, and tap a passport stamp to see that city's clovers
+· A sharper camera view
+· Arabic and Swahili, plus polish across languages
 ```
