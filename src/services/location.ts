@@ -1,4 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+
+import { arcDegrees, type LatLng } from '../journeyMap';
 
 const TIMEOUT_MS = 6000;
 
@@ -59,4 +62,44 @@ export function countryCodeAt(latitude: number, longitude: number): Promise<stri
     countries.set(key, code);
   }
   return code;
+}
+
+const CENTERS_KEY = 'cityCenters';
+// Within this many km of the 0.1° stop, a geocoded city is taken to be the same place (not a namesake elsewhere).
+const NEAR_KM = 30;
+const centers = new Map<string, Promise<LatLng | undefined>>();
+let saved: Promise<Record<string, LatLng>> | undefined;
+let queue: Promise<unknown> = Promise.resolve();
+
+/**
+ * Where to pin a journey stop: the center of its city, so a stop rounded to 0.1° for privacy doesn't land on a river
+ * or the next town. Undefined (keep the rounded point) when the geocoder can't place the name near it. Requests run
+ * one at a time (iOS geocodes one at a time) and hits are remembered across launches.
+ */
+export function cityCenter(name: string, near: LatLng): Promise<LatLng | undefined> {
+  const key = `${name}@${near.la.toFixed(1)},${near.lo.toFixed(1)}`;
+  let center = centers.get(key);
+  if (!center) {
+    saved ??= AsyncStorage.getItem(CENTERS_KEY)
+      .then((text) => (text ? (JSON.parse(text) as Record<string, LatLng>) : {}))
+      .catch(() => ({}));
+    center = saved.then(async (known) => {
+      if (known[key]) return known[key];
+      const lookup = queue.then(() => withTimeout(Location.geocodeAsync(name), TIMEOUT_MS));
+      queue = lookup.catch(() => {});
+      const results = await lookup.catch(() => null);
+      const hit = results
+        ?.map((r) => ({ la: r.latitude, lo: r.longitude }))
+        .find((p) => arcDegrees(p, near) * 111.195 < NEAR_KM);
+      if (hit) {
+        known[key] = hit;
+        AsyncStorage.setItem(CENTERS_KEY, JSON.stringify(known)).catch(() => {});
+      }
+      return hit;
+    });
+    // A miss (offline, no permission yet) is tried again next time.
+    center.then((found) => found === undefined && centers.delete(key));
+    centers.set(key, center);
+  }
+  return center;
 }

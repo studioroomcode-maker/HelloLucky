@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   LayoutChangeEvent,
   Linking,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -32,10 +31,9 @@ import { LuckBurst } from '@/src/ui/LuckBurst';
 import { SendLuckSheet } from '@/src/ui/SendLuckSheet';
 import { CornerFrame } from '@/src/ui/TrackBox';
 
+/** Google Maps on both platforms: the app when installed (universal link), otherwise the website. */
 function mapUrl(latitude: number, longitude: number) {
-  return Platform.OS === 'ios'
-    ? `https://maps.apple.com/?ll=${latitude},${longitude}&q=${encodeURIComponent('🍀')}`
-    : `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
+  return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 }
 
 export default function FindDetail() {

@@ -12,6 +12,7 @@ import { getCalendars } from 'expo-localization';
 import { BACKEND } from '../config/backend';
 import type { Hop } from '../letters';
 import { getFind, getSettings, updateFind, updateSettings, type Find } from './findsStore';
+import { cityCenter } from './location';
 import { randomNickname } from '../nicknames';
 import { OWNER_USER_ID, SAMPLE_JOURNEYS, SAMPLE_LETTER, WORLD_JOURNEY } from '../sampleJourneys';
 
@@ -311,7 +312,20 @@ export async function myJourneys(): Promise<Journey[]> {
   const journeys = (data ?? []) as Journey[];
   if (__DEV__ || me === OWNER_USER_ID) journeys.push(WORLD_JOURNEY);
   if (__DEV__) journeys.push(...SAMPLE_JOURNEYS);
-  return journeys.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+  // Stops are stored rounded to 0.1° (privacy); pin each at its city's center so it lands where the name says.
+  const placed = await Promise.all(
+    journeys.map(async (j) => ({
+      ...j,
+      route: await Promise.all(
+        j.route.map(async (hop) => {
+          if (!hop.c || typeof hop.la !== 'number' || typeof hop.lo !== 'number') return hop;
+          const center = await cityCenter(hop.c, { la: hop.la, lo: hop.lo });
+          return center ? { ...hop, la: center.la, lo: center.lo } : hop;
+        }),
+      ),
+    })),
+  );
+  return placed.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 }
 
 /** People my luck has reached so far (every delivery along chains I sent or relayed into). */

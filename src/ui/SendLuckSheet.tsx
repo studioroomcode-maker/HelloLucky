@@ -3,6 +3,7 @@ import { Alert, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, 
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 import { FONT, usePalette } from '@/constants/theme';
 import { lang, t } from '@/src/i18n';
@@ -57,6 +58,7 @@ export function SendLuckSheet({
   const [card, setCard] = useState(pickCard);
   const [busy, setBusy] = useState(false);
   const { nickname: nick } = useSettings();
+  const router = useRouter();
 
   useEffect(() => {
     if (visible) myNickname().catch(() => {});
@@ -181,12 +183,22 @@ export function SendLuckSheet({
                 <Ionicons name="shuffle" size={18} color={palette.primary} />
                 <Text style={[styles.shuffleText, { color: palette.primary }]}>{t.shuffle}</Text>
               </Pressable>
-              {/* The name saved in Settings; it is changed only there. */}
+              {/* The name saved in Settings; "Edit" takes you there (it is changed only in Settings). */}
               <View style={[styles.nick, { backgroundColor: palette.surfaceAlt }]}>
                 <Text style={[styles.nickLabel, { color: palette.muted }]}>{t.nicknameLabel}</Text>
                 <Text style={[styles.nickName, { color: palette.text }]} numberOfLines={1}>
                   {nickname(nick, lang)}
                 </Text>
+                <Pressable
+                  onPress={() => {
+                    onClose();
+                    router.push('/settings');
+                  }}
+                  accessibilityRole="button"
+                  hitSlop={10}
+                >
+                  <Text style={[styles.nickEdit, { color: palette.primary }]}>{t.nicknameEdit}</Text>
+                </Pressable>
               </View>
               <Text style={[styles.intro, { color: palette.muted }]}>{t.strangerIntro}</Text>
               <PrimaryButton icon="balloon" label={t.sendStranger} onPress={sendStranger} loading={busy} />
@@ -210,6 +222,7 @@ const styles = StyleSheet.create({
   nick: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
   nickLabel: { fontFamily: FONT.body, fontSize: 13 },
   nickName: { flex: 1, fontFamily: FONT.medium, fontSize: 15 },
+  nickEdit: { fontFamily: FONT.cute, fontSize: 14 },
   preview: { alignSelf: 'center', width: 150, aspectRatio: 3 / 4, borderRadius: 18, overflow: 'hidden', backgroundColor: '#000' },
   watermark: { position: 'absolute', right: 8, bottom: 8, width: '15%', aspectRatio: 366 / 290, opacity: 0.55 },
   input: { fontFamily: FONT.body, minHeight: 64, borderRadius: 16, padding: 14, fontSize: 16, textAlignVertical: 'top' },
