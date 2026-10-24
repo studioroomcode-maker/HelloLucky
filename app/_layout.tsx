@@ -10,6 +10,12 @@ import { TitleScreen } from '@/src/ui/TitleScreen';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+// In release, React Native reports an uncaught JS error through a native call that aborts the app (SIGABRT on the
+// TurboModule queue; this is what App Review saw on iPhone 17 Pro Max / iOS 27). Log it and keep running instead.
+if (!__DEV__) {
+  ErrorUtils.setGlobalHandler((error) => console.error('uncaught', error));
+}
+
 export default function RootLayout() {
   const loaded = useStoreLoaded();
   const palette = usePalette();

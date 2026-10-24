@@ -77,6 +77,20 @@ export default function Scan() {
   return <Scanner />;
 }
 
+// Expo Router mounts this for errors thrown while rendering the scan route (no boundary = the app aborts in release).
+export function ErrorBoundary({ error, retry }: { error: Error; retry: () => Promise<void> }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.gate, { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }]}>
+      <View style={styles.gateBody}>
+        <Text style={styles.gateTitle}>{t.cameraError}</Text>
+        <Text style={styles.gateText}>{String(error?.message ?? error)}</Text>
+      </View>
+      <PrimaryButton label={t.cameraPermissionButton} onPress={() => void retry()} />
+    </View>
+  );
+}
+
 function PermissionGate({ blocked, onPress }: { blocked: boolean; onPress: () => void }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -127,6 +141,7 @@ function Scanner() {
   const [cameraKey, setCameraKey] = useState(0);
   // Set when the device has no usable 4:3 format (see patches/react-native-vision-camera, iPhone 17 Bayer-only formats).
   const [defaultFormat, setDefaultFormat] = useState(false);
+  const [cameraError, setCameraError] = useState('');
   const [zoom, setZoom] = useState(1);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState({ width: 0, height: 0 });
@@ -187,8 +202,9 @@ function Scanner() {
   const shown = tracking.tracks.filter(
     (track) => track.isStable || (track.streak >= DETECTOR.hint.minStreak && track.confidence >= DETECTOR.hint.minConfidence),
   );
-  const status =
-    modelState === 'loading'
+  const status = cameraError
+    ? `${t.cameraError}: ${cameraError}`
+    : modelState === 'loading'
       ? t.scanLoadingModel
       : modelState === 'error'
         ? t.scanModelError
@@ -302,7 +318,7 @@ function Scanner() {
           frameProcessor={frameProcessor}
           onError={(error) => {
             console.warn('scan: camera error', error);
-            if (error.code === 'format/invalid-format' && !defaultFormat) {
+            if ((error.code === 'format/invalid-format' || error.code === 'device/pixel-format-not-supported') && !defaultFormat) {
               setDefaultFormat(true);
               setCameraKey((k) => k + 1);
               return;
@@ -311,7 +327,7 @@ function Scanner() {
               setTimeout(() => setCameraKey((k) => k + 1), 1000);
               return;
             }
-            Alert.alert(t.cameraError, error.message);
+            setCameraError(error.message);
           }}
         />
 
