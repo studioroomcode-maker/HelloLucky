@@ -66,7 +66,7 @@ export const ru: Strings = {
   shuffle: 'Другой текст',
   sendStranger: 'Отпустить удачу в полёт',
   strangerSent: 'Твоя удача уже летит к кому-то!',
-  strangerRateLimit: 'Сегодня удача уже улетела! Продолжим завтра',
+  strangerRateLimit: "Сегодняшняя удача уже долетела сполна.\nОстальное прибережём на завтра 🍀",
   fromCity: (city) => `Удача откуда-то из города ${city}`,
   fromSomewhere: 'Удача откуда-то издалека',
   mailTitle: 'Тебя нашла удача!',

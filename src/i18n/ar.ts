@@ -63,7 +63,7 @@ export const ar: Strings = {
   shuffle: 'عبارة أخرى',
   sendStranger: 'أطلق الحظ',
   strangerSent: 'حظك يطير الآن إلى شخص ما!',
-  strangerRateLimit: 'أرسلت حظ اليوم بالفعل! أرسل المزيد غدًا',
+  strangerRateLimit: "حظ اليوم وصل بما يكفي.\nلنحتفظ بالباقي ليوم الغد 🍀",
   fromCity: (city) => `حظ من مكانٍ ما في ${city}`,
   fromSomewhere: 'حظ من مكانٍ ما في هذا العالم',
   mailTitle: 'وصلك بعض الحظ!',

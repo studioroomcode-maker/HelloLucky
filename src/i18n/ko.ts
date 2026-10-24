@@ -55,7 +55,7 @@ export const ko = {
   shuffle: '다른 문구',
   sendStranger: '행운 띄워 보내기',
   strangerSent: '행운이 누군가에게 날아갔어요!',
-  strangerRateLimit: '오늘 행운은 이미 띄웠어요! 내일 또 보내요',
+  strangerRateLimit: "오늘의 행운은 이미 충분히 전해졌어요.\n남은 행운은 내일을 위해 아껴 둘게요 🍀",
   fromCity: (city: string) => `${city} 어딘가에서 온 행운`,
   fromSomewhere: '어딘가에서 온 행운',
   mailTitle: '우연히 행운이 도착했어요!',

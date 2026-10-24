@@ -52,7 +52,7 @@ export const vi: Strings = {
   shuffle: 'Câu khác',
   sendStranger: 'Thả may mắn bay đi',
   strangerSent: 'May mắn của bạn đang bay đến ai đó!',
-  strangerRateLimit: 'Hôm nay bạn đã gửi may mắn rồi! Mai gửi tiếp nhé',
+  strangerRateLimit: "May mắn hôm nay đã được gửi đi trọn vẹn rồi.\nPhần còn lại để dành cho ngày mai nhé 🍀",
   fromCity: (city) => `May mắn từ đâu đó ở ${city}`,
   fromSomewhere: 'May mắn từ đâu đó ngoài kia',
   mailTitle: 'Có may mắn tìm đến bạn!',

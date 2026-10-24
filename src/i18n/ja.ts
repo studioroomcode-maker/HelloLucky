@@ -52,7 +52,7 @@ export const ja: Strings = {
   shuffle: 'ほかの文にする',
   sendStranger: '幸運を飛ばす',
   strangerSent: '幸運がだれかのもとへ飛んでいったよ！',
-  strangerRateLimit: '今日の幸運はもう飛ばしたよ！また明日おくろうね',
+  strangerRateLimit: "今日の幸運はもう十分に届いたよ。\n残りは明日のためにとっておこうね 🍀",
   fromCity: (city) => `${city}のどこかから届いた幸運`,
   fromSomewhere: 'どこかから届いた幸運',
   mailTitle: '幸運がひょっこり届いたよ！',

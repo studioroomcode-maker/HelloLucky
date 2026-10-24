@@ -52,7 +52,7 @@ export const en: Strings = {
   shuffle: 'Another one',
   sendStranger: 'Let the luck fly',
   strangerSent: 'Your luck is flying to someone!',
-  strangerRateLimit: "You've already sent today's luck! Send more tomorrow",
+  strangerRateLimit: "Today's luck has already been shared.\nLet's save the rest for tomorrow 🍀",
   fromCity: (city) => `Luck from somewhere in ${city}`,
   fromSomewhere: 'Luck from somewhere out there',
   mailTitle: 'Some luck found you!',

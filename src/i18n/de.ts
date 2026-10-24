@@ -53,7 +53,7 @@ export const de: Strings = {
   shuffle: 'Ein anderer',
   sendStranger: 'Glück fliegen lassen',
   strangerSent: 'Dein Glück fliegt zu jemandem!',
-  strangerRateLimit: 'Du hast heute schon Glück verschickt! Morgen geht’s weiter',
+  strangerRateLimit: "Das Glück von heute ist schon reichlich unterwegs.\nHeben wir den Rest für morgen auf 🍀",
   fromCity: (city) => `Glück von irgendwo in ${city}`,
   fromSomewhere: 'Glück von irgendwo da draußen',
   mailTitle: 'Glück hat dich gefunden!',

@@ -52,7 +52,7 @@ export const zhHant: Strings = {
   shuffle: '換一句',
   sendStranger: '讓幸運飛出去',
   strangerSent: '幸運正飛向某個人！',
-  strangerRateLimit: '今天的幸運已經送出囉！明天再來吧',
+  strangerRateLimit: "今天的幸運已經傳遞得足夠囉。\n剩下的留給明天吧 🍀",
   fromCity: (city) => `來自${city}某處的幸運`,
   fromSomewhere: '來自遠方某處的幸運',
   mailTitle: '有一份幸運找到你了！',

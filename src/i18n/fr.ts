@@ -53,7 +53,7 @@ export const fr: Strings = {
   shuffle: 'Une autre',
   sendStranger: 'Faire envoler la chance',
   strangerSent: "Ta chance s'envole vers quelqu'un !",
-  strangerRateLimit: "Tu as déjà envoyé ta chance aujourd'hui ! Tu pourras en envoyer demain",
+  strangerRateLimit: "La chance d'aujourd'hui a déjà bien voyagé.\nGardons le reste pour demain 🍀",
   fromCity: (city) => `De la chance venue de quelque part à ${city}`,
   fromSomewhere: 'De la chance venue de quelque part',
   mailTitle: "Un peu de chance t'a trouvé !",

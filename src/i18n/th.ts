@@ -52,7 +52,7 @@ export const th: Strings = {
   shuffle: 'อันอื่น',
   sendStranger: 'ปล่อยโชคให้ลอยไป',
   strangerSent: 'โชคของคุณกำลังลอยไปหาใครสักคน!',
-  strangerRateLimit: 'วันนี้คุณส่งโชคไปแล้ว! พรุ่งนี้ค่อยส่งอีกนะ',
+  strangerRateLimit: "โชคของวันนี้ส่งถึงเพียงพอแล้ว\nเก็บที่เหลือไว้เพื่อพรุ่งนี้กันนะ 🍀",
   fromCity: (city) => `โชคจากที่ไหนสักแห่งใน${city}`,
   fromSomewhere: 'โชคจากที่ไหนสักแห่งไกลๆ',
   mailTitle: 'มีโชคมาหาคุณแล้ว!',

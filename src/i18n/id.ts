@@ -52,7 +52,7 @@ export const id: Strings = {
   shuffle: 'Yang lain',
   sendStranger: 'Terbangkan keberuntungan',
   strangerSent: 'Keberuntunganmu sedang terbang ke seseorang!',
-  strangerRateLimit: 'Keberuntungan hari ini sudah terkirim! Kirim lagi besok ya',
+  strangerRateLimit: "Keberuntungan hari ini sudah cukup tersampaikan.\nSisanya kita simpan untuk besok ya 🍀",
   fromCity: (city) => `Keberuntungan dari suatu tempat di ${city}`,
   fromSomewhere: 'Keberuntungan dari suatu tempat di luar sana',
   mailTitle: 'Ada keberuntungan yang menemukanmu!',

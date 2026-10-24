@@ -52,7 +52,7 @@ export const zhHans: Strings = {
   shuffle: '换一句',
   sendStranger: '让幸运飞出去',
   strangerSent: '幸运正飞向某个人！',
-  strangerRateLimit: '今天的幸运已经送出啦！明天再来吧',
+  strangerRateLimit: "今天的幸运已经传递得足够啦。\n剩下的留给明天吧 🍀",
   fromCity: (city) => `来自${city}某处的幸运`,
   fromSomewhere: '来自远方某处的幸运',
   mailTitle: '有一份幸运找到你啦！',

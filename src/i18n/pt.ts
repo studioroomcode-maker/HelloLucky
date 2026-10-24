@@ -52,7 +52,7 @@ export const pt: Strings = {
   shuffle: 'Outra frase',
   sendStranger: 'Deixar a sorte voar',
   strangerSent: 'Sua sorte está voando até alguém!',
-  strangerRateLimit: 'Você já mandou sua sorte hoje! Manda mais amanhã',
+  strangerRateLimit: "A sorte de hoje já foi entregue com folga.\nVamos guardar o resto para amanhã 🍀",
   fromCity: (city) => `Sorte de algum lugar em ${city}`,
   fromSomewhere: 'Sorte de algum lugar por aí',
   mailTitle: 'Uma sorte encontrou você!',

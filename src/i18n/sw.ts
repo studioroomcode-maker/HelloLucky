@@ -52,7 +52,7 @@ export const sw: Strings = {
   shuffle: 'Nyingine',
   sendStranger: 'Iache bahati iruke',
   strangerSent: 'Bahati yako inaruka kwenda kwa mtu!',
-  strangerRateLimit: 'Umeshatuma bahati leo! Tuma tena kesho',
+  strangerRateLimit: "Bahati ya leo tayari imefika ya kutosha.\nTuhifadhi iliyobaki kwa ajili ya kesho 🍀",
   fromCity: (city) => `Bahati kutoka mahali fulani huko ${city}`,
   fromSomewhere: 'Bahati kutoka mahali fulani duniani',
   mailTitle: 'Bahati imekufikia!',

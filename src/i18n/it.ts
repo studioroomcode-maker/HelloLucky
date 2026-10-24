@@ -54,7 +54,7 @@ export const it: Strings = {
   shuffle: "Un'altra",
   sendStranger: 'Fai volare la fortuna',
   strangerSent: 'La tua fortuna sta volando da qualcuno!',
-  strangerRateLimit: 'Oggi hai già mandato la tua fortuna! Mandane altra domani',
+  strangerRateLimit: "La fortuna di oggi è già arrivata in abbondanza.\nTeniamo il resto per domani 🍀",
   fromCity: (city) => `Fortuna da un angolo di ${city}`,
   fromSomewhere: 'Fortuna da chissà dove',
   mailTitle: "Un po' di fortuna ti ha trovato!",
