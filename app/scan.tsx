@@ -125,6 +125,8 @@ function Scanner() {
 
   const [torch, setTorch] = useState(false);
   const [cameraKey, setCameraKey] = useState(0);
+  // Set when the device has no usable 4:3 format (see patches/react-native-vision-camera, iPhone 17 Bayer-only formats).
+  const [defaultFormat, setDefaultFormat] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState({ width: 0, height: 0 });
@@ -286,7 +288,7 @@ function Scanner() {
           ref={camera}
           style={StyleSheet.absoluteFill}
           device={device}
-          format={format}
+          format={defaultFormat ? undefined : format}
           isActive={isFocused && appActive}
           photo
           video={false}
@@ -300,6 +302,11 @@ function Scanner() {
           frameProcessor={frameProcessor}
           onError={(error) => {
             console.warn('scan: camera error', error);
+            if (error.code === 'format/invalid-format' && !defaultFormat) {
+              setDefaultFormat(true);
+              setCameraKey((k) => k + 1);
+              return;
+            }
             if (TRANSIENT_CAMERA_ERRORS.has(error.code)) {
               setTimeout(() => setCameraKey((k) => k + 1), 1000);
               return;

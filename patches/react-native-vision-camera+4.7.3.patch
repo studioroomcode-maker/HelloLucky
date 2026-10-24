@@ -16,3 +16,21 @@ diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/m
            .setAllowedResolutionMode(ResolutionSelector.PREFER_CAPTURE_RATE_OVER_HIGHER_RESOLUTION)
            .build()
          analysis.setResolutionSelector(resolutionSelector)
+diff --git a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift
+index ecd2a94..55f106e 100644
+--- a/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift
++++ b/node_modules/react-native-vision-camera/ios/Core/CameraSession+Configuration.swift
+@@ -194,7 +194,12 @@ extension CameraSession {
+     }
+ 
+     // Find matching format (JS Dictionary -> strongly typed Swift class)
+-    let format = device.formats.first { targetFormat.isEqualTo(format: $0) }
++    // HelloLucky patch: the JS descriptor doesn't carry the pixel format, so several native formats match it. On
++    // iPhone 17 (iOS 26+) some of those twins only expose a Bayer pixel format (btp2): the preview turns grey and the
++    // frame processor gets frames no plugin can read. Prefer a twin with a YUV/RGB pixel format.
++    let matches = device.formats.filter { targetFormat.isEqualTo(format: $0) }
++    // No such twin: fail with invalidFormat so JS can retry without a custom format (a Bayer twin would crash the frame processor).
++    let format = matches.first { PixelFormat(mediaSubType: CMFormatDescriptionGetMediaSubType($0.formatDescription)) != .unknown }
+     guard let format else {
+       throw CameraError.format(.invalidFormat)
+     }
