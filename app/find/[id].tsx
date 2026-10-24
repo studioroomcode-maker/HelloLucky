@@ -27,6 +27,7 @@ import { SHARE_URL } from '@/src/config/links';
 import { copyShareText } from '@/src/shareText';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { fortuneFor } from '@/src/fortune';
+import { FoundPopup } from '@/src/ui/FoundPopup';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { SendLuckSheet } from '@/src/ui/SendLuckSheet';
 import { CornerFrame } from '@/src/ui/TrackBox';
@@ -38,6 +39,7 @@ function mapUrl(latitude: number, longitude: number) {
 
 export default function FindDetail() {
   const { id, fresh } = useLocalSearchParams<{ id: string; fresh?: string }>();
+  const [celebrate, setCelebrate] = useState(!!fresh);
   const router = useRouter();
   const palette = usePalette();
   const insets = useSafeAreaInsets();
@@ -325,6 +327,7 @@ export default function FindDetail() {
       </Pressable>
       {/* A fresh find gets one more pop of clovers on arrival. */}
       <LuckBurst trigger={fresh ? 1 : 0} />
+      <FoundPopup visible={celebrate} onClose={() => setCelebrate(false)} />
       <SendLuckSheet
         photoUri={find.photoUri}
         cloverUri={find.cloverUri}

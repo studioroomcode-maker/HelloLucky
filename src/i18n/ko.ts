@@ -27,6 +27,7 @@ export const ko = {
   cameraError: '카메라에 문제가 생겼어요',
   // Detail
   newFindTitle: '행운을 찾았어요!',
+  foundCheers: ['오늘 하는 일은 다 잘될 거예요!', '행운이 하루 종일 함께할 거예요!', '좋은 일이 곧 찾아올 거예요!'],
   aiFound: 'AI랑 같이 찾음',
   noteLabel: '행운 메모',
   notePlaceholder: '어디서, 누구와 찾았는지 남겨보세요',
@@ -54,7 +55,7 @@ export const ko = {
   shuffle: '다른 문구',
   sendStranger: '행운 띄워 보내기',
   strangerSent: '행운이 누군가에게 날아갔어요!',
-  strangerRateLimit: '오늘은 행운을 5번이나 띄웠어요! 내일 또 보내요',
+  strangerRateLimit: '오늘 행운은 이미 띄웠어요! 내일 또 보내요',
   fromCity: (city: string) => `${city} 어딘가에서 온 행운`,
   fromSomewhere: '어딘가에서 온 행운',
   mailTitle: '우연히 행운이 도착했어요!',

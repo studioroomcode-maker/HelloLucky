@@ -158,7 +158,8 @@ declare
   v_photo text := case when p_photo like auth.uid()::text || '/%' then p_photo end;
 begin
   if me is null then raise exception 'not_signed_in'; end if;
-  if (select count(*) from lucky_letters where sender = me and created_at > now() - interval '1 day') >= 5 then
+  -- One letter a day (relays included) keeps each one special.
+  if (select count(*) from lucky_letters where sender = me and created_at > now() - interval '1 day') >= 1 then
     raise exception 'rate_limit';
   end if;
   if p_parent is null then
