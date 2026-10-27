@@ -33,15 +33,20 @@ const GOLD = '#F2B705';
 const GREEN = '#3DAA4E';
 const DOT = 8; // trail dot spacing: 1 dot + 7 gap
 
-// Travel timeline in stop units: the first pin pops during LEAD, leg k flies over [k, k + FLY] and rests
-// until k + 1, then the little card lands into the last pin during LAND.
-const LEAD = 0.5;
-const FLY = 0.8;
-const LAND = 0.4;
+// Travel timeline in stop units: the first pin pops during LEAD (while the letter shows at home), leg k flies
+// over [k, k + FLY] and rests until k + 1 (the letter pops up where it arrived), then the little card lands into
+// the last pin during LAND.
+const LEAD = 1;
+const FLY = 0.45;
+const LAND = 0.6;
 // Short trips fly each stop in SHORT_MS; longer ones ease toward LONG_MS a stop, the whole trip capped at MAX_MS.
-const SHORT_MS = 1400;
-const LONG_MS = 2000;
-const MAX_MS = 20000;
+const SHORT_MS = 2800;
+const LONG_MS = 3000;
+const MAX_MS = 30000;
+// The letter bubble pops in over POP stop units, holds while the card rests, and shrinks away over FADE.
+const POP = 0.1;
+const FADE = 0.06;
+const GAP = 0.04;
 
 type Point = { x: number; y: number };
 type Props = {
@@ -77,9 +82,29 @@ export function tripUnitMs(legs: number) {
   return Math.min(unit, MAX_MS / (legs + LAND + LEAD));
 }
 
+/** Where the clock is `ms` into a trip, in stop units: -LEAD at the start, legs + LAND once landed. */
+export const tripProgress = (ms: number, legs: number) => ms / tripUnitMs(legs) - LEAD;
+
+/**
+ * The letter bubble at progress `p`: which stop it sits on and its size (0–1, overshooting a little as it pops),
+ * or nothing while the card is flying. It shows at home before the card leaves, at each stop while the card rests,
+ * and at the last stop from the landing on.
+ */
+export function bubbleAt(p: number, legs: number): { stop: number; scale: number } | undefined {
+  for (let stop = 0; stop <= legs; stop++) {
+    const from = stop === 0 ? -LEAD * 0.62 : arrival(stop) + GAP;
+    const to = stop === 0 ? -GAP : stop === legs ? Infinity : stop - GAP;
+    if (p < from || p > to) continue;
+    const f = Math.min((p - from) / POP, 1);
+    const pop = f < 0.7 ? 1.15 * (1 - (1 - f / 0.7) ** 2) : 1.15 - 0.15 * ((f - 0.7) / 0.3);
+    return { stop, scale: Math.min(pop, Math.max((to - p) / FADE, 0)) };
+  }
+  return undefined;
+}
+
 /** How much of the route is flown `ms` into a trip: whole legs plus the eased part of the current one. */
 export function tripDone(ms: number, legs: number) {
-  const p = ms / tripUnitMs(legs) - LEAD;
+  const p = tripProgress(ms, legs);
   if (p <= 0 || !legs) return 0;
   const k = Math.min(Math.floor(p), legs - 1);
   return k + legDone(p, k);

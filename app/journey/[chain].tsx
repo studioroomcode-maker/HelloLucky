@@ -7,6 +7,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { Asset } from 'expo-asset';
 import { Image } from 'expo-image';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Location from 'expo-location';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as MediaLibrary from 'expo-media-library';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -16,21 +17,24 @@ import { FONT, usePalette } from '@/constants/theme';
 import { JourneyVideo, type VideoLayer } from '@/modules/journey-video';
 import { SHARE_URL } from '@/src/config/links';
 import { copyShareText } from '@/src/shareText';
-import { ARROW, lang, t } from '@/src/i18n';
+import { ARROW, lang, stringsForCountry, t } from '@/src/i18n';
 import { arcDegrees, greatCirclePoint } from '@/src/journeyMap';
-import { flagEmoji } from '@/src/letters';
+import { flagEmoji, letterMessage, myPlace } from '@/src/letters';
 import { nickname } from '@/src/nicknames';
 import { useFinds, useSettings } from '@/src/services/findsStore';
 import { countryCodeAt } from '@/src/services/location';
 import { myJourneys, type Journey } from '@/src/services/sharing';
-import { JourneyCard, tripDone, tripMs } from '@/src/ui/JourneyCard';
+import { bubbleAt, JourneyCard, tripDone, tripMs, tripProgress } from '@/src/ui/JourneyCard';
 import { CARDS } from '@/src/ui/LuckCard';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { ScreenHeader } from '@/src/ui/ScreenHeader';
 
 const PIN_GREEN = require('@/assets/map/pin-green.png');
 const PIN_GOLD = require('@/assets/map/pin-gold.png');
-const EDGES = { top: 60, right: 60, bottom: 60, left: 60 };
+// Where the map rests when it opens and after a replay: around me, about a country across.
+const HOME_ZOOM = 5;
+// The stop pins (assets/map/pin-*.png) stand 58 dp tall with their tip at 94%: the letter bubble sits just above.
+const PIN_TOP = 58 * 0.94;
 // The trip video: 9:16 for stories and reels, drawn frame by frame (the map can't be screen-recorded).
 const FPS = 15;
 const VIDEO_W = 720;
@@ -71,15 +75,23 @@ export default function JourneyMap() {
   const [play, setPlay] = useState<number | undefined>(0);
   // While the map replays the trip: how many legs its line has grown (fractional); undefined shows it all.
   const [drawn, setDrawn] = useState<number>();
+  const drawnRef = useRef<number>(undefined);
+  drawnRef.current = drawn;
+  // The trip clock in stop units while it replays (for the letter bubble); undefined hides the bubble.
+  const [at, setAt] = useState<number>();
   // The replay has landed (shows who the trip came home to).
   const [landed, setLanded] = useState(false);
   // Making the trip video: its progress (0-100) while it records.
   const [recording, setRecording] = useState<number>();
+  const recordingRef = useRef<number>(undefined);
+  recordingRef.current = recording;
   const box = useRef<Box>({ x: 0, y: 0, width: 0, height: 0 });
   const boxRef = useRef<View>(null);
   const [boxWidth, setBoxWidth] = useState(0);
   const pillRef = useRef<View>(null);
   const pillBox = useRef<Box>({ x: 0, y: 0, width: 0, height: 0 });
+  const bubbleRef = useRef<View>(null);
+  const bubbleBox = useRef<Box>({ x: 0, y: 0, width: 0, height: 0 });
   const markRef = useRef<View>(null);
   const markBox = useRef<Box>({ x: 0, y: 0, width: 0, height: 0 });
   const frame = useRef(0);
@@ -93,6 +105,16 @@ export default function JourneyMap() {
   const source = journeyFinds[chain] ? finds.find((f) => f.id === journeyFinds[chain]) : chain.startsWith('sample-') ? finds[0] : undefined;
 
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
+  // Me: where the phone last was (only if location is already allowed; never prompt for this), else my newest find.
+  const [here, setHere] = useState<{ latitude: number; longitude: number }>();
+  useEffect(() => {
+    (async () => {
+      const { granted } = await Location.getForegroundPermissionsAsync();
+      const last = granted ? await Location.getLastKnownPositionAsync().catch(() => null) : null;
+      if (last) setHere({ latitude: last.coords.latitude, longitude: last.coords.longitude });
+    })().catch(() => {});
+  }, []);
 
   useEffect(() => {
     myJourneys()
@@ -121,6 +143,21 @@ export default function JourneyMap() {
     .filter((s) => typeof s.la === 'number' && typeof s.lo === 'number')
     .map((s) => ({ i: s.i, city: s.c, coordinate: { latitude: s.la!, longitude: s.lo! } }));
   const legs = Math.max(points.length - 1, 0);
+  const mine = myPlace(finds);
+  const home =
+    here ??
+    (typeof mine?.lat === 'number' && typeof mine?.lng === 'number' ? { latitude: mine.lat, longitude: mine.lng } : points[0]?.coordinate);
+  const goHome = (animated: boolean) => {
+    if (!home) return;
+    if (animated) map.current?.animateCamera({ center: home, zoom: HOME_ZOOM, heading: 0, pitch: 0 }, { duration: 900 });
+    else map.current?.setCamera({ center: home, zoom: HOME_ZOOM, heading: 0, pitch: 0 });
+  };
+  // The phone's position can arrive after the map is up: settle there unless the trip is flying.
+  const mapReady = useRef(false);
+  useEffect(() => {
+    if (here && mapReady.current && drawnRef.current === undefined && recordingRef.current === undefined) goHome(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [here]);
 
   // The card and the map fly the same trip on the same clock (src/ui/JourneyCard.tsx).
   const playTrip = () => {
@@ -135,12 +172,10 @@ export default function JourneyMap() {
       const ms = Date.now() - start;
       if (ms >= total) {
         setDrawn(undefined);
+        setAt(undefined);
         setLanded(true);
-        // Pull back to the whole route once the line is home.
-        map.current?.fitToCoordinates(
-          points.map((p) => p.coordinate),
-          { edgePadding: EDGES, animated: true },
-        );
+        // Back to me once the line is home.
+        goHome(true);
         return;
       }
       const done = tripDone(ms, legs);
@@ -149,6 +184,7 @@ export default function JourneyMap() {
       zoom += (legZoom(tip.arc) - zoom) * 0.06;
       map.current?.setCamera({ center: tip.coordinate, zoom, heading: 0, pitch: 0 });
       setDrawn(done);
+      setAt(tripProgress(ms, legs));
       frame.current = requestAnimationFrame(step);
     };
     step();
@@ -177,6 +213,22 @@ export default function JourneyMap() {
     // Home again: the starter (me) is the last name on the trip.
     leg = { sender: nickname(myName >= 0 ? myName : journey.route[0]?.n, lang), route: `🍀 ${stopName(points[0])} · ${t.cameHome}` };
   }
+
+  // The letter popping up over the stop the camera rests on (the map's centre), the way it reads there: as I sent
+  // it at home, and in the local language at every stop after.
+  const bubble = at !== undefined && legs ? bubbleAt(at, legs) : undefined;
+  const bubbleStop = bubble ? points[bubble.stop] : undefined;
+  const bubbleCountry = bubbleStop ? countries[bubbleStop.i] : undefined;
+  const bubbleText =
+    bubble && journey
+      ? `${bubbleCountry ? `${flagEmoji(bubbleCountry)} ` : ''}${letterMessage(bubble.stop === 0 ? t : stringsForCountry(bubbleCountry), journey.message_key)}`
+      : '';
+  /** The bubble's box at its current size, grown from its tail (bottom centre), in video pixels. */
+  const bubbleLayer = (uri: string, scale: number): VideoLayer => {
+    const b = bubbleBox.current;
+    const s = bubble?.scale ?? 1;
+    return layerAt(uri, { x: b.x + (b.width * (1 - s)) / 2, y: b.y + b.height * (1 - s), width: b.width * s, height: b.height * s }, scale);
+  };
 
   /** The finished card as a 1080 px wide PNG (crisp in feeds and messengers). */
   const captureCard = async () => {
@@ -234,9 +286,11 @@ export default function JourneyMap() {
       const scale = VIDEO_W / box.current.width;
       const mark = layerAt(await shot(markRef), markBox.current, scale);
       let pill: { key: number; layer: VideoLayer } | undefined;
-      // One map picture. Android: a map snapshot under the sender pill (captured again when its leg changes) and the
-      // watermark. iOS: the Google map's own snapshot comes out blank (Metal), so the whole box is captured as it shows.
-      const addMap = async (key: number, repeat: number) => {
+      let letter: { key: number; uri: string } | undefined;
+      // One map picture. Android: a map snapshot under the sender pill (captured again when its leg changes), the
+      // letter bubble (captured once per stop, then scaled as it pops) and the watermark. iOS: the Google map's own
+      // snapshot comes out blank (Metal), so the whole box is captured as it shows.
+      const addMap = async (key: number, repeat: number, stop?: number) => {
         await wait(80);
         const snap =
           Platform.OS === 'ios'
@@ -252,6 +306,10 @@ export default function JourneyMap() {
         if (Platform.OS !== 'ios') {
           if (pillRef.current && pill?.key !== key) pill = { key, layer: layerAt(await shot(pillRef), pillBox.current, scale) };
           if (pillRef.current && pill) layers.push(pill.layer);
+          if (bubbleRef.current && stop !== undefined) {
+            if (letter?.key !== stop) letter = { key: stop, uri: await shot(bubbleRef) };
+            layers.push(bubbleLayer(letter.uri, scale));
+          }
           layers.push(mark);
         }
         await JourneyVideo!.addFrame(layers, '#FFFFFF', repeat);
@@ -268,13 +326,15 @@ export default function JourneyMap() {
         zoom += (legZoom(tip.arc) - zoom) * 0.2;
         map.current.setCamera({ center: tip.coordinate, zoom, heading: 0, pitch: 0 });
         setDrawn(done);
-        await addMap(tip.k, 1);
+        const p = tripProgress((f * 1000) / FPS, legs);
+        setAt(p);
+        await addMap(tip.k, 1, bubbleAt(p, legs)?.stop);
         setRecording(Math.round((f / frames) * 90));
       }
-      // Landed: the camera holds where the last leg ended (home again, my name shows), then the card.
+      // Landed: the camera holds where the last leg ended, the letter still up (home again, my name shows), then the card.
       setDrawn(undefined);
       setLanded(true);
-      await addMap(-1, Math.round(FPS * 1.5));
+      await addMap(-1, Math.round(FPS * 1.5), legs);
       const card = await captureCard();
       const pad = 48;
       await JourneyVideo.addFrame(
@@ -296,8 +356,10 @@ export default function JourneyMap() {
       Alert.alert(t.saveError);
     } finally {
       setRecording(undefined);
+      setAt(undefined);
       setLanded(false);
       deactivateKeepAwake(MARK);
+      goHome(true);
     }
   };
 
@@ -344,7 +406,7 @@ export default function JourneyMap() {
                   ref={map}
                   provider={PROVIDER_GOOGLE}
                   style={StyleSheet.absoluteFill}
-                  initialRegion={{ ...points[0].coordinate, latitudeDelta: 30, longitudeDelta: 30 }}
+                  initialRegion={{ ...(home ?? points[0].coordinate), latitudeDelta: 30, longitudeDelta: 30 }}
                   toolbarEnabled={false}
                   // Held still while the video records: a drag would end up in the frames.
                   scrollEnabled={recording === undefined}
@@ -352,10 +414,8 @@ export default function JourneyMap() {
                   rotateEnabled={recording === undefined}
                   pitchEnabled={recording === undefined}
                   onMapReady={() => {
-                    map.current?.fitToCoordinates(
-                      points.map((p) => p.coordinate),
-                      { edgePadding: EDGES, animated: false },
-                    );
+                    mapReady.current = true;
+                    goHome(false);
                     if (autoplay && !autoplayed.current) {
                       autoplayed.current = true;
                       playTrip();
@@ -394,6 +454,24 @@ export default function JourneyMap() {
                   <Text style={[styles.legRoute, { color: palette.muted }]} numberOfLines={1}>
                     {leg.route}
                   </Text>
+                </View>
+              ) : null}
+              {/* The letter, popping up over the stop the camera rests on. The scaled wrapper is for the eye; the inner
+                  view is captured for the video at full size and scaled into its frame. */}
+              {bubble && bubbleText ? (
+                <View
+                  pointerEvents="none"
+                  onLayout={(e) => (bubbleBox.current = e.nativeEvent.layout)}
+                  style={[styles.bubble, { transform: [{ scale: bubble.scale }] }]}
+                >
+                  <View ref={bubbleRef} collapsable={false} style={styles.bubbleInner}>
+                    <View style={styles.bubbleBody}>
+                      <Text style={styles.bubbleText} numberOfLines={3}>
+                        {bubbleText}
+                      </Text>
+                    </View>
+                    <View style={styles.bubbleTail} />
+                  </View>
                 </View>
               ) : null}
               {/* Only while recording: the watermark stamped on every map frame (with the map's attribution). */}
@@ -529,4 +607,30 @@ const styles = StyleSheet.create({
   },
   legSender: { fontFamily: FONT.cute, fontSize: 15 },
   legRoute: { fontFamily: FONT.medium, fontSize: 13 },
+  // Anchored over the map's centre, where the camera rests on each stop; grows from its tail.
+  bubble: { position: 'absolute', alignSelf: 'center', bottom: '50%', marginBottom: PIN_TOP + 2, maxWidth: '72%', transformOrigin: 'bottom' },
+  bubbleInner: { alignItems: 'center' },
+  bubbleBody: {
+    borderRadius: 14,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
+  bubbleText: { fontFamily: FONT.cute, fontSize: 12.5, lineHeight: 17, color: '#1E2A22', textAlign: 'center' },
+  bubbleTail: {
+    width: 0,
+    height: 0,
+    marginTop: -1,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 8,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#fff',
+  },
 });
