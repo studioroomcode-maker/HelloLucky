@@ -12,7 +12,7 @@
       "subtitle": "AI가 찾아주는 네잎클로버",
       "promotionalText": "풀밭에 카메라를 비추면 휴대폰 안의 AI가 행운을 찾아줘요. 찾은 행운은 기록하고, 모르는 누군가에게 보내 보세요.",
       "description": "산책길 풀밭에서 네잎클로버, 찾아본 적 있나요?\nHello Luck은 카메라를 클로버 밭에 비추기만 하면 휴대폰 안의 AI가 행운 후보를 실시간으로 표시해 주는 앱이에요.\n\n■ 실시간으로 찾기\n• 카메라 화면 위에 행운 후보를 바로 표시해요\n• 손이 흔들려도 위치를 따라가다가, 확실해지면 \"찰칵\" 알려 줘요\n• 넓게 훑기 — 넓은 풀밭을 한 장 찍으면 구석구석 나눠서 꼼꼼히 살펴봐요\n\n■ 행운 기록장\n• 찾은 행운을 사진·장소·메모와 함께 저장해요\n• 행운마다 오늘의 한 줄 운세가 함께 와요\n• 모을수록 행운 화분이 씨앗에서 꽃밭까지 자라고, 숨은 배지도 열려요\n\n■ 행운은 나누는 것\n• 친구에게 행운 카드를 사진으로 보내요\n• \"모르는 누군가에게\" 행운을 보내면 세계 어딘가의 누군가에게 도착해요\n• 받은 행운을 이어 보내면, 내 행운이 어디까지 여행했는지 여정 지도로 볼 수 있어요\n• 행운 지도 — 전 세계 사람들이 찾은 행운 장소를 지도에서 만나요\n\n■ 내 정보는 내 폰에\n• 카메라 영상은 기기 안에서만 분석하고, 어디에도 보내지 않아요\n• 원본 사진과 메모는 기기 밖으로 나가지 않아요 (행운 지도에는 클로버 부분만 잘라낸 작은 사진이 올라가요)\n• 회원가입·광고·결제가 없어요\n• 행운 지도에는 내가 직접 고른 기록의 장소와 날짜만 올라가요. 행운 편지에는 정해진 문구와 도시 이름만 담겨요\n\n※ 인식 정확도는 빛, 거리, 풀 상태에 따라 달라질 수 있어요.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
-      "keywords": "네잎클로버,클로버,행운,산책,카메라,AI,운세,편지,지도,배지",
+      "keywords": "헬로럭,헬로우럭,헬로,헬로우,럭,클로버,네잎,네잎크로바,클로버찾기,산책,카메라,운세,편지,지도,배지",
       "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
       "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
       "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"

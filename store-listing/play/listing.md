@@ -25,7 +25,7 @@ Hello Luck: Find Your Luck
 ### 간단한 설명 (80자)
 **ko**
 ```
-풀밭에 카메라를 비추면 AI가 행운을 찾아줘요. 찾은 행운은 기록하고, 모르는 누군가에게 보내요 🍀
+풀밭에 카메라를 비추면 AI가 네잎클로버를 찾아줘요. 찾은 행운은 기록하고, 모르는 누군가에게 보내요 🍀
 ```
 **en**
 ```
@@ -36,7 +36,7 @@ Point your camera at clover and on-device AI spots your luck. Pass it on 🍀
 **ko**
 ```
 산책길 풀밭에서 네잎클로버, 찾아본 적 있나요?
-Hello Luck은 카메라를 클로버 밭에 비추기만 하면 휴대폰 안의 AI가 행운 후보를 실시간으로 표시해 주는 앱이에요.
+Hello Luck(헬로럭)은 카메라를 클로버 밭에 비추기만 하면 휴대폰 안의 AI가 행운 후보를 실시간으로 표시해 주는 앱이에요.
 
 ■ 실시간으로 찾기
 • 카메라 화면 위에 행운 후보를 바로 표시해요
@@ -99,19 +99,19 @@ AI model trained in part on "4 Leaf Clover Detect" by test-ara07 and "Hunting fo
 ## 5. 버전 출시 노트 (500자)
 **ko**
 ```
-🍀 1.0.1 업데이트
-· 행운의 여정을 영상(배경음악 포함)과 이미지로 저장할 수 있어요
-· 보내는 이름(귀여운 동물 닉네임)과 내가 찾은 클로버 사진이 행운과 함께 여행해요
-· 받은 응원에 클로버 사진이 보이고, 클로버 여권 도장을 누르면 그 도시의 클로버를 볼 수 있어요
-· 카메라 화면이 더 선명해졌어요
-· 아랍어·스와힐리어 추가, 여러 언어 화면 다듬기
+🍀 1.0.3 업데이트
+· 여정 영상에서 내 응원 메시지가 도착한 도시마다 말풍선으로 톡 떠올라요
+· 다른 나라에 도착하면 그 나라 말로 메시지가 보여요
+· 여정 지도가 내 위치에서 시작하고, 재생이 끝나면 내 위치로 돌아와요
+· 네잎클로버를 찾으면 더 크게 축하해 드려요
+· 행운 보내기는 하루 한 통, 내일의 행운을 위해 아껴 둬요
 ```
 **en**
 ```
-🍀 What's new in 1.0.1
-· Save your luck's journey as a video (with music) or an image
-· A cute animal sender name and your clover photo now travel with your luck
-· See clover photos on cheers you received, and tap a passport stamp to see that city's clovers
-· A sharper camera view
-· Arabic and Swahili, plus polish across languages
+🍀 What's new in 1.0.3
+· In the journey video, your cheer pops up in a bubble at every city it reaches
+· In another country, the message shows in that country's language
+· The journey map starts at your location and comes back to it after the replay
+· A bigger celebration when you find a four-leaf clover
+· Send luck once a day, saving tomorrow's luck for tomorrow
 ```
