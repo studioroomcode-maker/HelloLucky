@@ -1,7 +1,7 @@
 {
   "_comment": "App Store 등록정보 — node ../../../HelloDashboard/tools/apple-signing.mjs listing listing.json (이 폴더에서). 문구 원본은 ../play/listing.md 와 같다. 무료, 앱 안 구입 없음. 스크린샷 폴더가 비어 있으면 올리지 않는다.",
   "bundleId": "com.studioroomkr.HelloLucky",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "copyright": "2026 Studioroom",
   "primaryCategory": "LIFESTYLE",
   "secondaryCategory": "ENTERTAINMENT",

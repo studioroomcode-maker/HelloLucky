@@ -46,7 +46,8 @@ export default function FindDetail() {
   const find = useFinds().find((item) => item.id === id);
   const [note, setNote] = useState(find?.note ?? '');
   const scrollRef = useRef<ScrollView>(null);
-  const photoRef = useRef<View>(null);
+  const shareRef = useRef<View>(null);
+  const [shareNote, setShareNote] = useState('');
   const settings = useSettings();
   const [mapBusy, setMapBusy] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -65,15 +66,43 @@ export default function FindDetail() {
 
   const hasLocation = find.latitude != null && find.longitude != null;
 
+  const photo = (
+    <>
+      <Image source={{ uri: find.photoUri }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+      {find.cloverBox && find.photoAspect && photoView.width ? (
+        // Where the AI saw the clover, on the photo as it is drawn ("cover"); shared images keep it too.
+        <CornerFrame
+          rect={projectToView(
+            {
+              x: find.cloverBox.x * find.photoAspect,
+              y: find.cloverBox.y,
+              width: find.cloverBox.width * find.photoAspect,
+              height: find.cloverBox.height,
+              confidence: 1,
+            },
+            find.photoAspect,
+            1,
+            photoView.width,
+            photoView.height,
+          )}
+        />
+      ) : null}
+      <Image source={require('@/assets/logo.png')} style={styles.watermark} contentFit="contain" accessible={false} />
+    </>
+  );
+
   const saveNote = () => {
     if (note !== find.note) updateFind(find.id, { note: note.trim() }).catch(() => Alert.alert(t.saveError));
   };
 
-  // Share the on-screen photo (with its watermark) plus an invite line, so friends can find the app.
+  // Share the photo (with its watermark) with the message drawn under it, plus an invite line, so friends can find the app.
   const share = async (note: string) => {
     setSendOpen(false);
     try {
-      const uri = await captureRef(photoRef, { format: 'jpg', quality: 0.92, result: 'tmpfile' });
+      setShareNote(note);
+      // Let the share card re-render with the new note before it is captured.
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const uri = await captureRef(shareRef, { format: 'jpg', quality: 0.92, result: 'tmpfile' });
       const message = [note, t.shareLink(SHARE_URL)].filter(Boolean).join('\n\n');
       await copyShareText(message);
       const result = await Share.open({
@@ -154,42 +183,8 @@ export default function FindDetail() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View
-          ref={photoRef}
-          collapsable={false}
-          style={styles.photo}
-          onLayout={(event: LayoutChangeEvent) => setPhotoView(event.nativeEvent.layout)}
-        >
-          <Image
-            source={{ uri: find.photoUri }}
-            style={StyleSheet.absoluteFill}
-            contentFit="cover"
-            transition={200}
-          />
-          {find.cloverBox && find.photoAspect && photoView.width ? (
-            // Where the AI saw the clover, on the photo as it is drawn ("cover"); shared images keep it too.
-            <CornerFrame
-              rect={projectToView(
-                {
-                  x: find.cloverBox.x * find.photoAspect,
-                  y: find.cloverBox.y,
-                  width: find.cloverBox.width * find.photoAspect,
-                  height: find.cloverBox.height,
-                  confidence: 1,
-                },
-                find.photoAspect,
-                1,
-                photoView.width,
-                photoView.height,
-              )}
-            />
-          ) : null}
-          <Image
-            source={require('@/assets/logo.png')}
-            style={styles.watermark}
-            contentFit="contain"
-            accessible={false}
-          />
+        <View style={styles.photo} onLayout={(event: LayoutChangeEvent) => setPhotoView(event.nativeEvent.layout)}>
+          {photo}
         </View>
 
         <View style={styles.content}>
@@ -313,6 +308,31 @@ export default function FindDetail() {
         </View>
       </ScrollView>
 
+      {photoView.width ? (
+        // Off-screen card the friend share captures: KakaoTalk and others drop a share's text, so the message rides in the image.
+        <View
+          ref={shareRef}
+          collapsable={false}
+          pointerEvents="none"
+          style={[styles.shareCard, { width: photoView.width, backgroundColor: palette.surface }]}
+        >
+          <View style={styles.photo}>{photo}</View>
+          {shareNote ? <Text style={[styles.shareNote, { color: palette.text }]}>{shareNote}</Text> : null}
+          <View style={styles.stores}>
+            {(
+              [
+                ['logo-apple', 'App Store'],
+                ['logo-google-playstore', 'Google Play'],
+              ] as const
+            ).map(([icon, label]) => (
+              <View key={label} style={[styles.store, { backgroundColor: palette.text }]}>
+                <Ionicons name={icon} size={17} color={palette.surface} />
+                <Text style={[styles.storeText, { color: palette.surface }]}>{label}</Text>
+              </View>
+            ))}
+          </View>        </View>
+      ) : null}
+
       <Pressable
         onPress={() => {
           saveNote();
@@ -359,6 +379,10 @@ const styles = StyleSheet.create({
     aspectRatio: 366 / 290,
     opacity: 0.55,
   },
+  shareCard: { position: 'absolute', left: -10000, top: 0, paddingBottom: 20 },
+  shareNote: { fontFamily: FONT.cute, fontSize: 18, lineHeight: 27, paddingHorizontal: 20, paddingTop: 18 },  stores: { flexDirection: 'row', justifyContent: 'center', gap: 10, paddingTop: 16 },
+  store: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7 },
+  storeText: { fontFamily: FONT.medium, fontSize: 14 },
   back: {
     position: 'absolute',
     left: 16,

@@ -99,19 +99,13 @@ AI model trained in part on "4 Leaf Clover Detect" by test-ara07 and "Hunting fo
 ## 5. 버전 출시 노트 (500자)
 **ko**
 ```
-🍀 1.0.3 업데이트
-· 여정 영상에서 내 응원 메시지가 도착한 도시마다 말풍선으로 톡 떠올라요
-· 다른 나라에 도착하면 그 나라 말로 메시지가 보여요
-· 여정 지도가 내 위치에서 시작하고, 재생이 끝나면 내 위치로 돌아와요
-· 네잎클로버를 찾으면 더 크게 축하해 드려요
-· 행운 보내기는 하루 한 통, 내일의 행운을 위해 아껴 둬요
+🍀 1.0.4 업데이트
+· 네잎클로버가 확인된 사진만 행운으로 저장돼요
+· 친구에게 행운을 보낼 때 메시지가 사진 속에 함께 담겨요
 ```
 **en**
 ```
-🍀 What's new in 1.0.3
-· In the journey video, your cheer pops up in a bubble at every city it reaches
-· In another country, the message shows in that country's language
-· The journey map starts at your location and comes back to it after the replay
-· A bigger celebration when you find a four-leaf clover
-· Send luck once a day, saving tomorrow's luck for tomorrow
+🍀 What's new in 1.0.4
+· Only photos with a confirmed four-leaf clover are saved as a find
+· When you send luck to a friend, your message now travels inside the photo
 ```

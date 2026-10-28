@@ -272,7 +272,14 @@ function Scanner() {
         console.warn('scan: photo check failed', error);
         return live;
       });
-      const id = await saveCapture(photo.path, box !== undefined, box);
+      // Only a confirmed four-leaf clover becomes a find; anything else is dropped unsaved.
+      if (!box) {
+        Alert.alert(t.wideNone);
+        paused.value = false;
+        setSaving(false);
+        return;
+      }
+      const id = await saveCapture(photo.path, true, box);
       router.replace({ pathname: '/find/[id]', params: { id, fresh: '1' } });
     } catch (error) {
       console.warn('scan: capture failed', error);
