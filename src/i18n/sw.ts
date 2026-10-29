@@ -26,7 +26,6 @@ export const sw: Strings = {
   noCamera: 'Hakuna kamera ya nyuma',
   cameraError: 'Kuna hitilafu kwenye kamera',
   newFindTitle: 'Umepata bahati!',
-  foundCheers: ['Kila unachofanya leo kitafanikiwa!', 'Bahati iko nawe siku nzima!', 'Jambo zuri linakuja hivi karibuni!'],
   aiFound: 'Imepatikana kwa AI',
   noteLabel: 'Kumbukumbu ya bahati',
   notePlaceholder: 'Ulikuwa wapi, na ulikuwa na nani?',
@@ -231,7 +230,7 @@ export const sw: Strings = {
   shareRateLimit: 'Umeshiriki bahati nyingi leo! Tuonane kesho',
   rulesTitle: 'Kabla hujaiweka',
   rulesBody:
-    '• Mahali halisi na tarehe ya bahati yako vitaonekana kwenye ramani ambayo mtu yeyote duniani anaweza kuiona.\n• Picha ndogo ya karibu ya klova ya majani manne pekee itaonyeshwa pia. Picha yako halisi na kumbukumbu zinabaki kwenye kifaa chako.\n• Usiweke maeneo ya faragha kama nyumbani kwako.\n• Unaweza kuiondoa wakati wowote.',
+    '• Mahali halisi na tarehe ya bahati yako vitaonekana kwenye ramani ambayo mtu yeyote duniani anaweza kuiona.\n• Picha ndogo ya karibu ya klova ya majani manne pekee itaonyeshwa pia. Picha yako halisi na kumbukumbu zinabaki kwenye kifaa chako.\n• Usiweke maeneo ya faragha kama nyumbani kwako.\n• Bahati mpya utakazopata zitawekwa kwenye ramani moja kwa moja.\n• Unaweza kuiondoa wakati wowote.',
   rulesAgree: 'Sawa, iweke',
   deleteMyShares: 'Ondoa bahati zangu zote kwenye ramani',
   deleteMySharesConfirm: 'Inaondoa alama zako zote kwenye Ramani ya Bahati. Bahati ulizopata kwenye kifaa hiki zinabaki.',

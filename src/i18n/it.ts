@@ -28,7 +28,6 @@ export const it: Strings = {
   noCamera: 'Nessuna fotocamera posteriore disponibile',
   cameraError: 'Qualcosa non va con la fotocamera',
   newFindTitle: 'Hai trovato la fortuna!',
-  foundCheers: ['Oggi ti riuscirà tutto!', 'La fortuna ti accompagna tutto il giorno!', 'Qualcosa di bello sta arrivando!'],
   aiFound: "Trovata con l'IA",
   noteLabel: 'Nota fortunata',
   notePlaceholder: "Dov'eri e con chi?",
@@ -230,7 +229,7 @@ export const it: Strings = {
   shareRateLimit: 'Oggi hai condiviso un sacco di fortuna! A domani',
   rulesTitle: 'Prima di appuntarla',
   rulesBody:
-    '• Il punto esatto e la data della tua fortuna compaiono su una mappa visibile a chiunque nel mondo.\n• Viene mostrata anche una piccola foto ritagliata solo sul quadrifoglio. La foto originale e la nota restano sul tuo dispositivo.\n• Non appuntare luoghi privati, come casa tua.\n• Puoi toglierla quando vuoi.',
+    '• Il punto esatto e la data della tua fortuna compaiono su una mappa visibile a chiunque nel mondo.\n• Viene mostrata anche una piccola foto ritagliata solo sul quadrifoglio. La foto originale e la nota restano sul tuo dispositivo.\n• Non appuntare luoghi privati, come casa tua.\n• I nuovi ritrovamenti vengono appuntati sulla mappa in automatico.\n• Puoi toglierla quando vuoi.',
   rulesAgree: 'Va bene, appuntala',
   deleteMyShares: 'Togli tutta la mia fortuna dalla mappa',
   deleteMySharesConfirm: 'Rimuove tutti i tuoi punti dalla Mappa della Fortuna. I ritrovamenti su questo dispositivo restano.',

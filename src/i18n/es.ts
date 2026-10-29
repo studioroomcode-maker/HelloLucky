@@ -27,7 +27,6 @@ export const es: Strings = {
   noCamera: 'No hay cámara trasera disponible',
   cameraError: 'Algo ha fallado con la cámara',
   newFindTitle: '¡Has encontrado suerte!',
-  foundCheers: ['¡Hoy todo te va a salir bien!', '¡La suerte te acompaña todo el día!', '¡Algo bueno está en camino!'],
   aiFound: 'Encontrada con la IA',
   noteLabel: 'Nota de la suerte',
   notePlaceholder: '¿Dónde estabas y con quién?',
@@ -229,7 +228,7 @@ export const es: Strings = {
   shareRateLimit: '¡Hoy ya has compartido mucha suerte! Nos vemos mañana',
   rulesTitle: 'Antes de marcarla',
   rulesBody:
-    '• El lugar exacto y la fecha de tu suerte aparecerán en un mapa que cualquiera en el mundo puede ver.\n• También se muestra una pequeña foto recortada solo del trébol de cuatro hojas. Tu foto original y tu nota se quedan en tu dispositivo.\n• No marques lugares privados, como tu casa.\n• Puedes quitar la marca cuando quieras.',
+    '• El lugar exacto y la fecha de tu suerte aparecerán en un mapa que cualquiera en el mundo puede ver.\n• También se muestra una pequeña foto recortada solo del trébol de cuatro hojas. Tu foto original y tu nota se quedan en tu dispositivo.\n• No marques lugares privados, como tu casa.\n• Tus nuevos hallazgos se marcan en el mapa automáticamente.\n• Puedes quitar la marca cuando quieras.',
   rulesAgree: 'Vale, márcala',
   deleteMyShares: 'Quitar todas mis marcas',
   deleteMySharesConfirm: 'Quita todas tus marcas del Mapa de la suerte. Tus hallazgos en este dispositivo se quedan.',

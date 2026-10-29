@@ -26,7 +26,6 @@ export const id: Strings = {
   noCamera: 'Kamera belakang tidak tersedia',
   cameraError: 'Ada masalah dengan kamera',
   newFindTitle: 'Kamu menemukan keberuntungan!',
-  foundCheers: ['Semua yang kamu lakukan hari ini pasti lancar!', 'Keberuntungan menemanimu sepanjang hari!', 'Hal baik segera datang!'],
   aiFound: 'Ditemukan bersama AI',
   noteLabel: 'Catatan keberuntungan',
   notePlaceholder: 'Di mana kamu, dan bersama siapa?',
@@ -227,7 +226,7 @@ export const id: Strings = {
   shareRateLimit: 'Hari ini kamu sudah berbagi banyak keberuntungan! Sampai besok ya',
   rulesTitle: 'Sebelum kamu menyematkannya',
   rulesBody:
-    '• Titik persis dan tanggal keberuntunganmu akan muncul di peta yang bisa dilihat siapa saja di dunia.\n• Foto kecil yang hanya memotong bagian semanggi berdaun empat juga ditampilkan. Foto asli dan catatanmu tetap di perangkatmu.\n• Jangan sematkan tempat pribadi seperti rumahmu.\n• Kamu bisa melepas sematan kapan saja.',
+    '• Titik persis dan tanggal keberuntunganmu akan muncul di peta yang bisa dilihat siapa saja di dunia.\n• Foto kecil yang hanya memotong bagian semanggi berdaun empat juga ditampilkan. Foto asli dan catatanmu tetap di perangkatmu.\n• Jangan sematkan tempat pribadi seperti rumahmu.\n• Temuan baru akan otomatis disematkan di peta.\n• Kamu bisa melepas sematan kapan saja.',
   rulesAgree: 'Oke, sematkan',
   deleteMyShares: 'Lepas semua sematan keberuntunganku',
   deleteMySharesConfirm: 'Menghapus semua sematanmu dari Peta Keberuntungan. Temuan di perangkat ini tetap ada.',

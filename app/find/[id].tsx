@@ -40,6 +40,7 @@ function mapUrl(latitude: number, longitude: number) {
 export default function FindDetail() {
   const { id, fresh } = useLocalSearchParams<{ id: string; fresh?: string }>();
   const [celebrate, setCelebrate] = useState(!!fresh);
+  const autoPin = useRef(!!fresh);
   const router = useRouter();
   const palette = usePalette();
   const insets = useSafeAreaInsets();
@@ -144,6 +145,13 @@ export default function FindDetail() {
         },
       },
     ]);
+  };
+
+  // A new find goes on the Lucky Map by default (after the one-time rules); "지도에서 빼기" takes it off.
+  const closeCelebrate = () => {
+    setCelebrate(false);
+    if (autoPin.current && canShare(find) && !find.sharedId) shareToMap();
+    autoPin.current = false;
   };
 
   const stopSharing = () => {
@@ -350,7 +358,7 @@ export default function FindDetail() {
       </Pressable>
       {/* A fresh find gets one more pop of clovers on arrival. */}
       <LuckBurst trigger={fresh ? 1 : 0} />
-      <FoundPopup visible={celebrate} onClose={() => setCelebrate(false)} />
+      <FoundPopup visible={celebrate} fortune={fortuneFor(find)} onClose={closeCelebrate} />
       <SendLuckSheet
         photoUri={find.photoUri}
         cloverUri={find.cloverUri}

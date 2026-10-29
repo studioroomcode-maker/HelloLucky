@@ -37,7 +37,7 @@ export type Find = {
 export type Settings = {
   onboarded: boolean;
   saveLocation: boolean;
-  /** Version of the Lucky Map notice the user accepted (MAP_RULES: 2 = spot + clover close-up). */
+  /** Version of the Lucky Map notice the user accepted (MAP_RULES: 2 = spot + clover close-up, 3 = new finds pinned automatically). */
   mapRules: number;
   /** Lucky Map pins hidden after reporting them, and people whose pins are hidden (map ⋯ menu). */
   hiddenPins: string[];
@@ -96,7 +96,7 @@ async function persist(next: Data) {
 }
 
 /** Current Lucky Map notice; a higher number asks again before the next pin (1.0's `sharingAgreed` was version 1). */
-export const MAP_RULES = 2;
+export const MAP_RULES = 3;
 
 export function parseData(raw: string): Data {
   const parsed = JSON.parse(raw);

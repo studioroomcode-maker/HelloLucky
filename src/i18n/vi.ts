@@ -26,7 +26,6 @@ export const vi: Strings = {
   noCamera: 'Không có camera sau nào dùng được',
   cameraError: 'Camera gặp chút trục trặc',
   newFindTitle: 'Bạn tìm thấy may mắn rồi!',
-  foundCheers: ['Hôm nay làm gì cũng suôn sẻ!', 'May mắn sẽ bên bạn cả ngày!', 'Điều tốt đẹp sắp đến rồi!'],
   aiFound: 'Tìm cùng AI',
   noteLabel: 'Ghi chú may mắn',
   notePlaceholder: 'Bạn đã ở đâu, và đi cùng ai?',
@@ -227,7 +226,7 @@ export const vi: Strings = {
   shareRateLimit: 'Hôm nay bạn đã chia sẻ nhiều may mắn lắm rồi! Hẹn mai nhé',
   rulesTitle: 'Trước khi ghim',
   rulesBody:
-    '• Vị trí chính xác và ngày tìm thấy may mắn sẽ hiện trên bản đồ mà ai trên thế giới cũng xem được.\n• Một ảnh nhỏ chỉ cắt phần cỏ bốn lá cũng được hiển thị. Ảnh gốc và ghi chú chỉ ở trên máy của bạn.\n• Đừng ghim những nơi riêng tư như nhà bạn.\n• Bạn có thể bỏ ghim bất cứ lúc nào.',
+    '• Vị trí chính xác và ngày tìm thấy may mắn sẽ hiện trên bản đồ mà ai trên thế giới cũng xem được.\n• Một ảnh nhỏ chỉ cắt phần cỏ bốn lá cũng được hiển thị. Ảnh gốc và ghi chú chỉ ở trên máy của bạn.\n• Đừng ghim những nơi riêng tư như nhà bạn.\n• May mắn mới tìm thấy sẽ tự động được ghim lên bản đồ.\n• Bạn có thể bỏ ghim bất cứ lúc nào.',
   rulesAgree: 'Được, ghim thôi',
   deleteMyShares: 'Bỏ ghim tất cả may mắn của tôi',
   deleteMySharesConfirm: 'Gỡ mọi điểm ghim của bạn khỏi Bản đồ May mắn. Các lần tìm trên máy này vẫn giữ nguyên.',

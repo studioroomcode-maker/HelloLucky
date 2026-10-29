@@ -26,7 +26,6 @@ export const zhHans: Strings = {
   noCamera: '没有可用的后置相机',
   cameraError: '相机出了点问题',
   newFindTitle: '你找到幸运啦！',
-  foundCheers: ['今天做什么都会顺利！', '幸运会陪你一整天！', '好事马上就要来了！'],
   aiFound: '和 AI 一起找到',
   noteLabel: '幸运笔记',
   notePlaceholder: '在哪里、和谁一起找到的？记下来吧',
@@ -227,7 +226,7 @@ export const zhHans: Strings = {
   shareRateLimit: '今天已经分享了好多幸运！明天见',
   rulesTitle: '钉上去之前',
   rulesBody:
-    '• 找到幸运的精确地点和日期会显示在全世界任何人都能看到的地图上。\n• 也会显示只裁出四叶草部分的小照片。原始照片和笔记只保存在你的设备上。\n• 请不要钉选家等私人地点。\n• 你可以随时取消钉选。',
+    '• 找到幸运的精确地点和日期会显示在全世界任何人都能看到的地图上。\n• 也会显示只裁出四叶草部分的小照片。原始照片和笔记只保存在你的设备上。\n• 请不要钉选家等私人地点。\n• 新找到的幸运会自动钉选到地图上。\n• 你可以随时取消钉选。',
   rulesAgree: '好的，钉上去',
   deleteMyShares: '取消钉选我所有的幸运',
   deleteMySharesConfirm: '会移除你在幸运地图上的所有钉选。设备上的记录会保留。',

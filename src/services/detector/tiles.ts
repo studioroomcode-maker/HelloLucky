@@ -69,7 +69,7 @@ const clamp = (v: number, hi: number) => Math.round(Math.min(Math.max(v, 0), hi)
  * Square close-up around a four-leaf: `pad`× the box's longer side (at least `minSide` of the short image side),
  * shifted to stay inside the image. The box comes from the photo itself, so the margin only frames the clover.
  */
-export function cloverSquare(box: FractionBox, width: number, height: number, pad = 1.4, minSide = 0.08) {
+export function cloverSquare(box: FractionBox, width: number, height: number, pad = 1.25, minSide = 0.07) {
   const short = Math.min(width, height);
   const side = Math.round(Math.min(short, Math.max(Math.max(box.width * width, box.height * height) * pad, short * minSide)));
   return { left: clamp(box.x * width - side / 2, width - side), top: clamp(box.y * height - side / 2, height - side), side };

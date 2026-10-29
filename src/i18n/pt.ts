@@ -26,7 +26,6 @@ export const pt: Strings = {
   noCamera: 'Nenhuma câmera traseira disponível',
   cameraError: 'Algo deu errado com a câmera',
   newFindTitle: 'Você achou sorte!',
-  foundCheers: ['Hoje tudo vai dar certo!', 'A sorte vai te acompanhar o dia todo!', 'Algo bom está a caminho!'],
   aiFound: 'Achado com a IA',
   noteLabel: 'Nota da sorte',
   notePlaceholder: 'Onde você estava e com quem?',
@@ -228,7 +227,7 @@ export const pt: Strings = {
   shareRateLimit: 'Você já espalhou bastante sorte hoje! Até amanhã',
   rulesTitle: 'Antes de marcar',
   rulesBody:
-    '• O local exato e a data da sua sorte aparecem num mapa que qualquer pessoa do mundo pode ver.\n• Uma pequena foto recortada só do trevo de quatro folhas também aparece. Sua foto original e nota ficam no seu aparelho.\n• Não marque lugares privados, como a sua casa.\n• Você pode desmarcar quando quiser.',
+    '• O local exato e a data da sua sorte aparecem num mapa que qualquer pessoa do mundo pode ver.\n• Uma pequena foto recortada só do trevo de quatro folhas também aparece. Sua foto original e nota ficam no seu aparelho.\n• Não marque lugares privados, como a sua casa.\n• Suas novas descobertas são marcadas no mapa automaticamente.\n• Você pode desmarcar quando quiser.',
   rulesAgree: 'Beleza, pode marcar',
   deleteMyShares: 'Desmarcar toda a minha sorte',
   deleteMySharesConfirm: 'Remove todas as suas marcações do Mapa da Sorte. Seus achados neste aparelho continuam.',

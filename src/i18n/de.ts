@@ -27,7 +27,6 @@ export const de: Strings = {
   noCamera: 'Keine Rückkamera verfügbar',
   cameraError: 'Mit der Kamera ist etwas schiefgelaufen',
   newFindTitle: 'Du hast Glück gefunden!',
-  foundCheers: ['Heute gelingt dir alles!', 'Das Glück begleitet dich den ganzen Tag!', 'Etwas Gutes ist unterwegs!'],
   aiFound: 'Mit der KI gefunden',
   noteLabel: 'Glücksnotiz',
   notePlaceholder: 'Wo warst du und mit wem?',
@@ -229,7 +228,7 @@ export const de: Strings = {
   shareRateLimit: 'Du hast heute schon jede Menge Glück geteilt! Bis morgen',
   rulesTitle: 'Bevor du pinnst',
   rulesBody:
-    '• Der genaue Ort und das Datum deines Glücks erscheinen auf einer Karte, die die ganze Welt sehen kann.\n• Ein kleiner Ausschnitt nur mit dem vierblättrigen Kleeblatt wird ebenfalls gezeigt. Dein Originalfoto und deine Notiz bleiben auf deinem Gerät.\n• Pinne keine privaten Orte wie dein Zuhause.\n• Du kannst den Pin jederzeit entfernen.',
+    '• Der genaue Ort und das Datum deines Glücks erscheinen auf einer Karte, die die ganze Welt sehen kann.\n• Ein kleiner Ausschnitt nur mit dem vierblättrigen Kleeblatt wird ebenfalls gezeigt. Dein Originalfoto und deine Notiz bleiben auf deinem Gerät.\n• Pinne keine privaten Orte wie dein Zuhause.\n• Neue Funde werden automatisch auf der Karte gepinnt.\n• Du kannst den Pin jederzeit entfernen.',
   rulesAgree: 'Alles klar, pinnen',
   deleteMyShares: 'Alle meine Pins entfernen',
   deleteMySharesConfirm: 'Entfernt alle deine Pins von der Glückskarte. Deine Funde auf diesem Gerät bleiben.',

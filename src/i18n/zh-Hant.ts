@@ -26,7 +26,6 @@ export const zhHant: Strings = {
   noCamera: '沒有可用的後置相機',
   cameraError: '相機出了點問題',
   newFindTitle: '你找到幸運了！',
-  foundCheers: ['今天做什麼都會順利！', '幸運會陪你一整天！', '好事馬上就要來了！'],
   aiFound: '和 AI 一起找到',
   noteLabel: '幸運筆記',
   notePlaceholder: '在哪裡、和誰一起找到的？記下來吧',
@@ -227,7 +226,7 @@ export const zhHant: Strings = {
   shareRateLimit: '今天已經分享了好多幸運！明天見',
   rulesTitle: '釘上去之前',
   rulesBody:
-    '• 找到幸運的精確地點和日期會顯示在全世界任何人都看得到的地圖上。\n• 也會顯示只裁出四葉草部分的小照片。原始照片和筆記只保存在你的裝置上。\n• 請不要釘選住家等私人地點。\n• 你可以隨時取消釘選。',
+    '• 找到幸運的精確地點和日期會顯示在全世界任何人都看得到的地圖上。\n• 也會顯示只裁出四葉草部分的小照片。原始照片和筆記只保存在你的裝置上。\n• 請不要釘選住家等私人地點。\n• 新找到的幸運會自動釘選到地圖上。\n• 你可以隨時取消釘選。',
   rulesAgree: '好，釘上去',
   deleteMyShares: '取消釘選我所有的幸運',
   deleteMySharesConfirm: '會移除你在幸運地圖上的所有釘選。裝置上的紀錄會保留。',

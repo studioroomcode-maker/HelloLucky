@@ -27,7 +27,6 @@ export const fr: Strings = {
   noCamera: "Aucune caméra arrière n'est disponible",
   cameraError: 'Un souci est survenu avec la caméra',
   newFindTitle: 'Tu as trouvé de la chance !',
-  foundCheers: ["Aujourd'hui, tout va te réussir !", 'La chance t’accompagne toute la journée !', 'Quelque chose de bien arrive !'],
   aiFound: "Trouvé avec l'IA",
   noteLabel: 'Note porte-bonheur',
   notePlaceholder: 'Où étais-tu, et avec qui ?',
@@ -229,7 +228,7 @@ export const fr: Strings = {
   shareRateLimit: "Tu as partagé plein de chance aujourd'hui ! À demain",
   rulesTitle: "Avant d'épingler",
   rulesBody:
-    "• Le lieu exact et la date de ta chance apparaîtront sur une carte visible par tout le monde.\n• Une petite photo recadrée sur le trèfle à quatre feuilles s'affiche aussi. Ta photo d'origine et ta note restent sur ton appareil.\n• N'épingle pas de lieux privés comme ton domicile.\n• Tu peux désépingler à tout moment.",
+    "• Le lieu exact et la date de ta chance apparaîtront sur une carte visible par tout le monde.\n• Une petite photo recadrée sur le trèfle à quatre feuilles s'affiche aussi. Ta photo d'origine et ta note restent sur ton appareil.\n• N'épingle pas de lieux privés comme ton domicile.\n• Tes nouvelles trouvailles sont épinglées automatiquement sur la carte.\n• Tu peux désépingler à tout moment.",
   rulesAgree: "D'accord, épingle-la",
   deleteMyShares: 'Désépingler toute ma chance',
   deleteMySharesConfirm: 'Retire toutes tes épingles de la Carte de la chance. Tes trouvailles restent sur cet appareil.',

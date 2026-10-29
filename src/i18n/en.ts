@@ -26,7 +26,6 @@ export const en: Strings = {
   noCamera: 'No back camera is available',
   cameraError: 'Something went wrong with the camera',
   newFindTitle: 'You found some luck!',
-  foundCheers: ['Everything you do today will go well!', 'Luck is with you all day long!', 'Something good is on its way!'],
   aiFound: 'Found with AI',
   noteLabel: 'Lucky note',
   notePlaceholder: 'Where were you, and who were you with?',
@@ -228,7 +227,7 @@ export const en: Strings = {
   shareRateLimit: "You've shared plenty of luck today! See you tomorrow",
   rulesTitle: 'Before you pin it',
   rulesBody:
-    "• The exact spot and date of your luck appear on a map anyone in the world can see.\n• A small close-up of just the four-leaf clover is shown too. Your original photo and note stay on your device.\n• Don't pin private places such as your home.\n• You can unpin at any time.",
+    "• The exact spot and date of your luck appear on a map anyone in the world can see.\n• A small close-up of just the four-leaf clover is shown too. Your original photo and note stay on your device.\n• Don't pin private places such as your home.\n• New finds are pinned on the map automatically.\n• You can unpin at any time.",
   rulesAgree: 'Sounds good, pin it',
   deleteMyShares: 'Unpin all my luck',
   deleteMySharesConfirm: 'Removes all your pins from the Lucky Map. Your finds on this device stay.',
