@@ -65,6 +65,7 @@ export const ar: Strings = {
   strangerRateLimit: "حظ اليوم وصل بما يكفي.\nلنحتفظ بالباقي ليوم الغد 🍀",
   fromCity: (city) => `حظ من مكانٍ ما في ${city}`,
   fromSomewhere: 'حظ من مكانٍ ما في هذا العالم',
+  fromApp: 'تشجيع من Hello Luck',
   mailTitle: 'وصلك بعض الحظ!',
   mailTap: 'المس الظرف لفتحه',
   mailThanks: 'شكرًا',

@@ -54,6 +54,7 @@ export const ja: Strings = {
   strangerRateLimit: "今日の幸運はもう十分に届いたよ。\n残りは明日のためにとっておこうね 🍀",
   fromCity: (city) => `${city}のどこかから届いた幸運`,
   fromSomewhere: 'どこかから届いた幸運',
+  fromApp: 'Hello Luckからの応援',
   mailTitle: '幸運がひょっこり届いたよ！',
   mailTap: '封筒をタップして開けてみて',
   mailThanks: 'ありがとう',

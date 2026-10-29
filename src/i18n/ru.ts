@@ -68,6 +68,7 @@ export const ru: Strings = {
   strangerRateLimit: "Сегодняшняя удача уже долетела сполна.\nОстальное прибережём на завтра 🍀",
   fromCity: (city) => `Удача откуда-то из города ${city}`,
   fromSomewhere: 'Удача откуда-то издалека',
+  fromApp: 'Поддержка от Hello Luck',
   mailTitle: 'Тебя нашла удача!',
   mailTap: 'Нажми на конверт, чтобы открыть',
   mailThanks: 'Спасибо',

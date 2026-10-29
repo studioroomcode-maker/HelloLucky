@@ -54,6 +54,7 @@ export const zhHant: Strings = {
   strangerRateLimit: "今天的幸運已經傳遞得足夠囉。\n剩下的留給明天吧 🍀",
   fromCity: (city) => `來自${city}某處的幸運`,
   fromSomewhere: '來自遠方某處的幸運',
+  fromApp: '來自 Hello Luck 的加油',
   mailTitle: '有一份幸運找到你了！',
   mailTap: '點一下信封打開吧',
   mailThanks: '謝謝你',

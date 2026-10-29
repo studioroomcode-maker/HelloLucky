@@ -54,6 +54,7 @@ export const en: Strings = {
   strangerRateLimit: "Today's luck has already been shared.\nLet's save the rest for tomorrow 🍀",
   fromCity: (city) => `Luck from somewhere in ${city}`,
   fromSomewhere: 'Luck from somewhere out there',
+  fromApp: 'A cheer from Hello Luck',
   mailTitle: 'Some luck found you!',
   mailTap: 'Tap the envelope to open it',
   mailThanks: 'Thank you',

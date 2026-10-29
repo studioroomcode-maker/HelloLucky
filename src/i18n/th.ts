@@ -54,6 +54,7 @@ export const th: Strings = {
   strangerRateLimit: "โชคของวันนี้ส่งถึงเพียงพอแล้ว\nเก็บที่เหลือไว้เพื่อพรุ่งนี้กันนะ 🍀",
   fromCity: (city) => `โชคจากที่ไหนสักแห่งใน${city}`,
   fromSomewhere: 'โชคจากที่ไหนสักแห่งไกลๆ',
+  fromApp: 'กำลังใจจาก Hello Luck',
   mailTitle: 'มีโชคมาหาคุณแล้ว!',
   mailTap: 'แตะซองจดหมายเพื่อเปิด',
   mailThanks: 'ขอบคุณนะ',

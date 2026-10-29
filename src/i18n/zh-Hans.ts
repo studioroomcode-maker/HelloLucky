@@ -54,6 +54,7 @@ export const zhHans: Strings = {
   strangerRateLimit: "今天的幸运已经传递得足够啦。\n剩下的留给明天吧 🍀",
   fromCity: (city) => `来自${city}某处的幸运`,
   fromSomewhere: '来自远方某处的幸运',
+  fromApp: '来自 Hello Luck 的加油',
   mailTitle: '有一份幸运找到你啦！',
   mailTap: '点一下信封打开吧',
   mailThanks: '谢谢你',

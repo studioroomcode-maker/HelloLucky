@@ -137,7 +137,7 @@ export function LetterPopup({
               <LuckCard
                 card={letter.card_key}
                 message={letterMessage(t, letter.message_key)}
-                footer={letter.origin ? t.fromCity(letter.origin) : t.fromSomewhere}
+                footer={letter.from_app ? t.fromApp : letter.origin ? t.fromCity(letter.origin) : t.fromSomewhere}
               />
               {letter.hops > 0 ? (
                 <View style={styles.route}>
@@ -148,27 +148,32 @@ export function LetterPopup({
                 </View>
               ) : null}
 
-              <Text style={[styles.label, { color: palette.muted }]}>{thanked === undefined ? t.thanksTitle : t.thanksSent}</Text>
-              <View style={styles.stickers}>
-                {Array.from({ length: STICKER_COUNT }, (_, i) => (
-                  <Pressable
-                    key={i}
-                    onPress={() => thank(i)}
-                    disabled={thanked !== undefined}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t.thanksTitle} ${i + 1}`}
-                    style={[
-                      styles.sticker,
-                      {
-                        backgroundColor: thanked === i ? palette.surfaceAlt : 'transparent',
-                      },
-                      thanked !== undefined && thanked !== i && styles.dim,
-                    ]}
-                  >
-                    <Sticker index={i} size={32} />
-                  </Pressable>
-                ))}
-              </View>
+              {/* The app's own cheer has no one to thank; passing it on still works. */}
+              {letter.from_app ? null : (
+                <>
+                  <Text style={[styles.label, { color: palette.muted }]}>{thanked === undefined ? t.thanksTitle : t.thanksSent}</Text>
+                  <View style={styles.stickers}>
+                    {Array.from({ length: STICKER_COUNT }, (_, i) => (
+                      <Pressable
+                        key={i}
+                        onPress={() => thank(i)}
+                        disabled={thanked !== undefined}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${t.thanksTitle} ${i + 1}`}
+                        style={[
+                          styles.sticker,
+                          {
+                            backgroundColor: thanked === i ? palette.surfaceAlt : 'transparent',
+                          },
+                          thanked !== undefined && thanked !== i && styles.dim,
+                        ]}
+                      >
+                        <Sticker index={i} size={32} />
+                      </Pressable>
+                    ))}
+                  </View>
+                </>
+              )}
 
               {letter.homecoming ? null : (
                 <PrimaryButton

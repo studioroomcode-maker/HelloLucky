@@ -55,6 +55,7 @@ export const de: Strings = {
   strangerRateLimit: "Das Glück von heute ist schon reichlich unterwegs.\nHeben wir den Rest für morgen auf 🍀",
   fromCity: (city) => `Glück von irgendwo in ${city}`,
   fromSomewhere: 'Glück von irgendwo da draußen',
+  fromApp: 'Ein Gruß von Hello Luck',
   mailTitle: 'Glück hat dich gefunden!',
   mailTap: 'Tipp auf den Umschlag, um ihn zu öffnen',
   mailThanks: 'Danke',

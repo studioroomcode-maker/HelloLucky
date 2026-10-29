@@ -54,6 +54,7 @@ export const id: Strings = {
   strangerRateLimit: "Keberuntungan hari ini sudah cukup tersampaikan.\nSisanya kita simpan untuk besok ya 🍀",
   fromCity: (city) => `Keberuntungan dari suatu tempat di ${city}`,
   fromSomewhere: 'Keberuntungan dari suatu tempat di luar sana',
+  fromApp: 'Semangat dari Hello Luck',
   mailTitle: 'Ada keberuntungan yang menemukanmu!',
   mailTap: 'Ketuk amplopnya untuk membuka',
   mailThanks: 'Terima kasih',

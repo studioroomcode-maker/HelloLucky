@@ -190,6 +190,8 @@ export type LuckyLetter = {
   hops: number;
   route: Hop[];
   homecoming: boolean;
+  /** Hello Luck's own cheer for someone nobody wrote to lately: no sender to thank. */
+  from_app?: boolean;
 };
 
 /** Where the sender is: city name plus a point the server rounds to 0.1° (≈11 km). */
@@ -279,6 +281,7 @@ export type KeptLetter = {
   thanked: boolean;
   /** The sender's clover close-up (letterPhotoUrl), if the letter carries one. */
   photo?: string | null;
+  from_app?: boolean;
 };
 
 /** The clover a received letter shows; the samples borrow `latest`, my newest clover. */

@@ -54,6 +54,7 @@ export const pt: Strings = {
   strangerRateLimit: "A sorte de hoje já foi entregue com folga.\nVamos guardar o resto para amanhã 🍀",
   fromCity: (city) => `Sorte de algum lugar em ${city}`,
   fromSomewhere: 'Sorte de algum lugar por aí',
+  fromApp: 'Um incentivo do Hello Luck',
   mailTitle: 'Uma sorte encontrou você!',
   mailTap: 'Toque no envelope pra abrir',
   mailThanks: 'Valeu',

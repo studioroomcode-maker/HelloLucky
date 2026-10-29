@@ -57,6 +57,7 @@ export const ko = {
   strangerRateLimit: "오늘의 행운은 이미 충분히 전해졌어요.\n남은 행운은 내일을 위해 아껴 둘게요 🍀",
   fromCity: (city: string) => `${city} 어딘가에서 온 행운`,
   fromSomewhere: '어딘가에서 온 행운',
+  fromApp: 'Hello Luck이 보낸 응원',
   mailTitle: '우연히 행운이 도착했어요!',
   mailTap: '봉투를 눌러 열어보세요',
   mailThanks: '고마워요',

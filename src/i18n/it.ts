@@ -56,6 +56,7 @@ export const it: Strings = {
   strangerRateLimit: "La fortuna di oggi è già arrivata in abbondanza.\nTeniamo il resto per domani 🍀",
   fromCity: (city) => `Fortuna da un angolo di ${city}`,
   fromSomewhere: 'Fortuna da chissà dove',
+  fromApp: 'Un incoraggiamento da Hello Luck',
   mailTitle: "Un po' di fortuna ti ha trovato!",
   mailTap: 'Tocca la busta per aprirla',
   mailThanks: 'Grazie',

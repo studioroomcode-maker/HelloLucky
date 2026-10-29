@@ -51,6 +51,11 @@ alter table public.lucky_letters
   -- The sender's clover close-up in the public clovers bucket (<user>/<uuid>.jpg); relays carry it on.
   add column if not exists photo text check (photo ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}\.jpg$'),
   add column if not exists thanks_seen_at timestamptz;
+-- Hello Luck's own cheer for someone nobody wrote to lately (check_mailbox): no sender, shown as from the app.
+alter table public.lucky_letters add column if not exists from_app boolean not null default false;
+alter table public.lucky_letters alter column sender drop not null;
+alter table public.lucky_letters drop constraint if exists lucky_letters_sender_check;
+alter table public.lucky_letters add constraint lucky_letters_sender_check check (sender is not null or from_app);
 update public.lucky_letters set chain = id where chain is null;
 create index if not exists lucky_letters_pending on public.lucky_letters (created_at) where recipient is null;
 create index if not exists lucky_letters_recipient on public.lucky_letters (recipient, delivered_at);
@@ -80,12 +85,17 @@ create or replace function public.notify_letter(p_letter uuid) returns void
 language plpgsql security definer set search_path = public as $$
 declare m record;
 begin
-  select lm.push_token, lm.lang, l.homecoming, l.hops into m
+  select lm.push_token, lm.lang, l.homecoming, l.hops, l.from_app into m
     from lucky_letters l join luck_members lm on lm.user_id = l.recipient where l.id = p_letter;
   if m.homecoming then
     perform push(m.push_token,
       case when m.lang = 'ko' then '🎉 내가 보낸 행운이 돌아왔어요!' else '🎉 Your luck came back to you!' end,
       case when m.lang = 'ko' then m.hops || '명을 거쳐 다시 나에게 왔어요' else 'It traveled through ' || m.hops || ' people and found its way home' end,
+      jsonb_build_object('letter', p_letter));
+  elsif m.from_app then
+    perform push(m.push_token,
+      case when m.lang = 'ko' then '🍀 행운이 도착했어요!' else '🍀 Some luck just arrived!' end,
+      case when m.lang = 'ko' then 'Hello Luck이 보낸 응원을 열어보세요' else 'Open a cheer from Hello Luck' end,
       jsonb_build_object('letter', p_letter));
   else
     perform push(m.push_token,
@@ -223,7 +233,7 @@ select cron.schedule('deliver-lucky-letters', '*/5 * * * *', 'select public.deli
 drop function if exists public.check_mailbox(text);
 create or replace function public.check_mailbox(p_lang text, p_tz text default null) returns setof public.lucky_letters
 language plpgsql security definer set search_path = public as $$
-declare me uuid := auth.uid(); waiting uuid;
+declare me uuid := auth.uid(); waiting uuid; own uuid := gen_random_uuid();
 begin
   if me is null then raise exception 'not_signed_in'; end if;
   insert into luck_members (user_id, lang, tz, last_seen) values (me, left(p_lang, 10), left(p_tz, 64), now())
@@ -234,6 +244,13 @@ begin
     if waiting is not null then
       update lucky_letters set recipient = me, delivered_at = now(), deliver_at = now() where id = waiting;
     end if;
+  end if;
+  -- Nobody wrote for 3 days (or ever, for someone new): Hello Luck sends a general cheer (keys 1040–1049, topic 4)
+  -- at the next cozy moment, so the mailbox never goes quiet while there are few senders. Marked from_app, not a stranger.
+  if is_free(me) and not exists (select 1 from lucky_letters where recipient = me and delivered_at > now() - interval '3 days') then
+    insert into lucky_letters (id, sender, from_app, message_key, card_key, recipient, deliver_at, chain)
+    values (own, null, true, 1040 + floor(random() * 10)::int, floor(random() * 8)::int, me,
+            cozy_time((select lm.tz from luck_members lm where lm.user_id = me)), own);
   end if;
   return query select * from lucky_letters
     where recipient = me and delivered_at is not null and opened_at is null order by delivered_at;
@@ -281,9 +298,11 @@ $$;
 -- Letters that reached me, newest first (the keepsake box).
 drop function if exists public.my_letters();
 create or replace function public.my_letters() returns table (letter uuid, message_key smallint, card_key smallint,
-  origin text, hops smallint, route jsonb, homecoming boolean, delivered_at timestamptz, relayed boolean, thanked boolean, photo text)
+  origin text, hops smallint, route jsonb, homecoming boolean, delivered_at timestamptz, relayed boolean, thanked boolean, photo text,
+  from_app boolean)
 language sql stable security definer set search_path = public as $$
-  select id, message_key, card_key, origin, hops, route, homecoming, delivered_at, relayed_at is not null, thanked_at is not null, photo
+  select id, message_key, card_key, origin, hops, route, homecoming, delivered_at, relayed_at is not null, thanked_at is not null, photo,
+         from_app
     from lucky_letters where recipient = auth.uid() and delivered_at is not null
    order by delivered_at desc limit 200
 $$;
@@ -314,7 +333,7 @@ $$;
 -- Letters sent anywhere in the last 24 hours: a number only, for "luck in the world today".
 create or replace function public.luck_today() returns integer
 language sql stable security definer set search_path = public as $$
-  select count(*)::int from lucky_letters where created_at > now() - interval '1 day'
+  select count(*)::int from lucky_letters where created_at > now() - interval '1 day' and not from_app
 $$;
 
 revoke execute on function public.notify_letter(uuid), public.pick_recipient(uuid), public.push(text, text, text, jsonb),

@@ -143,7 +143,7 @@ export default function Letters() {
                     <View>
                       <Text style={[styles.meta, { color: card.ink }]}>
                         {item.homecoming ? `${t.cameHome} · ` : ''}
-                        {item.origin ? t.fromCity(item.origin) : t.fromSomewhere}
+                        {item.from_app ? t.fromApp : item.origin ? t.fromCity(item.origin) : t.fromSomewhere}
                       </Text>
                       <Text style={[styles.meta, { color: card.ink }]}>{formatDate(item.delivered_at)}</Text>
                       {item.hops > 0 ? <Text style={[styles.meta, { color: card.ink }]}>{t.relayCount(item.hops)}</Text> : null}

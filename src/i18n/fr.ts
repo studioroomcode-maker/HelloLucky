@@ -55,6 +55,7 @@ export const fr: Strings = {
   strangerRateLimit: "La chance d'aujourd'hui a déjà bien voyagé.\nGardons le reste pour demain 🍀",
   fromCity: (city) => `De la chance venue de quelque part à ${city}`,
   fromSomewhere: 'De la chance venue de quelque part',
+  fromApp: 'Un encouragement de Hello Luck',
   mailTitle: "Un peu de chance t'a trouvé !",
   mailTap: "Touche l'enveloppe pour l'ouvrir",
   mailThanks: 'Merci',

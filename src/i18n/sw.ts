@@ -54,6 +54,7 @@ export const sw: Strings = {
   strangerRateLimit: "Bahati ya leo tayari imefika ya kutosha.\nTuhifadhi iliyobaki kwa ajili ya kesho 🍀",
   fromCity: (city) => `Bahati kutoka mahali fulani huko ${city}`,
   fromSomewhere: 'Bahati kutoka mahali fulani duniani',
+  fromApp: 'Kutia moyo kutoka Hello Luck',
   mailTitle: 'Bahati imekufikia!',
   mailTap: 'Gusa bahasha uifungue',
   mailThanks: 'Asante',

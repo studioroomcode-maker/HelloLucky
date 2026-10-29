@@ -55,6 +55,7 @@ export const es: Strings = {
   strangerRateLimit: "La suerte de hoy ya ha llegado de sobra.\nGuardemos el resto para mañana 🍀",
   fromCity: (city) => `Suerte desde algún lugar de ${city}`,
   fromSomewhere: 'Suerte desde algún lugar del mundo',
+  fromApp: 'Un ánimo de Hello Luck',
   mailTitle: '¡Te ha llegado suerte!',
   mailTap: 'Toca el sobre para abrirlo',
   mailThanks: 'Gracias',

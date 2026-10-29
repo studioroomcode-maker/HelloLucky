@@ -54,6 +54,7 @@ export const vi: Strings = {
   strangerRateLimit: "May mắn hôm nay đã được gửi đi trọn vẹn rồi.\nPhần còn lại để dành cho ngày mai nhé 🍀",
   fromCity: (city) => `May mắn từ đâu đó ở ${city}`,
   fromSomewhere: 'May mắn từ đâu đó ngoài kia',
+  fromApp: 'Lời cổ vũ từ Hello Luck',
   mailTitle: 'Có may mắn tìm đến bạn!',
   mailTap: 'Chạm vào phong bì để mở',
   mailThanks: 'Cảm ơn nhé',
