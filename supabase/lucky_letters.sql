@@ -245,9 +245,9 @@ begin
       update lucky_letters set recipient = me, delivered_at = now(), deliver_at = now() where id = waiting;
     end if;
   end if;
-  -- Nobody wrote for 3 days (or ever, for someone new): Hello Luck sends a general cheer (keys 1040–1049, topic 4)
+  -- Nobody wrote for 15 days (or ever, for someone new): Hello Luck sends a general cheer (keys 1040–1049, topic 4)
   -- at the next cozy moment, so the mailbox never goes quiet while there are few senders. Marked from_app, not a stranger.
-  if is_free(me) and not exists (select 1 from lucky_letters where recipient = me and delivered_at > now() - interval '3 days') then
+  if is_free(me) and not exists (select 1 from lucky_letters where recipient = me and delivered_at > now() - interval '15 days') then
     insert into lucky_letters (id, sender, from_app, message_key, card_key, recipient, deliver_at, chain)
     values (own, null, true, 1040 + floor(random() * 10)::int, floor(random() * 8)::int, me,
             cozy_time((select lm.tz from luck_members lm where lm.user_id = me)), own);
