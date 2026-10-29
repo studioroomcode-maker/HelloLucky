@@ -99,13 +99,21 @@ AI model trained in part on "4 Leaf Clover Detect" by test-ara07 and "Hunting fo
 ## 5. 버전 출시 노트 (500자)
 **ko**
 ```
-🍀 1.0.4 업데이트
-· 네잎클로버가 확인된 사진만 행운으로 저장돼요
-· 친구에게 행운을 보낼 때 메시지가 사진 속에 함께 담겨요
+🍀 1.0.5 업데이트
+· 네잎클로버를 찾으면 바로 행운을 나눌 수 있어요
+· 내 행운이 다음 도시로 떠나면 알림으로 알려 드려요
+· 한동안 편지가 없으면 Hello Luck이 응원을 보내 드려요
+· 새로 찾은 행운은 행운 지도에 자동으로 찍혀요 (언제든 뺄 수 있어요)
+· 클로버 하나당 한 번씩 행운을 보낼 수 있어요
+· 찍은 사진 속 네잎클로버를 더 잘 확인해요
 ```
 **en**
 ```
-🍀 What's new in 1.0.4
-· Only photos with a confirmed four-leaf clover are saved as a find
-· When you send luck to a friend, your message now travels inside the photo
+🍀 What's new in 1.0.5
+· Share your luck right after you find a four-leaf clover
+· Get a notification when your luck moves on to the next city
+· If no letter has come for a while, Hello Luck sends you a cheer
+· New finds are pinned on the Lucky Map automatically (unpin any time)
+· Each clover can send its luck once
+· Better four-leaf checks in the photos you take
 ```
