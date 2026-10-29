@@ -105,7 +105,7 @@ export const ko = {
   specialCardNote: '오늘 보내는 행운엔 특별한 카드가 붙어요',
   // Cheers, thanks, relays and journeys (src/letters.ts keys: topic index and order must match in every language)
   luckTopic: '행운',
-  cheerTopics: ['지친 날', '시험·면접', '출근길', '비 오는 날', '그냥 응원'],
+  cheerTopics: ['지친 날', '시험·면접', '출근길', '비 오는 날', '응원'],
   cheers: [
     [
       '오늘 하루도 정말 수고 많았어요',

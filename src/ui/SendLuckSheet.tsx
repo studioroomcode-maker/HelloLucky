@@ -32,6 +32,7 @@ export function SendLuckSheet({
   cloverUri,
   fortune,
   place,
+  sent,
   visible,
   onClose,
   onSend,
@@ -42,6 +43,8 @@ export function SendLuckSheet({
   cloverUri?: string;
   fortune: string;
   place?: Place;
+  /** A find sends its luck once, to a friend or to a stranger; then both buttons rest. */
+  sent?: boolean;
   visible: boolean;
   onClose: () => void;
   onSend: (note: string) => Promise<void>;
@@ -65,6 +68,7 @@ export function SendLuckSheet({
   }, [visible]);
 
   const sendFriend = async () => {
+    if (sent || busy) return;
     setBusy(true);
     try {
       await onSend(note.trim());
@@ -75,6 +79,7 @@ export function SendLuckSheet({
   };
 
   const sendStranger = async () => {
+    if (sent || busy) return;
     setBusy(true);
     try {
       onStrangerSent(await sendLuckyLetter(message, card, place, undefined, cloverUri));
@@ -142,13 +147,14 @@ export function SendLuckSheet({
                 accessibilityLabel={t.sendLuckPlaceholder}
                 style={[styles.input, { color: palette.text, backgroundColor: palette.surfaceAlt }]}
               />
-              <PrimaryButton icon="paper-plane" label={t.sendLuckButton} onPress={sendFriend} loading={busy} />
+              <PrimaryButton icon="paper-plane" label={sent ? t.strangerSent : t.sendLuckButton} onPress={sendFriend} loading={busy} disabled={sent} />
             </>
           ) : (
             <>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.topics}>
-                {[t.luckTopic, ...t.cheerTopics].map((label, i) => {
-                  const value = i - 1;
+                {/* Display order only: the general cheer (topic 4) goes first; topic indexes are message keys, so the array stays as is. */}
+                {[4, -1, 0, 1, 2, 3].map((value) => {
+                  const label = value < 0 ? t.luckTopic : t.cheerTopics[value];
                   const on = topic === value;
                   return (
                     <Pressable
@@ -201,7 +207,13 @@ export function SendLuckSheet({
                 </Pressable>
               </View>
               <Text style={[styles.intro, { color: palette.muted }]}>{t.strangerIntro}</Text>
-              <PrimaryButton icon="balloon" label={t.sendStranger} onPress={sendStranger} loading={busy} />
+              <PrimaryButton
+                icon="balloon"
+                label={sent ? t.strangerSent : t.sendStranger}
+                onPress={sendStranger}
+                loading={busy}
+                disabled={sent}
+              />
             </>
           )}
         </View>

@@ -111,7 +111,10 @@ export default function FindDetail() {
         message,
         failOnCancel: false,
       });
-      if (result.success) bumpCounters({ sentLuck: 1 }).catch(() => {});
+      if (result.success) {
+        bumpCounters({ sentLuck: 1 }).catch(() => {});
+        updateFind(find.id, { luckSent: true }).catch(() => {});
+      }
     } catch (error) {
       console.warn('detail: share failed', error);
     }
@@ -353,8 +356,11 @@ export default function FindDetail() {
         cloverUri={find.cloverUri}
         fortune={fortuneFor(find)}
         place={{ city: find.city, lat: find.latitude, lng: find.longitude }}
+        // Finds sent to a stranger before luckSent existed are known by the journeys they started.
+        sent={find.luckSent || Object.values(settings.journeyFinds).includes(find.id)}
         onStrangerSent={(chain) => {
           bumpCounters({ sentLuck: 1 }).catch(() => {});
+          updateFind(find.id, { luckSent: true }).catch(() => {});
           // Remember which find started this journey, so its card can show the clover.
           updateSettings({ journeyFinds: { ...getSettings().journeyFinds, [chain]: find.id } }).catch(() => {});
         }}

@@ -30,6 +30,8 @@ export type Find = {
   sharedId?: string;
   /** Random seed for the fortune-cookie line (src/fortune.ts), fixed at capture. */
   fortune?: number;
+  /** Set once this find's luck went out, to a friend or a stranger: each find sends once. */
+  luckSent?: boolean;
 };
 
 export type Settings = {
@@ -177,7 +179,7 @@ export async function addFind(
   return find;
 }
 
-export async function updateFind(id: string, patch: Partial<Pick<Find, 'note' | 'place' | 'city' | 'sharedId'>>) {
+export async function updateFind(id: string, patch: Partial<Pick<Find, 'note' | 'place' | 'city' | 'sharedId' | 'luckSent'>>) {
   await persist({
     ...data,
     finds: data.finds.map((find) => (find.id === id ? { ...find, ...patch } : find)),
