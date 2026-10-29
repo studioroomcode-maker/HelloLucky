@@ -170,7 +170,7 @@ export const fr: Strings = {
   thanksSent: 'Ton merci est en route',
   relayButton: 'Transmettre cette chance',
   relayConfirmTitle: '🍀 Cette chance reprend la route',
-  relayConfirmBody: "Cette chance est venue de loin jusqu'à toi.\nAjoute-y un peu de ton cœur\net offre-la à quelqu'un que tu ne connais pas encore.\n\nElle partira comme ta lettre de chance du jour.",
+  relayConfirmBody: "Cette chance est venue de loin jusqu'à toi.\nAjoute-y un peu de ton cœur\net offre-la à quelqu'un que tu ne connais pas encore.\n\nTu peux transmettre la chance une fois par jour.",
   relayConfirmGo: 'Transmettre la chance',
   relayConfirmKeep: 'La garder encore un peu',
   relaySent: 'La chance file vers la prochaine personne !',

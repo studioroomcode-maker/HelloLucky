@@ -171,7 +171,7 @@ export const ko = {
   thanksSent: '고마움이 전해졌어요',
   relayButton: '이 행운 이어 보내기',
   relayConfirmTitle: '🍀 이 행운, 다시 길을 떠나요',
-  relayConfirmBody: '멀리서 날아온 이 행운에\n당신의 마음을 살짝 얹어\n아직 만나지 못한 누군가에게 건네요.\n\n오늘의 행운 한 통으로 보내져요.',
+  relayConfirmBody: '멀리서 날아온 이 행운에\n당신의 마음을 살짝 얹어\n아직 만나지 못한 누군가에게 건네요.\n\n이어 보내기는 하루에 한 번 할 수 있어요.',
   relayConfirmGo: '행운 건네기',
   relayConfirmKeep: '조금 더 간직할게요',
   relaySent: '행운이 다음 사람에게 이어졌어요!',

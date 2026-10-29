@@ -40,7 +40,7 @@ function mapUrl(latitude: number, longitude: number) {
 export default function FindDetail() {
   const { id, fresh } = useLocalSearchParams<{ id: string; fresh?: string }>();
   const [celebrate, setCelebrate] = useState(!!fresh);
-  const autoPin = useRef(!!fresh);
+  const autoPinPending = useRef(!!fresh);
   const router = useRouter();
   const palette = usePalette();
   const insets = useSafeAreaInsets();
@@ -147,11 +147,22 @@ export default function FindDetail() {
     ]);
   };
 
-  // A new find goes on the Lucky Map by default (after the one-time rules); "지도에서 빼기" takes it off.
-  const closeCelebrate = () => {
+  // A new find goes on the Lucky Map by default once the current notice is accepted (the map button asks otherwise),
+  // quietly, so no dialog cuts into the celebration. "지도에서 빼기" takes it off.
+  const autoPin = async () => {
+    if (!autoPinPending.current) return;
+    autoPinPending.current = false;
+    if (settings.mapRules < MAP_RULES || !canShare(find) || find.sharedId) return;
+    setMapBusy(true);
+    await shareFind(find).catch((error) => console.warn('detail: auto pin failed', error));
+    setMapBusy(false);
+  };
+
+  const closeCelebrate = (send: boolean) => {
     setCelebrate(false);
-    if (autoPin.current && canShare(find) && !find.sharedId) shareToMap();
-    autoPin.current = false;
+    autoPin();
+    // iOS drops a modal presented while another one is still fading out.
+    if (send) setTimeout(() => setSendOpen(true), 400);
   };
 
   const stopSharing = () => {
@@ -297,7 +308,6 @@ export default function FindDetail() {
                 icon="paper-plane-outline"
                 label={t.share}
                 onPress={() => setSendOpen(true)}
-                variant="secondary"
               />
             </View>
             <View style={styles.done}>
@@ -308,6 +318,7 @@ export default function FindDetail() {
                   saveNote();
                   goHome();
                 }}
+                variant="secondary"
               />
             </View>
           </View>
@@ -358,7 +369,12 @@ export default function FindDetail() {
       </Pressable>
       {/* A fresh find gets one more pop of clovers on arrival. */}
       <LuckBurst trigger={fresh ? 1 : 0} />
-      <FoundPopup visible={celebrate} fortune={fortuneFor(find)} onClose={closeCelebrate} />
+      <FoundPopup
+        visible={celebrate}
+        fortune={fortuneFor(find)}
+        onClose={() => closeCelebrate(false)}
+        onSend={() => closeCelebrate(true)}
+      />
       <SendLuckSheet
         photoUri={find.photoUri}
         cloverUri={find.cloverUri}

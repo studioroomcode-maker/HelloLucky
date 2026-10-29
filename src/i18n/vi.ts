@@ -168,7 +168,7 @@ export const vi: Strings = {
   thanksSent: 'Lời cảm ơn của bạn đang trên đường đi',
   relayButton: 'Gửi tiếp may mắn này',
   relayConfirmTitle: '🍀 May mắn này lại lên đường',
-  relayConfirmBody: 'May mắn này đã đi một chặng xa để đến với bạn.\nHãy gửi thêm một chút tấm lòng\nrồi trao cho một người bạn chưa từng gặp.\n\nĐây sẽ là lá thư may mắn hôm nay của bạn.',
+  relayConfirmBody: 'May mắn này đã đi một chặng xa để đến với bạn.\nHãy gửi thêm một chút tấm lòng\nrồi trao cho một người bạn chưa từng gặp.\n\nBạn có thể gửi tiếp may mắn mỗi ngày một lần.',
   relayConfirmGo: 'Trao may mắn',
   relayConfirmKeep: 'Giữ thêm chút nữa',
   relaySent: 'May mắn đang bay đến người tiếp theo!',

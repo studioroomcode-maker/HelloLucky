@@ -172,7 +172,7 @@ export const sw: Strings = {
   thanksSent: 'Shukrani zako ziko njiani',
   relayButton: 'Pitisha bahati hii',
   relayConfirmTitle: '🍀 Bahati hii inaanza safari tena',
-  relayConfirmBody: 'Bahati hii imetoka mbali kukufikia.\nOngeza kidogo cha moyo wako\nkisha mpe mtu ambaye bado hujakutana naye.\n\nItatumwa kama barua yako ya bahati ya leo.',
+  relayConfirmBody: 'Bahati hii imetoka mbali kukufikia.\nOngeza kidogo cha moyo wako\nkisha mpe mtu ambaye bado hujakutana naye.\n\nUnaweza kupitisha bahati mara moja kwa siku.',
   relayConfirmGo: 'Pitisha bahati',
   relayConfirmKeep: 'Nitaihifadhi kidogo zaidi',
   relaySent: 'Bahati iko njiani kwenda kwa mtu anayefuata!',

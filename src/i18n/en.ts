@@ -169,7 +169,7 @@ export const en: Strings = {
   thanksSent: 'Your thanks is on its way',
   relayButton: 'Pass this luck on',
   relayConfirmTitle: '🍀 This luck sets off again',
-  relayConfirmBody: "This luck came a long way to reach you.\nAdd a little of your heart\nand hand it to someone you've yet to meet.\n\nIt goes out as today's one letter of luck.",
+  relayConfirmBody: "This luck came a long way to reach you.\nAdd a little of your heart\nand hand it to someone you've yet to meet.\n\nYou can pass luck on once a day.",
   relayConfirmGo: 'Pass it on',
   relayConfirmKeep: 'Keep it a little longer',
   relaySent: 'The luck is on its way to the next person!',

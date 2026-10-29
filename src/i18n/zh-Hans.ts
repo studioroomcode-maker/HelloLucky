@@ -168,7 +168,7 @@ export const zhHans: Strings = {
   thanksSent: '你的谢意已经送出',
   relayButton: '把这份幸运传下去',
   relayConfirmTitle: '🍀 这份幸运，又要启程了',
-  relayConfirmBody: '从远方飞来的这份幸运\n悄悄添上你的心意\n交给一位还未相识的人。\n\n它会作为你今天的那一封幸运寄出。',
+  relayConfirmBody: '从远方飞来的这份幸运\n悄悄添上你的心意\n交给一位还未相识的人。\n\n每天只能传递一次幸运。',
   relayConfirmGo: '传递幸运',
   relayConfirmKeep: '再珍藏一会儿',
   relaySent: '幸运已经传给下一个人啦！',

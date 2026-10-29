@@ -171,7 +171,7 @@ export const it: Strings = {
   thanksSent: 'Il tuo grazie è in viaggio',
   relayButton: 'Passa avanti la fortuna',
   relayConfirmTitle: '🍀 Questa fortuna riparte',
-  relayConfirmBody: "Questa fortuna è arrivata da lontano fino a te.\nAggiungi un po' del tuo cuore\ne affidala a qualcuno che non conosci ancora.\n\nPartirà come la tua lettera fortunata di oggi.",
+  relayConfirmBody: "Questa fortuna è arrivata da lontano fino a te.\nAggiungi un po' del tuo cuore\ne affidala a qualcuno che non conosci ancora.\n\nPuoi passare la fortuna una volta al giorno.",
   relayConfirmGo: 'Passa la fortuna',
   relayConfirmKeep: "Tienila ancora un po'",
   relaySent: 'La fortuna sta andando alla prossima persona!',

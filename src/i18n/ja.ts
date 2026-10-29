@@ -168,7 +168,7 @@ export const ja: Strings = {
   thanksSent: 'ありがとうの気持ちを届けたよ',
   relayButton: 'この幸運をつなぐ',
   relayConfirmTitle: '🍀 この幸運が、また旅に出ます',
-  relayConfirmBody: '遠くから届いたこの幸運に\nあなたの気持ちをそっと添えて\nまだ見ぬ誰かへ手渡します。\n\n今日の一通として送られます。',
+  relayConfirmBody: '遠くから届いたこの幸運に\nあなたの気持ちをそっと添えて\nまだ見ぬ誰かへ手渡します。\n\n幸運をつなげるのは1日1回までです。',
   relayConfirmGo: '幸運を手渡す',
   relayConfirmKeep: 'もう少し大切にする',
   relaySent: '幸運が次の人へつながったよ！',

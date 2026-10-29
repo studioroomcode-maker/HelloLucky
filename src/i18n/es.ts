@@ -170,7 +170,7 @@ export const es: Strings = {
   thanksSent: 'Tu agradecimiento va en camino',
   relayButton: 'Pasar esta suerte',
   relayConfirmTitle: '🍀 Esta suerte vuelve a viajar',
-  relayConfirmBody: 'Esta suerte llegó desde lejos hasta ti.\nAñádele un poquito de tu corazón\ny entrégasela a alguien que aún no conoces.\n\nSaldrá como tu carta de suerte de hoy.',
+  relayConfirmBody: 'Esta suerte llegó desde lejos hasta ti.\nAñádele un poquito de tu corazón\ny entrégasela a alguien que aún no conoces.\n\nPuedes pasar la suerte una vez al día.',
   relayConfirmGo: 'Pasar la suerte',
   relayConfirmKeep: 'Guardarla un poco más',
   relaySent: '¡La suerte va de camino a la siguiente persona!',

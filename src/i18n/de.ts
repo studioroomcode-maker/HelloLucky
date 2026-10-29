@@ -170,7 +170,7 @@ export const de: Strings = {
   thanksSent: 'Dein Dankeschön ist unterwegs',
   relayButton: 'Dieses Glück weitergeben',
   relayConfirmTitle: '🍀 Dieses Glück geht wieder auf Reisen',
-  relayConfirmBody: 'Dieses Glück kam von weit her zu dir.\nLeg ein wenig von deinem Herzen dazu\nund schenk es jemandem, den du noch nicht kennst.\n\nEs geht als dein Glücksbrief für heute auf den Weg.',
+  relayConfirmBody: 'Dieses Glück kam von weit her zu dir.\nLeg ein wenig von deinem Herzen dazu\nund schenk es jemandem, den du noch nicht kennst.\n\nWeitergeben kannst du einmal am Tag.',
   relayConfirmGo: 'Glück weiterschenken',
   relayConfirmKeep: 'Noch ein wenig behalten',
   relaySent: 'Das Glück ist unterwegs zur nächsten Person!',

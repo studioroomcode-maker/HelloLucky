@@ -168,7 +168,7 @@ export const id: Strings = {
   thanksSent: 'Terima kasihmu sedang dalam perjalanan',
   relayButton: 'Teruskan keberuntungan',
   relayConfirmTitle: '🍀 Keberuntungan ini berangkat lagi',
-  relayConfirmBody: 'Keberuntungan ini datang dari jauh untukmu.\nTitipkan sedikit isi hatimu\nlalu berikan kepada seseorang yang belum kamu kenal.\n\nIni dikirim sebagai surat keberuntunganmu hari ini.',
+  relayConfirmBody: 'Keberuntungan ini datang dari jauh untukmu.\nTitipkan sedikit isi hatimu\nlalu berikan kepada seseorang yang belum kamu kenal.\n\nKamu bisa meneruskan keberuntungan sekali sehari.',
   relayConfirmGo: 'Teruskan keberuntungan',
   relayConfirmKeep: 'Simpan sebentar lagi',
   relaySent: 'Keberuntungan sedang menuju orang berikutnya!',
