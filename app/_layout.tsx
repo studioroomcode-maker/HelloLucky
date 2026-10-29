@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { BRAND_FONT, useIsDark, usePalette } from '@/constants/theme';
 import { loadStore, useStoreLoaded } from '@/src/services/findsStore';
+import { useJourneyTaps } from '@/src/services/notifications';
 import { TitleScreen } from '@/src/ui/TitleScreen';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -28,12 +29,15 @@ export default function RootLayout() {
     [BRAND_FONT.cute]: require('@/assets/fonts/SDGothicNeoRound-hEb.ttf'),
   });
 
+  const ready = loaded && (fontsLoaded || !!fontError);
+  useJourneyTaps(ready);
+
   useEffect(() => {
     // The native splash stays up until the title art is on screen (TitleScreen.onShown).
     loadStore();
   }, []);
 
-  if (!loaded || (!fontsLoaded && !fontError)) return null;
+  if (!ready) return null;
 
   return (
     <>

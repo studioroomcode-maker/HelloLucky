@@ -5,6 +5,8 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { lang } from '../i18n';
@@ -18,6 +20,20 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
+/** A tapped "your luck is traveling" push opens that journey's map; other pushes just open the app (home has the mail). */
+export function useJourneyTaps(ready: boolean) {
+  const response = Notifications.useLastNotificationResponse();
+  const router = useRouter();
+  useEffect(() => {
+    const chain = response?.notification.request.content.data?.journey;
+    // Navigating before the root Stack mounts throws, so wait until the layout renders it.
+    if (!ready || typeof chain !== 'string') return;
+    // Handled once: without clearing, the next cold start would reopen the same journey.
+    Notifications.clearLastNotificationResponse();
+    router.push({ pathname: '/journey/[chain]', params: { chain } });
+  }, [ready, response, router]);
+}
 
 export async function notificationsGranted() {
   return (await Notifications.getPermissionsAsync()).granted;

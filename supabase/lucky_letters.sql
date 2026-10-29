@@ -161,7 +161,7 @@ begin
   -- My own finds: the app sends each find once, so a find is never held back by a relay; 5 a day only stops abuse.
   -- Relays: one a day keeps each pass-on special. hops > 0 marks a relay.
   if (select count(*) from lucky_letters where sender = me and created_at > now() - interval '1 day'
-        and (hops > 0) = (p_parent is not null)) >= case when p_parent is null then 5 else 1 end then
+        and (hops > 0) = (p_parent is not null)) >= (case when p_parent is null then 5 else 1 end) then
     raise exception 'rate_limit';
   end if;
   if p_parent is null then
@@ -191,6 +191,18 @@ begin
   insert into lucky_letters (id, sender, message_key, card_key, origin, recipient, deliver_at, chain, hops, route, homecoming, photo)
   values (letter, me, v_message, v_card, left(p_origin, 60), target,
           case when target is null then null else cozy_time(tz) end, v_chain, v_hops, v_route, home, v_photo);
+  -- A relay tells whoever started the chain and whoever passed it to me that their luck moved on, so the loop is felt
+  -- long before (or without) a homecoming. A starter it is heading home to gets the homecoming push instead.
+  if p_parent is not null then
+    perform push(lm.push_token,
+      case when lm.lang = 'ko' then '✈️ 내 행운이 여행 중이에요' else '✈️ Your luck is traveling' end,
+      case when lm.lang = 'ko' then coalesce(left(p_origin, 60) || '에서 ', '') || '다음 사람에게 떠났어요'
+           when p_origin is null then 'It just moved on to the next person'
+           else 'It just left ' || left(p_origin, 60) || ' for the next person' end,
+      jsonb_build_object('journey', v_chain))
+    from luck_members lm
+    where lm.user_id in (root, parent.sender) and lm.user_id <> me and not (home and lm.user_id = root);
+  end if;
   return letter;
 end $$;
 
