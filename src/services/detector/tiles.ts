@@ -76,6 +76,17 @@ export function cloverSquare(box: FractionBox, width: number, height: number, pa
 }
 
 /**
+ * The detection that is the live lock: the nearest one within 2× the lock's longer side (the hand may move between
+ * lock and shutter, but a clover farther off is a different one). Without a lock, the first (most confident).
+ */
+export function nearLive(found: FractionBox[], live: FractionBox | undefined, width: number, height: number) {
+  if (!live) return found[0];
+  const reach = 2 * Math.max(live.width * width, live.height * height);
+  const distance = (b: FractionBox) => Math.hypot((b.x - live.x) * width, (b.y - live.y) * height);
+  return found.filter((b) => distance(b) <= reach).sort((a, b) => distance(a) - distance(b))[0];
+}
+
+/**
  * The square of a photo the live detector looks at: the short side, like the frame's center crop, but centred on
  * `around` (the live lock) when given, so the clover is seen at the same scale it was locked at.
  */

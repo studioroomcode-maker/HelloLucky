@@ -12,6 +12,14 @@ import { LuckBurst } from '@/src/ui/LuckBurst';
 import { LuckCard } from '@/src/ui/LuckCard';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 
+/** A relay sends at once and spends today's one letter, so a stray tap first gets a gentle second thought. */
+export function confirmRelay(go: () => void) {
+  Alert.alert(t.relayConfirmTitle, t.relayConfirmBody, [
+    { text: t.relayConfirmKeep, style: 'cancel' },
+    { text: t.relayConfirmGo, onPress: go },
+  ]);
+}
+
 /**
  * A sealed envelope that wiggles until tapped, then reveals a stranger's luck card.
  * The reader can send a thank-you sticker back and pass the same card on to someone new.
@@ -166,7 +174,7 @@ export function LetterPopup({
                 <PrimaryButton
                   icon="paper-plane"
                   label={relayed ? t.relayDone : t.relayButton}
-                  onPress={relay}
+                  onPress={() => confirmRelay(relay)}
                   loading={busy}
                   disabled={relayed}
                 />

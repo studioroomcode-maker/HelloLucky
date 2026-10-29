@@ -268,10 +268,8 @@ function Scanner() {
       // The saved photo decides: a lock it doesn't confirm was a passing false hit, and its own box sits on the clover.
       // Loading the photo takes far longer than one live inference, so a frame already running finishes first.
       paused.value = true;
-      const box = await findInPhoto(photo.path, live).catch((error) => {
-        console.warn('scan: photo check failed', error);
-        return live;
-      });
+      // A check that fails confirms nothing: it lands in the catch below (save error), never saving the unchecked lock.
+      const box = await findInPhoto(photo.path, live);
       // Only a confirmed four-leaf clover becomes a find; anything else is dropped unsaved.
       if (!box) {
         Alert.alert(t.wideNone);

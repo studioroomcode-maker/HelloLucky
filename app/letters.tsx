@@ -13,6 +13,7 @@ import { letterMessage, myPlace, passportStamps, routeCities } from '@/src/lette
 import { bumpCounters, useFinds } from '@/src/services/findsStore';
 import { letterClover, myJourneys, myLetters, sendLuckyLetter, type Journey, type KeptLetter } from '@/src/services/sharing';
 import { CardArt } from '@/src/ui/art';
+import { confirmRelay } from '@/src/ui/LetterPopup';
 import { CARDS } from '@/src/ui/LuckCard';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { ScreenHeader } from '@/src/ui/ScreenHeader';
@@ -152,7 +153,7 @@ export default function Letters() {
                       <Text style={[styles.done, { color: card.ink }]}>✓ {t.relayed}</Text>
                     ) : item.homecoming ? null : (
                       <Pressable
-                        onPress={() => relay(item)}
+                        onPress={() => confirmRelay(() => relay(item))}
                         disabled={relaying !== undefined}
                         accessibilityRole="button"
                         style={[styles.relay, { borderColor: card.ink }]}

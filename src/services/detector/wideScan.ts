@@ -10,7 +10,7 @@ import { DETECTOR } from '../../config/detector';
 import type { CloverDetectionBox } from '../detectionTracker';
 import { exifRotation } from './exif';
 import { loadDetector } from './model';
-import { mergeBoxes, photoWindow, tilePlan, toModelInput, type FractionBox } from './tiles';
+import { cloverSquare, mergeBoxes, nearLive, photoWindow, tilePlan, toModelInput, type FractionBox } from './tiles';
 import { decodeYolo } from './yoloDecode';
 
 /** Photo is scaled to ~2/3 first: 4032×3024 → 12 tiles of 960, about 1–2 s on a recent phone. */
@@ -40,24 +40,26 @@ export async function loadUpright(path: string) {
 
 /**
  * Second look at a shutter photo, so a find is judged on what was actually saved: a live lock can be a passing
- * false hit (grass flickering by while walking). Runs the detector once on the window the live scanner saw,
- * near `around`, and returns the four-leaf it confirms as fractions of the upright photo, or undefined.
+ * false hit (grass flickering by while walking). Looks close up around the `live` lock first, then at the window
+ * the live scanner saw, and returns the four-leaf it confirms as fractions of the upright photo, or undefined.
  */
-export async function findInPhoto(path: string, around?: { x: number; y: number }): Promise<FractionBox | undefined> {
+export async function findInPhoto(path: string, live?: FractionBox): Promise<FractionBox | undefined> {
   const model = await loadDetector();
   const image = await loadUpright(path);
   const { width, height } = image;
   const size = DETECTOR.inputSize;
-  const { left, top, side } = photoWindow(width, height, around);
-  const square = await (await image.cropAsync(left, top, left + side, top + side)).resizeAsync(size, size);
-  const [output] = await model.run([toModelInput(await square.toRawPixelDataAsync(), size).buffer as ArrayBuffer]);
-  const k = side / size;
-  const found = decodeYolo(new Float32Array(output), DETECTOR.decode)
-    .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
-    .map((b) => ({ x: (left + b.x * k) / width, y: (top + b.y * k) / height, width: (b.width * k) / width, height: (b.height * k) / height }));
-  // The one the user locked onto, else the most confident (decodeYolo sorts by confidence).
-  const distance = (b: FractionBox) => (around ? Math.hypot(b.x - around.x, b.y - around.y) : 0);
-  return found.sort((a, b) => distance(a) - distance(b))[0];
+  const look = async ({ left, top, side }: { left: number; top: number; side: number }) => {
+    const square = await (await image.cropAsync(left, top, left + side, top + side)).resizeAsync(size, size);
+    const [output] = await model.run([toModelInput(await square.toRawPixelDataAsync(), size).buffer as ArrayBuffer]);
+    const k = side / size;
+    const found = decodeYolo(new Float32Array(output), DETECTOR.decode)
+      .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
+      .map((b) => ({ x: (left + b.x * k) / width, y: (top + b.y * k) / height, width: (b.width * k) / width, height: (b.height * k) / height }));
+    return nearLive(found, live, width, height);
+  };
+  // ~3× the lock puts the clover at ~30% of the input: in a paired eval (2026-10-29) that confirmed 56% of four-leafs
+  // vs 22% at the live scale, with the same 3% three-leaf false rate. The wide window catches a hand that moved.
+  return (live && (await look(cloverSquare(live, width, height, 3)))) ?? look(photoWindow(width, height, live));
 }
 
 export async function wideScan(path: string, onProgress: (done: number, total: number) => void): Promise<WideResult> {

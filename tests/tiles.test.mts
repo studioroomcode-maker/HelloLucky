@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { mergeBoxes, tilePlan } from '../src/services/detector/tiles.ts';
+import { mergeBoxes, nearLive, tilePlan } from '../src/services/detector/tiles.ts';
 
 test('tiles cover the whole image with overlap and stay inside it', () => {
   for (const [w, h] of [[2016, 2688], [1512, 2016], [960, 960], [3024, 4032]]) {
@@ -37,4 +37,13 @@ test('raw pixels in any channel order become RGB 0–1, padded with grey', async
   const rgb = toModelInput({ buffer: new Uint8Array([255, 128, 0]).buffer, width: 1, height: 1, pixelFormat: 'RGB' }, 1);
   assert.deepEqual([...rgb].map((v) => Math.round(v * 255)), [255, 128, 0]);
   assert.throws(() => toModelInput({ buffer: new ArrayBuffer(4), width: 1, height: 1, pixelFormat: 'unknown' }, 1));
+});
+
+test('the photo check keeps only the clover near the live lock', () => {
+  const live = { x: 0.5, y: 0.5, width: 0.05, height: 0.05 }; // 200 px on a 4000 × 3000 photo → reach 400 px
+  const near = { x: 0.55, y: 0.5, width: 0.05, height: 0.05 }; // 200 px off
+  const far = { x: 0.7, y: 0.5, width: 0.05, height: 0.05 }; // 800 px off: a different clover
+  assert.equal(nearLive([far, near], live, 4000, 3000), near);
+  assert.equal(nearLive([far], live, 4000, 3000), undefined);
+  assert.equal(nearLive([far, near], undefined, 4000, 3000), far); // no lock: most confident
 });

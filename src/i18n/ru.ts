@@ -183,6 +183,10 @@ export const ru: Strings = {
   thanksTitle: 'Сказать спасибо',
   thanksSent: 'Твоё спасибо уже в пути',
   relayButton: 'Передать удачу дальше',
+  relayConfirmTitle: '🍀 Эта удача снова в пути',
+  relayConfirmBody: 'Эта удача пришла к тебе издалека.\nДобавь к ней частичку своего сердца\nи передай тому, кого ты ещё не знаешь.\n\nОна уйдёт как твоё письмо удачи на сегодня.',
+  relayConfirmGo: 'Передать удачу',
+  relayConfirmKeep: 'Сохранить ещё немного',
   relaySent: 'Удача летит к следующему человеку!',
   relayDone: 'Эта удача уже передана дальше',
   relayCount: (n: number) => {
