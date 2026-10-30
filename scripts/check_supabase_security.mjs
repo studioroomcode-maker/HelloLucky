@@ -9,10 +9,12 @@ const db = new PGlite();
 const A = '00000000-0000-4000-8000-00000000000a';
 const B = '00000000-0000-4000-8000-00000000000b';
 const C = '00000000-0000-4000-8000-00000000000c';
+// Fresh accounts (made today) for the report_find abuse check.
+const [D, E, F] = ['d', 'e', 'f'].map((x) => `00000000-0000-4000-8000-00000000000${x}`);
 
 await db.exec(`
 create role anon nologin; create role authenticated nologin;
-create schema auth; create table auth.users (id uuid primary key);
+create schema auth; create table auth.users (id uuid primary key, created_at timestamptz default now() - interval '10 days');
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
 grant usage on schema auth to anon, authenticated;
 create schema storage;
@@ -28,7 +30,8 @@ create function net.http_post(url text, headers jsonb, body jsonb) returns bigin
 create schema cron; create table cron.job (jobid bigint, jobname text);
 create function cron.schedule(a text, b text, c text) returns bigint language sql as $$ select 1::bigint $$;
 create function cron.unschedule(a bigint) returns boolean language sql as $$ select true $$;
-insert into auth.users values ('${A}'), ('${B}'), ('${C}');
+insert into auth.users (id) values ('${A}'), ('${B}'), ('${C}');
+insert into auth.users values ('${D}', now()), ('${E}', now()), ('${F}', now());
 `);
 const strip = (f) => readFileSync(`${repo}/supabase/${f}`, 'utf8').replace(/^create extension.*$/gm, '');
 for (const f of ['schema.sql', 'clover_photos.sql', 'lucky_letters.sql']) await db.exec(strip(f));
@@ -98,7 +101,37 @@ assert.equal(r.route.at(-1).c, '서울특별시 강서구');
 await as(B, `select thank_letter($1, 2::smallint, 'insta.com/me')`, [letter]);
 assert.equal((await db.query(`select thanks_city from lucky_letters where id = $1`, [letter])).rows[0].thanks_city, null);
 
-// 6. Place names in every script survive; links / numbers / handles don't.
+// 6. report_find: three fresh accounts can't hide a pin; three older ones can.
+const pin2 = (await as(A, `insert into shared_finds (latitude, longitude, found_at) values (37.6, 127, now()) returning id`))[0].id;
+for (const u of [D, E, F]) await as(u, `select report_find($1)`, [pin2]);
+assert.equal((await as(B, `select id from shared_finds where id = $1`, [pin2])).length, 1);
+await as(B, `select report_find($1)`, [pin2]);
+await as(C, `select report_find($1)`, [pin2]);
+assert.equal((await as(B, `select id from shared_finds where id = $1`, [pin2])).length, 1);
+await db.query(`insert into auth.users (id) values ('00000000-0000-4000-8000-000000000010')`);
+await as('00000000-0000-4000-8000-000000000010', `select report_find($1)`, [pin2]);
+assert.equal((await as(B, `select id from shared_finds where id = $1`, [pin2])).length, 0);
+
+// 7. report_letter: recipient only; blocks the sender for the reporter, takes the clover off the whole chain.
+await fails(as(C, `select report_letter($1)`, [letter]));
+await fails(as(null, `select report_letter($1)`, [letter]));
+await as(B, `select report_letter($1)`, [letter]);
+assert.equal((await db.query(`select count(*)::int n from letter_reports where letter = $1`, [letter])).rows[0].n, 1);
+assert.deepEqual((await db.query(`select blocker, blocked from letter_blocks`)).rows, [{ blocker: B, blocked: A }]);
+assert.equal((await db.query(`select count(*)::int n from lucky_letters where photo = $1`, [photoA])).rows[0].n, 0);
+assert.equal((await as(B, `select * from my_letters() where letter = $1`, [letter])).length, 0);
+assert.equal((await as(B, `select * from letter_blocks`)).length, 0);
+assert.equal((await as(B, `select * from letter_reports`)).length, 0);
+// Everyone free again: A's next letter skips B (blocked) and goes to C; with C busy it waits, and B won't adopt it.
+await db.exec(`delete from lucky_letters where from_app; update lucky_letters set delivered_at = now() - interval '2 days'`);
+const toC = (await as(A, `select send_lucky_letter(2::smallint, 1::smallint, null) id`))[0].id;
+assert.equal((await db.query(`select recipient from lucky_letters where id = $1`, [toC])).rows[0].recipient, C);
+const waiting = (await as(A, `select send_lucky_letter(3::smallint, 1::smallint, null) id`))[0].id;
+assert.equal((await db.query(`select recipient from lucky_letters where id = $1`, [waiting])).rows[0].recipient, null);
+await as(B, `select check_mailbox('ko', 'Asia/Seoul')`);
+assert.equal((await db.query(`select recipient from lucky_letters where id = $1`, [waiting])).rows[0].recipient, null);
+
+// 8. Place names in every script survive; links / numbers / handles don't.
 const names = { 'Seoul Gangseo-gu': true, 'São Paulo': true, 'กรุงเทพมหานคร': true, 'हिन्दी नगर': true, '東京都': true,
   "St. John's": true, 'www.x.com': false, 'call 010': false, 'me@x': false, 'http://x': false }; // non-ASCII digits: checked on the live ICU locale instead (PGlite is C)
 for (const [s, keep] of Object.entries(names))

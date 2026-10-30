@@ -13,7 +13,7 @@ import { letterMessage, myPlace, passportStamps, routeCities } from '@/src/lette
 import { bumpCounters, useFinds } from '@/src/services/findsStore';
 import { letterClover, myJourneys, myLetters, sendLuckyLetter, type Journey, type KeptLetter } from '@/src/services/sharing';
 import { CardArt } from '@/src/ui/art';
-import { confirmRelay } from '@/src/ui/LetterPopup';
+import { confirmRelay, confirmReport } from '@/src/ui/LetterPopup';
 import { CARDS } from '@/src/ui/LuckCard';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { ScreenHeader } from '@/src/ui/ScreenHeader';
@@ -163,6 +163,15 @@ export default function Letters() {
                         ) : (
                           <Text style={[styles.relayText, { color: card.ink }]}>{t.relayButton}</Text>
                         )}
+                      </Pressable>
+                    )}
+                    {item.from_app || item.letter.startsWith('sample-') ? null : (
+                      <Pressable
+                        onPress={() => confirmReport(item.letter, () => setLetters((list) => list?.filter((l) => l.letter !== item.letter)))}
+                        accessibilityRole="button"
+                        hitSlop={8}
+                      >
+                        <Text style={[styles.meta, { color: card.ink }]}>{t.reportLetter}</Text>
                       </Pressable>
                     )}
                   </View>
