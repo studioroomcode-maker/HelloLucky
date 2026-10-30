@@ -15,8 +15,7 @@ create index if not exists shared_finds_geo on public.shared_finds (latitude, lo
 create index if not exists shared_finds_user on public.shared_finds (user_id, created_at);
 
 alter table public.shared_finds enable row level security;
-drop policy if exists "read all" on public.shared_finds;
-create policy "read all" on public.shared_finds for select using (true);
+-- Read policy ("read unhidden"): clover_photos.sql, which adds the hidden column it needs.
 drop policy if exists "insert own" on public.shared_finds;
 create policy "insert own" on public.shared_finds for insert to authenticated with check (user_id = auth.uid());
 drop policy if exists "delete own" on public.shared_finds;

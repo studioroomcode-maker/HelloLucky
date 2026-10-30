@@ -87,8 +87,8 @@ python collect_and_train.py --no-collect
 3. 앱 `.env` 에 입력:
    ```env
    EXPO_PUBLIC_ROBOFLOW_DETECTION_MODEL_ID=hellolucky/3
-   EXPO_PUBLIC_ROBOFLOW_API_KEY=<키>
    ```
+   Roboflow API 키는 앱 `.env` 에 넣지 않는다 — `EXPO_PUBLIC_` 값은 앱 번들에 그대로 들어가 누구나 꺼내 볼 수 있다.
 
 ## 팁
 
