@@ -67,6 +67,23 @@ alter table public.lucky_letters enable row level security;
 -- user id (which would point to their exact pins on the public shared_finds map).
 drop policy if exists "see own letters" on public.lucky_letters;
 
+-- Report & block (Apple guideline 1.2), written only by report_letter(): reports stay for the operator to review
+-- (Table Editor), blocks keep the reported sender's letters away from the reporter.
+create table if not exists public.letter_reports (
+  letter uuid not null references public.lucky_letters (id) on delete cascade,
+  reporter uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (letter, reporter)
+);
+alter table public.letter_reports enable row level security;
+create table if not exists public.letter_blocks (
+  blocker uuid not null references auth.users (id) on delete cascade,
+  blocked uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (blocker, blocked)
+);
+alter table public.letter_blocks enable row level security;
+
 -- A city name from the OS geocoder, or null: the app has no free text, so drop anything shaped like a link,
 -- handle, phone number or email (digits, @, /, :, "x.com") before it reaches a stranger or a push.
 create or replace function public.place_name(p text) returns text
@@ -138,11 +155,12 @@ language sql stable security definer set search_path = public as $$
                        and (l.delivered_at is null or l.delivered_at > now() - interval '1 day'))
 $$;
 
--- A random recent member (not the sender) who is free.
+-- A random recent member (not the sender, nor anyone who blocked the sender) who is free.
 create or replace function public.pick_recipient(p_exclude uuid) returns uuid
 language sql security definer set search_path = public as $$
   select lm.user_id from luck_members lm
    where lm.user_id <> p_exclude and lm.last_seen > now() - interval '30 days' and is_free(lm.user_id)
+     and not exists (select 1 from letter_blocks b where b.blocker = lm.user_id and b.blocked = p_exclude)
    order by random() limit 1
 $$;
 
@@ -198,6 +216,7 @@ begin
   select sender into root from lucky_letters where id = v_chain;
   if root <> me and random() < homecoming_chance(v_hops, (select count(*)::int from lucky_letters where chain = v_chain and homecoming))
      and is_free(root)
+     and not exists (select 1 from letter_blocks b where b.blocker = root and b.blocked = me)
      and exists (select 1 from luck_members where user_id = root and last_seen > now() - interval '30 days') then
     target := root; home := true;
   else
@@ -246,7 +265,9 @@ begin
   on conflict (user_id) do update set lang = excluded.lang, tz = coalesce(excluded.tz, luck_members.tz), last_seen = now();
   if is_free(me) then
     select id into waiting from lucky_letters
-     where recipient is null and sender <> me order by created_at limit 1 for update skip locked;
+     where recipient is null and sender <> me
+       and not exists (select 1 from letter_blocks b where b.blocker = me and b.blocked = sender)
+     order by created_at limit 1 for update skip locked;
     if waiting is not null then
       update lucky_letters set recipient = me, delivered_at = now(), deliver_at = now() where id = waiting;
     end if;
@@ -285,6 +306,23 @@ begin
   from luck_members lm where lm.user_id = s.sender;
 end $$;
 
+-- Report a letter that reached me: blocks its sender and the clover's owner for me (their letters, relays and
+-- homecomings skip me from now on), takes that clover photo off every letter, and drops the letter from my box.
+-- The photo file stays in storage for the operator to review and delete (dashboard → Storage → clovers).
+create or replace function public.report_letter(p_letter uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare me uuid := auth.uid(); l lucky_letters;
+begin
+  select * into l from lucky_letters where id = p_letter and recipient = me and delivered_at is not null;
+  if l.id is null then raise exception 'not_your_letter'; end if;
+  insert into letter_reports (letter, reporter) values (l.id, me) on conflict do nothing;
+  insert into letter_blocks (blocker, blocked)
+  select me, u.id from auth.users u where u.id in (l.sender, split_part(l.photo, '/', 1)::uuid) and u.id <> me
+  on conflict do nothing;
+  update lucky_letters set opened_at = coalesce(opened_at, now()) where id = l.id;
+  if l.photo is not null then update lucky_letters set photo = null where photo = l.photo; end if;
+end $$;
+
 -- Thank-yous for my letters not shown yet; marks them seen.
 create or replace function public.my_thanks() returns table (letter uuid, message_key smallint, card_key smallint,
   thanks_key smallint, thanks_city text)
@@ -310,7 +348,8 @@ create or replace function public.my_letters() returns table (letter uuid, messa
 language sql stable security definer set search_path = public as $$
   select id, message_key, card_key, origin, hops, route, homecoming, delivered_at, relayed_at is not null, thanked_at is not null, photo,
          from_app
-    from lucky_letters where recipient = auth.uid() and delivered_at is not null
+    from lucky_letters l where recipient = auth.uid() and delivered_at is not null
+     and not exists (select 1 from letter_reports r where r.letter = l.id and r.reporter = auth.uid())
    order by delivered_at desc limit 200
 $$;
 
@@ -348,3 +387,5 @@ revoke execute on function public.notify_letter(uuid), public.pick_recipient(uui
 grant execute on function public.send_lucky_letter(smallint, smallint, text, double precision, double precision, uuid, smallint, text),
   public.check_mailbox(text, text), public.open_letter(uuid), public.thank_letter(uuid, smallint, text),
   public.my_thanks(), public.my_letters(), public.my_journeys(), public.my_echo(), public.luck_today(), public.set_push_token(text, text) to authenticated;
+revoke all on function public.report_letter(uuid) from public, anon;
+grant execute on function public.report_letter(uuid) to authenticated;

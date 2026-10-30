@@ -7,7 +7,7 @@ import { ARROW, t } from '@/src/i18n';
 import { letterMessage, routeCities } from '@/src/letters';
 import { Envelope, Sticker, STICKER_COUNT } from '@/src/ui/art';
 import { playChime } from '@/src/services/chime';
-import { sendLuckyLetter, thankLetter, type LuckyLetter, type Place } from '@/src/services/sharing';
+import { reportLetter, sendLuckyLetter, thankLetter, type LuckyLetter, type Place } from '@/src/services/sharing';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { LuckCard } from '@/src/ui/LuckCard';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
@@ -17,6 +17,25 @@ export function confirmRelay(go: () => void) {
   Alert.alert(t.relayConfirmTitle, t.relayConfirmBody, [
     { text: t.relayConfirmKeep, style: 'cancel' },
     { text: t.relayConfirmGo, onPress: go },
+  ]);
+}
+
+/** Report & block a received letter (Apple guideline 1.2); `done` runs once the server took it. */
+export function confirmReport(id: string, done: () => void) {
+  Alert.alert(t.reportLetter, t.reportLetterBody, [
+    { text: t.cancel, style: 'cancel' },
+    {
+      text: t.reportLetter,
+      style: 'destructive',
+      onPress: () =>
+        reportLetter(id).then(
+          () => {
+            done();
+            Alert.alert(t.letterReported);
+          },
+          () => Alert.alert(t.shareError),
+        ),
+    },
   ]);
 }
 
@@ -187,6 +206,11 @@ export function LetterPopup({
               <Pressable onPress={() => onDone(letter)} accessibilityRole="button" hitSlop={8} style={styles.close}>
                 <Text style={[styles.closeText, { color: palette.muted }]}>{t.close}</Text>
               </Pressable>
+              {letter.from_app ? null : (
+                <Pressable onPress={() => confirmReport(letter.id, () => onDone(letter))} accessibilityRole="button" hitSlop={8}>
+                  <Text style={[styles.reportText, { color: palette.muted }]}>{t.reportLetter}</Text>
+                </Pressable>
+              )}
             </>
           ) : (
             <Pressable onPress={() => setOpened(true)} accessibilityRole="button" accessibilityLabel={t.mailTap}>
@@ -280,6 +304,7 @@ const styles = StyleSheet.create({
   dim: { opacity: 0.3 },
   close: { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 16 },
   closeText: { fontFamily: FONT.medium, fontSize: 15 },
+  reportText: { fontFamily: FONT.body, fontSize: 12, textAlign: 'center' },
   envelope: { alignSelf: 'center', marginVertical: 8 },
   tap: { fontFamily: FONT.body, fontSize: 14, textAlign: 'center' },
 });

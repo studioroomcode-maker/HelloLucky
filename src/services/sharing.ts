@@ -258,6 +258,12 @@ export async function thankLetter(id: string, sticker: number, city?: string) {
   if (error) throw error;
 }
 
+/** Reports a letter I received: the server blocks its sender for me and takes its clover photo down (supabase/lucky_letters.sql). */
+export async function reportLetter(id: string) {
+  const { error } = await supabase.rpc('report_letter', { p_letter: id });
+  if (error) throw error;
+}
+
 export type Thanks = { letter: string; message_key: number; card_key: number; thanks_key: number; thanks_city: string | null };
 
 /** Thank-yous for letters I sent that I haven't seen yet (the server marks them seen). */

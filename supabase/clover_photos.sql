@@ -41,7 +41,9 @@ language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is null then raise exception 'auth'; end if;
   insert into find_reports (find_id, reporter) values (p_find, auth.uid()) on conflict do nothing;
-  if (select count(*) from find_reports where find_id = p_find) >= 3 then
+  -- Only accounts at least 3 days old count, so three fresh anonymous installs can't hide someone's pin.
+  if (select count(*) from find_reports r join auth.users u on u.id = r.reporter
+       where r.find_id = p_find and u.created_at < now() - interval '3 days') >= 3 then
     update shared_finds set hidden = true where id = p_find;
   end if;
 end $$;
