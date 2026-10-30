@@ -63,11 +63,16 @@ create index if not exists lucky_letters_sender on public.lucky_letters (sender,
 create index if not exists lucky_letters_due on public.lucky_letters (deliver_at) where delivered_at is null and recipient is not null;
 create index if not exists lucky_letters_chain on public.lucky_letters (chain);
 alter table public.lucky_letters enable row level security;
+-- No policies: letters are read and moved only through the functions below, so neither side ever sees the other's
+-- user id (which would point to their exact pins on the public shared_finds map).
 drop policy if exists "see own letters" on public.lucky_letters;
--- Recipients see a letter only once it has arrived.
-create policy "see own letters" on public.lucky_letters for select to authenticated
-  using (sender = auth.uid() or (recipient = auth.uid() and delivered_at is not null));
--- No insert/update policies: letters move only through the functions below.
+
+-- A city name from the OS geocoder, or null: the app has no free text, so drop anything shaped like a link,
+-- handle, phone number or email (digits, @, /, :, "x.com") before it reaches a stranger or a push.
+create or replace function public.place_name(p text) returns text
+language sql immutable set search_path = public as $$
+  select case when p !~ '[[:digit:]@/:]|\.[[:alpha:]]' then left(p, 60) end
+$$;
 
 create or replace function public.push(p_token text, p_title text, p_body text, p_data jsonb) returns void
 language plpgsql security definer set search_path = public as $$
@@ -160,7 +165,8 @@ declare
   me uuid := auth.uid();
   parent lucky_letters;
   letter uuid := gen_random_uuid();
-  hop jsonb := jsonb_strip_nulls(jsonb_build_object('c', left(p_origin, 60),
+  v_origin text := place_name(p_origin);
+  hop jsonb := jsonb_strip_nulls(jsonb_build_object('c', v_origin,
     'la', round(p_lat::numeric, 1), 'lo', round(p_lng::numeric, 1),
     'n', case when p_nick between 0 and 2499 then p_nick end));
   v_chain uuid; v_hops smallint := 0; v_route jsonb; v_message smallint := p_message; v_card smallint := p_card;
@@ -185,7 +191,7 @@ begin
     update lucky_letters set relayed_at = now() where id = parent.id;
     v_chain := parent.chain; v_hops := parent.hops + 1; v_message := parent.message_key; v_card := parent.card_key;
     v_route := parent.route || hop;
-    v_photo := coalesce(v_photo, parent.photo);
+    v_photo := parent.photo;
     if jsonb_array_length(v_route) > 30 then v_route := v_route - 1; end if;
   end if;
   -- After 4+ hops a chain sometimes finds its way home to whoever started it (rarer the further it goes).
@@ -199,16 +205,16 @@ begin
   end if;
   select lm.tz into tz from luck_members lm where lm.user_id = target;
   insert into lucky_letters (id, sender, message_key, card_key, origin, recipient, deliver_at, chain, hops, route, homecoming, photo)
-  values (letter, me, v_message, v_card, left(p_origin, 60), target,
+  values (letter, me, v_message, v_card, v_origin, target,
           case when target is null then null else cozy_time(tz) end, v_chain, v_hops, v_route, home, v_photo);
   -- A relay tells whoever started the chain and whoever passed it to me that their luck moved on, so the loop is felt
   -- long before (or without) a homecoming. A starter it is heading home to gets the homecoming push instead.
   if p_parent is not null then
     perform push(lm.push_token,
       case when lm.lang = 'ko' then '✈️ 내 행운이 여행 중이에요' else '✈️ Your luck is traveling' end,
-      case when lm.lang = 'ko' then coalesce(left(p_origin, 60) || '에서 ', '') || '다음 사람에게 떠났어요'
-           when p_origin is null then 'It just moved on to the next person'
-           else 'It just left ' || left(p_origin, 60) || ' for the next person' end,
+      case when lm.lang = 'ko' then coalesce(v_origin || '에서 ', '') || '다음 사람에게 떠났어요'
+           when v_origin is null then 'It just moved on to the next person'
+           else 'It just left ' || v_origin || ' for the next person' end,
       jsonb_build_object('journey', v_chain))
     from luck_members lm
     where lm.user_id in (root, parent.sender) and lm.user_id <> me and not (home and lm.user_id = root);
@@ -252,8 +258,9 @@ begin
     values (own, null, true, 1040 + floor(random() * 10)::int, floor(random() * 8)::int, me,
             cozy_time((select lm.tz from luck_members lm where lm.user_id = me)), own);
   end if;
-  return query select * from lucky_letters
-    where recipient = me and delivered_at is not null and opened_at is null order by delivered_at;
+  -- Without sender/recipient ids: a stranger stays a stranger.
+  return query select r.* from lucky_letters l, jsonb_populate_record(l, '{"sender": null, "recipient": null}') r
+    where l.recipient = me and l.delivered_at is not null and l.opened_at is null order by l.delivered_at;
 end $$;
 
 create or replace function public.open_letter(p_letter uuid) returns void
@@ -267,7 +274,7 @@ create or replace function public.thank_letter(p_letter uuid, p_sticker smallint
 language plpgsql security definer set search_path = public as $$
 declare s record;
 begin
-  update lucky_letters set thanks_key = p_sticker, thanks_city = left(p_city, 60), thanked_at = now()
+  update lucky_letters set thanks_key = p_sticker, thanks_city = place_name(p_city), thanked_at = now()
    where id = p_letter and recipient = auth.uid() and delivered_at is not null and thanked_at is null
    returning sender into s;
   if s.sender is null then return; end if;

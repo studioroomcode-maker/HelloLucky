@@ -18,7 +18,7 @@ object-detection 모델을 만들기 위한 전 단계입니다.
 
 사용법:
   1. pip install requests python-dotenv
-  2. .env 에 ROBOFLOW_API_KEY (또는 EXPO_PUBLIC_ROBOFLOW_API_KEY) 설정
+  2. .env 에 ROBOFLOW_API_KEY 설정 (EXPO_PUBLIC_ 이름은 금지: 앱 번들에 그대로 들어간다)
   3. python collect_and_train.py                # 수집 + 업로드
      python collect_and_train.py --no-collect   # 이미 받은 이미지만 업로드
      python collect_and_train.py --no-upload    # 수집만
@@ -48,11 +48,7 @@ except ImportError:
 # ============================
 # API 키는 하드코딩하지 않습니다. .env 또는 환경변수에서 읽습니다.
 # (기존 스크립트에 하드코딩됐던 키는 git 이력에 남아있으므로 Roboflow 에서 폐기/재발급하세요.)
-ROBOFLOW_API_KEY = (
-    os.getenv("ROBOFLOW_API_KEY")
-    or os.getenv("EXPO_PUBLIC_ROBOFLOW_API_KEY")
-    or ""
-)
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY") or ""
 ROBOFLOW_WORKSPACE = os.getenv("ROBOFLOW_WORKSPACE", "hellolucky")
 ROBOFLOW_PROJECT = os.getenv("ROBOFLOW_PROJECT", "hellolucky")  # 업로드 대상 프로젝트 slug
 
@@ -308,7 +304,7 @@ def print_next_steps():
     print("5. Train Model 클릭 → 학습 완료되면 모델 ID 확인 (예: hellolucky/3)")
     print("6. 앱 .env 에 입력:")
     print("     EXPO_PUBLIC_ROBOFLOW_DETECTION_MODEL_ID=hellolucky/<버전>")
-    print("     EXPO_PUBLIC_ROBOFLOW_API_KEY=<키>")
+    print("   (API 키는 앱에 넣지 않는다 — EXPO_PUBLIC_ 값은 누구나 앱에서 꺼내 볼 수 있다)")
     print("=" * 56)
 
 
