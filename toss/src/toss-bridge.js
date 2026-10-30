@@ -8,6 +8,9 @@
 //   hlToss.photo(how)          'camera' | 'album' → {dataUri} · {canceled} · {denied} · {unsupported} · {error}
 //                              src/services/stillPhoto.web.ts — 실시간 카메라(getUserMedia)를 못 쓸 때
 //   hlToss.openURL(url)        외부 링크(길찾기)를 토스 밖 브라우저로 — src/web/setup.web.ts 의 Linking.openURL
+//   hlToss.shareLink(path)     intoss://<appName><path> 를 토스에서 여는 https 공유 링크로 → string | undefined
+//                              Share.createLink 먼저, 안 되면(옛 토스 앱) getTossShareLink — src/config/links.ts
+//   hlToss.sendMessage(text)   토스 공유 시트로 글 보내기(Share.sendMessage) — src/web/share.ts
 //   hlTossSave(dataUri, name)  이미지를 기기에 저장(File.saveBase64) → true/false — src/web/share.ts
 //   (뒤로가기)                 backEvent → window.hlBack() 이 한 단계 돌아갔으면 끝, 아니면 미니앱을 닫는다
 //   (위치)                     navigator.geolocation.getCurrentPosition 을 토스 위치(Device.getLocation)로 먼저 받는다
@@ -20,7 +23,10 @@ import {
   OpenCameraPermissionError,
   FetchAlbumPhotosPermissionError,
   GetCurrentLocationPermissionError,
+  Share,
+  getTossShareLink,
 } from '@apps-in-toss/web-framework';
+import { APP_NAME } from '../constants.mjs';
 
 // 토스 앱 웹뷰 안(또는 devtools 가 SDK 를 흉내 내는 개발 서버)에서만 붙는다. 그냥 브라우저로 dist 를 열면
 // 아무것도 안 바꾼다 — 앱은 브라우저 기본 동작(파일 선택·window.open·웹 위치)으로 간다.
@@ -75,6 +81,20 @@ async function saveImage(dataUri, fileName) {
   } catch (_) { return false; }
 }
 
+// 공유 문구에 넣는 미니앱 링크. 체크리스트: intoss-private:// 가 아니라 intoss:// 로 만든다.
+async function shareLink(path) {
+  const deep = `intoss://${APP_NAME}${path || ''}`;
+  try {
+    const url = await Share.createLink({ path: deep });
+    if (url) return url;
+  } catch (_) {}
+  try {
+    return (await getTossShareLink(deep)) || undefined;
+  } catch (_) {
+    return undefined;
+  }
+}
+
 // ── 뒤로가기 — 구독하면 토스의 기본 동작(닫기)이 막히고 여기로 온다 ──
 function onBack() {
   try { if (typeof window.hlBack === 'function' && window.hlBack()) return; } catch (_) {}
@@ -109,6 +129,8 @@ if (IN_TOSS) {
   window.hlToss = {
     photo: (how) => takePhoto(how === 'album' ? 'album' : 'camera', false),
     openURL: (url) => Device.openURL(url),
+    shareLink,
+    sendMessage: (message) => Share.sendMessage({ message }),
   };
   window.hlTossSave = saveImage;
 }

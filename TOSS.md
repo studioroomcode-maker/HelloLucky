@@ -45,12 +45,14 @@ Hello Luck(Expo 앱)을 토스 앱 안의 미니앱(앱인토스, **WebView**)�
 | `src/web/nitroImage.ts` | `react-native-nitro-image` 대체(캔버스). 그래서 `wideScan.ts`(넓게 훑기·셔터 사진 확인) · `cloverCrop.ts` 가 **고치지 않고** 웹에서 돈다 |
 | `src/web/fileSystem.ts` | `expo-file-system/legacy` 대체(IndexedDB). 기록장 JSON을 담는다. 사진은 기록장 안에 data: URI로 들어간다(`findsStore.keepPhoto`) |
 | `src/web/maps.tsx` | `react-native-maps` 대체(Leaflet). `map.tsx` 와 `journey/[chain].tsx` 가 쓰는 props와 카메라 이동을 지원한다 |
-| `src/web/share.ts` | `react-native-share` 대체. Web Share API를 쓰고, 안 되면 토스 `File.saveBase64` 로 기기에 저장한다 |
+| `src/web/share.ts` | `react-native-share` 대체. Web Share API를 먼저 쓴다. 안 되면(토스 웹뷰) 그림은 토스 `File.saveBase64` 로 기기에 저장하고, 글은 **토스 공유 시트**(`Share.sendMessage`)로 보낸다. 글에는 미니앱 링크가 들어간다 |
+| `src/web/viewShot.ts` | `react-native-view-shot` 대체(html2canvas). 원래 웹 빌드는 RN-web 0.21에서 `findNodeHandle` 오류로 멈춰서, 친구 공유 그림을 만들지 못했다 |
 | `src/web/sensors.ts` | `expo-sensors` 대체. 웹 자이로가 깨져 있어서(아래 9장) 웹에서는 상자가 자이로를 따라가지 않는다 |
 | `src/web/setup.web.ts` | `Alert.alert` 를 DOM 대화상자로 바꾼다(RN-web은 아무것도 안 한다. 지도의 **신고·차단 메뉴**가 이것에 달려 있다). `Linking.openURL` 은 토스 `openURL` 로 보낸다(웹뷰가 다른 사이트로 넘어가지 않게). 뒤로가기 처리 `window.hlBack` 도 여기 있다 |
 | `src/services/stillPhoto(.web).ts` + `app/scan.tsx` | 카메라 권한을 거절했거나 `getUserMedia` 가 없을 때 쓴다. **토스 카메라**·**토스 앨범**으로 사진 한 장을 받아 '넓게 훑기' 화면(`/wide`)에서 감지한다. 일반 브라우저에서는 파일 선택을 쓴다 |
 | `src/services/notifications.web.ts` | 푸시 없음(expo-notifications는 웹에서 시작하자마자 멈췄다) |
-| `src/config/links.ts` | 공유 문구의 **스토어 링크(/go)를 토스 번들에서 뺀다.** 빌드 스크립트가 번들에 링크가 남았는지 검사한다 |
+| `src/config/links.ts` | 공유 문구의 **스토어 링크(/go)를 토스 번들에서 뺀다.** 빌드 스크립트가 번들에 링크가 남았는지 검사한다. 대신 `shareLine()` 이 토스 공유 링크(`intoss://helloluck` → https)를 넣는다 |
+| `app/find/[id].tsx` | 친구 공유 그림 아래의 **App Store·Google Play 배지를 토스에서 숨긴다**(자사 앱 설치 유도 금지). 문자열은 죽은 코드로 번들에 남아 있어 빌드 검사에는 넣지 않았다 |
 | `constants/theme.ts`, `app/settings.tsx` | 토스는 **라이트 고정**이다. 테마 선택과 백업·복원(파일·공유 시트) 카드를 숨긴다 |
 | `app.config.js` | 토스 빌드에서만 `web.output: 'single'` 로 바꾼다(SSR·사전 렌더링 없음). 그 밖에는 app.json을 그대로 돌려준다 |
 | `toss/` | `build-src.mjs`(export → LiteRT wasm 복사 → index.html 손질 → 금지 링크·용량 검사), `src/toss-bridge.js`, `apps-in-toss.config.ts`, `constants.mjs` |
@@ -63,6 +65,11 @@ Hello Luck(Expo 앱)을 토스 앱 안의 미니앱(앱인토스, **WebView**)�
   - 토스 `Device.openCamera` · `getAlbumItems` 로 사진을 받는다. maxWidth는 1920이다.
   - 권한이 없으면 토스 권한 창으로 한 번 다시 묻는다.
 - `hlToss.openURL`: 토스 `Device.openURL` 로 연다(길찾기, '지도에서 보기').
+- `hlToss.shareLink(path)`: `intoss://<appName><path>` 를 토스에서 여는 https 링크로 바꾼다.
+  - `Share.createLink` 를 먼저 쓴다.
+  - 실패하면(옛 토스 앱) `getTossShareLink` 를 쓴다.
+  - 둘 다 실패하면 링크 줄을 뺀다.
+- `hlToss.sendMessage`: 토스 공유 시트(`Share.sendMessage`)로 글을 보낸다.
 - `hlTossSave`: 토스 `File.saveBase64` 로 이미지를 저장한다.
 - **backEvent**: 앱 안에서 한 단계 뒤로 간다. 첫 화면이면 `Screen.close()` 로 닫는다.
 - **위치**
@@ -112,6 +119,10 @@ npx ait token add && npm run deploy   # 콘솔 API 키가 있을 때. 지금은 
   - `hlToss` 와 `hlBack` 이 붙는다.
   - 위치 요청이 토스 `Device.getLocation`(가짜)으로 간다.
   - 카메라를 거절한 뒤 '사진 찍어서 찾기'를 누르면 토스 `openCamera`(가짜 이미지) → 넓게 훑기 화면으로 간다.
+  - **친구에게 행운 보내기**(Web Share 없음으로 가정):
+    - 공유 그림(759 KB JPEG, 스토어 배지 없음)이 `saveBase64` 로 저장된다.
+    - 이어서 `sendMessage` 로 "…나도 행운 찾으러 가기 👉 https://toss.im/share/mockintoss://helloluck" 가 나간다. 링크는 devtools 가짜 값이다.
+  - `getTossShareLink` 대체 경로는 가짜 SDK에서 `createLink` 가 성공해서 타지 않았다.
 - **확인하지 못한 것**: 실제 토스 앱(QR), 휴대폰 성능, 실제 토스 권한 창, backEvent.
 
 ## 5. 사용자가 할 일 (콘솔)
@@ -157,7 +168,10 @@ npx ait token add && npm run deploy   # 콘솔 API 키가 있을 때. 지금은 
 - [ ] **안전 영역**: 셔터와 하단 버튼이 홈 인디케이터에 가리지 않는지 본다.
 - [ ] **지도**: 두 손가락 확대와 이동이 되는지 본다(지도라서 허용된다). 핀 카드와 신고 메뉴가 열리는지 본다.
   - 저작권 표기를 눌러도 다른 사이트로 넘어가면 안 된다.
-- [ ] **친구에게 행운 보내기와 여정 카드 공유**: 공유 시트가 뜨는지 본다. 안 뜨면 이미지가 저장되고 "사진첩에 저장했어요"가 나와야 한다.
+- [ ] **친구에게 행운 보내기와 여정 카드 공유**
+  - [ ] 웹 공유 시트가 뜨는지 본다. 안 뜨면 이미지가 저장되고 토스 공유 시트가 뜨는지 본다.
+  - [ ] 받은 링크를 눌렀을 때 토스에서 Hello Luck이 열리는지 본다.
+  - [ ] 링크가 `intoss-private://` 가 아니라 `intoss://` 기반인지 본다.
 
 ## 7. 검수 반려 위험 (우리 앱에 해당하는 것)
 
@@ -220,8 +234,10 @@ for name in sys.argv[1:]:
 6. **장소 이름**: `expo-location` 의 웹 역지오코딩에는 Google API 키가 필요해서 지금은 동작하지 않는다.
    - 그래서 기록에 동네 이름이 비고, 행운 편지의 '보낸 도시'도 빈다.
    - 고치려면 역지오코딩 API를 하나 붙여야 한다(키·약관 결정 필요).
-7. **토스 친구 공유**: `getTossShareLink('intoss://helloluck')` 나 `Share.sendMessage` 로 친구를 미니앱으로 부를 수 있다. 지금은 이미지 공유나 저장만 한다.
-   - 체크리스트에 "공유 기능에서 `intoss://` 스킴 사용"이 있으니, 붙일 때는 이 링크를 쓴다.
+7. **토스 친구 공유**: 구현했다(2장). 확인하지 못한 것이 셋 있다.
+   - 토스 웹뷰가 Web Share API(파일 포함)를 지원하는지.
+   - `Share.sendMessage` 가 끝났을 때 실제로 보냈는지 알 수 있는지. 지금은 끝나면 보낸 것으로 쳐서 배지 횟수를 올린다.
+   - 공유 링크에 OG 이미지(`ogImageUrl`, 토스 5.240+)를 붙일지. 지금은 붙이지 않는다.
 8. **푸시(행운 편지 알림)**: 토스는 콘솔의 스마트 발송만 쓸 수 있다. 미니앱에서는 알림 권한을 묻지 않게 했다. 편지는 앱 안 우편함으로만 받는다.
 
 ## 9. 알려진 한계 (이번에 일부러 안 한 것)

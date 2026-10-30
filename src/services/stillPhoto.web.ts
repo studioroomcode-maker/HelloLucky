@@ -7,13 +7,6 @@ import { lang } from '../i18n';
 import { dataUriToBlob, uprightPhotoUri } from '../web/photo';
 import type { StillPhoto } from './stillPhoto';
 
-type TossPhoto = { dataUri?: string; canceled?: boolean; denied?: boolean; unsupported?: boolean; error?: boolean };
-declare global {
-  interface Window {
-    hlToss?: { photo(how: 'camera' | 'album'): Promise<TossPhoto>; openURL(url: string): Promise<unknown> };
-  }
-}
-
 // Toss users read Korean; English for anyone else (these few lines live outside src/i18n's 16 languages).
 const ko = lang === 'ko';
 const TEXT = {

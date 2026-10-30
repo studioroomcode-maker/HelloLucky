@@ -61,12 +61,6 @@ Alert.alert = (title, message, buttons) => showAlert(title, message, buttons);
 const openInBrowser = Linking.openURL.bind(Linking);
 Linking.openURL = (url: string) => (window.hlToss ? window.hlToss.openURL(url) : openInBrowser(url));
 
-declare global {
-  interface Window {
-    hlBack?: () => boolean;
-  }
-}
-
 /** True when the app stepped back; false at the first screen, where the bridge closes the mini-app. */
 window.hlBack = () => {
   if (router.canGoBack()) {

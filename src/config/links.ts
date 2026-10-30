@@ -6,5 +6,8 @@
  */
 export const SHARE_URL = process.env.EXPO_PUBLIC_TOSS === '1' ? '' : 'https://helloluck.studioroomkr.com/go';
 
-/** The invite line under a shared picture, or nothing without a link. */
-export const shareLine = (t: { shareLink(url: string): string }) => (SHARE_URL ? t.shareLink(SHARE_URL) : '');
+/** The invite line under a shared picture: the store page, or in Toss a link that opens this mini-app; '' without one. */
+export async function shareLine(t: { shareLink(url: string): string }) {
+  const url = SHARE_URL || (await globalThis.window?.hlToss?.shareLink().catch(() => undefined));
+  return url ? t.shareLink(url) : '';
+}

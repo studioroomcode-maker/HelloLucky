@@ -17,6 +17,7 @@ const WEB_SHIMS = {
   'expo-file-system/legacy': 'src/web/fileSystem.ts',
   'react-native-share': 'src/web/share.ts',
   'expo-sensors': 'src/web/sensors.ts',
+  'react-native-view-shot': 'src/web/viewShot.ts',
 };
 const resolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {

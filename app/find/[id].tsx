@@ -24,6 +24,7 @@ import { bumpCounters, deleteFind, getSettings, MAP_RULES, updateFind, updateSet
 import { canShare, shareFind, sharingAvailable, unshareFind } from '@/src/services/sharing';
 import { projectToView } from '@/src/services/detector/frameMapping';
 import { shareLine } from '@/src/config/links';
+import { IS_TOSS } from '@/src/config/toss';
 import { copyShareText } from '@/src/shareText';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { fortuneFor } from '@/src/fortune';
@@ -104,7 +105,7 @@ export default function FindDetail() {
       // Let the share card re-render with the new note before it is captured.
       await new Promise((resolve) => setTimeout(resolve, 100));
       const uri = await captureRef(shareRef, { format: 'jpg', quality: 0.92, result: 'tmpfile' });
-      const message = [note, shareLine(t)].filter(Boolean).join('\n\n');
+      const message = [note, await shareLine(t)].filter(Boolean).join('\n\n');
       await copyShareText(message);
       const result = await Share.open({
         url: uri.startsWith('file://') ? uri : `file://${uri}`,
@@ -340,6 +341,8 @@ export default function FindDetail() {
         >
           <View style={styles.photo}>{photo}</View>
           {shareNote ? <Text style={[styles.shareNote, { color: palette.text }]}>{shareNote}</Text> : null}
+          {/* Store badges invite an install: not allowed inside a Toss mini-app (TOSS.md). */}
+          {IS_TOSS ? null : (
           <View style={styles.stores}>
             {(
               [
@@ -352,7 +355,9 @@ export default function FindDetail() {
                 <Text style={[styles.storeText, { color: palette.surface }]}>{label}</Text>
               </View>
             ))}
-          </View>        </View>
+          </View>
+          )}
+        </View>
       ) : null}
 
       <Pressable

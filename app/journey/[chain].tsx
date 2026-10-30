@@ -244,8 +244,9 @@ export default function JourneyMap() {
     setSharing(true);
     try {
       const url = await captureCard();
-      await copyShareText(shareLine(t));
-      await Share.open({ url, type: 'image/png', message: shareLine(t), failOnCancel: false });
+      const message = await shareLine(t);
+      await copyShareText(message);
+      await Share.open({ url, type: 'image/png', message, failOnCancel: false });
     } catch (error) {
       console.warn('journey: share failed', error);
     } finally {
