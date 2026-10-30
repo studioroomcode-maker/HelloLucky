@@ -16,5 +16,5 @@ export async function cropClover(photoUri: string, box: FractionBox): Promise<{ 
   let crop = await image.cropAsync(left, top, left + side, top + side);
   if (side > SIZE) crop = await crop.resizeAsync(SIZE, SIZE);
   const file = await crop.saveToTemporaryFileAsync('jpg', 85);
-  return { uri: file.startsWith('file://') ? file : `file://${file}`, aspect: image.width / image.height };
+  return { uri: /^[a-z]+:/.test(file) ? file : `file://${file}`, aspect: image.width / image.height };
 }

@@ -23,7 +23,7 @@ import { CHEVRON_BACK, formatDate, t } from '@/src/i18n';
 import { bumpCounters, deleteFind, getSettings, MAP_RULES, updateFind, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
 import { canShare, shareFind, sharingAvailable, unshareFind } from '@/src/services/sharing';
 import { projectToView } from '@/src/services/detector/frameMapping';
-import { SHARE_URL } from '@/src/config/links';
+import { shareLine } from '@/src/config/links';
 import { copyShareText } from '@/src/shareText';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { fortuneFor } from '@/src/fortune';
@@ -104,7 +104,7 @@ export default function FindDetail() {
       // Let the share card re-render with the new note before it is captured.
       await new Promise((resolve) => setTimeout(resolve, 100));
       const uri = await captureRef(shareRef, { format: 'jpg', quality: 0.92, result: 'tmpfile' });
-      const message = [note, t.shareLink(SHARE_URL)].filter(Boolean).join('\n\n');
+      const message = [note, shareLine(t)].filter(Boolean).join('\n\n');
       await copyShareText(message);
       const result = await Share.open({
         url: uri.startsWith('file://') ? uri : `file://${uri}`,

@@ -5,7 +5,8 @@ import { captureLocation } from './location';
 
 /** Saves a camera photo as a find (with the spot, if allowed, and a clover close-up around `box`) and returns its id. */
 export async function saveCapture(photoPath: string, aiDetected: boolean, box?: FractionBox): Promise<string> {
-  const tempPhotoUri = photoPath.startsWith('file://') ? photoPath : `file://${photoPath}`;
+  // A bare path on native; already a URI (file:, or blob: in the Toss web bundle) otherwise.
+  const tempPhotoUri = /^[a-z]+:/.test(photoPath) ? photoPath : `file://${photoPath}`;
   const [location, clover] = await Promise.all([
     getSettings().saveLocation ? captureLocation() : null,
     // The close-up is a nicety: a failed crop still saves the find.

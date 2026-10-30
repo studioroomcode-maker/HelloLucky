@@ -1,6 +1,7 @@
 import { Platform, useColorScheme } from 'react-native';
 
 import { lang } from '@/src/i18n';
+import { IS_TOSS } from '@/src/config/toss';
 import { useSettings } from '@/src/services/findsStore';
 
 const light = {
@@ -31,11 +32,11 @@ const dark: typeof light = {
 
 export type Palette = typeof light;
 
-/** Light by default; Settings can switch to dark or follow the system. */
+/** Light by default; Settings can switch to dark or follow the system. Toss mini-apps must stay light. */
 export function useIsDark() {
   const system = useColorScheme();
   const { theme } = useSettings();
-  return theme === 'dark' || (theme === 'system' && system === 'dark');
+  return !IS_TOSS && (theme === 'dark' || (theme === 'system' && system === 'dark'));
 }
 
 export function usePalette(): Palette {

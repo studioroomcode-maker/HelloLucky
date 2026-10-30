@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@litertjs/core": "^2.6.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
@@ -44,6 +45,7 @@
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.10",
+    "leaflet": "^1.9.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
@@ -66,6 +68,7 @@
     "vision-camera-resize-plugin": "^3.2.0"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.20",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",

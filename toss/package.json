@@ -1,0 +1,20 @@
+{
+  "name": "hellolucky-toss",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Hello Luck 앱인토스(토스 미니앱) 번들 — ../TOSS.md 참고",
+  "scripts": {
+    "dev": "node build-src.mjs --dev && vite",
+    "build": "node build-src.mjs && vite build && ait build",
+    "build:web": "node build-src.mjs && vite build",
+    "deploy": "ait deploy"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "3.9.0"
+  },
+  "devDependencies": {
+    "@apps-in-toss/devtools": "3.9.0",
+    "vite": "^8.3.1"
+  }
+}

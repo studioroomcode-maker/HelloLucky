@@ -95,6 +95,26 @@ async function persist(next: Data) {
   emit();
 }
 
+/**
+ * Web (Toss bundle) has no files: its photos (blob: URIs) are kept inside the journal as data: URIs.
+ * shortcut: each journal write carries every photo (~0.3 MB each); give photos their own IndexedDB keys past ~100 finds.
+ */
+const inJournal = (uri?: string) => !!uri?.startsWith('data:');
+
+async function keepPhoto(from: string, to: string) {
+  if (!from.startsWith('blob:')) {
+    await FileSystem.copyAsync({ from, to });
+    return to;
+  }
+  const blob = await (await fetch(from)).blob();
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
 /** Current Lucky Map notice; a higher number asks again before the next pin (1.0's `sharingAgreed` was version 1). */
 export const MAP_RULES = 3;
 
@@ -106,8 +126,8 @@ export function parseData(raw: string): Data {
     finds: Array.isArray(parsed?.finds)
       ? parsed.finds.map((find: Find) => ({
           ...find,
-          photoUri: `${PHOTO_DIR}${String(find.photoUri ?? '').split('/').pop()}`,
-          cloverUri: find.cloverUri ? `${PHOTO_DIR}${find.cloverUri.split('/').pop()}` : undefined,
+          photoUri: inJournal(find.photoUri) ? find.photoUri : `${PHOTO_DIR}${String(find.photoUri ?? '').split('/').pop()}`,
+          cloverUri: !find.cloverUri || inJournal(find.cloverUri) ? find.cloverUri : `${PHOTO_DIR}${find.cloverUri.split('/').pop()}`,
         }))
       : [],
     settings: { ...DEFAULT_SETTINGS, ...(parsed?.settings ?? {}) },
@@ -161,10 +181,8 @@ export async function addFind(
 ) {
   const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
   await FileSystem.makeDirectoryAsync(PHOTO_DIR, { intermediates: true });
-  const photoUri = `${PHOTO_DIR}${id}.jpg`;
-  await FileSystem.copyAsync({ from: input.tempPhotoUri, to: photoUri });
-  const cloverUri = input.tempCloverUri ? `${PHOTO_DIR}${id}-clover.jpg` : undefined;
-  if (input.tempCloverUri && cloverUri) await FileSystem.copyAsync({ from: input.tempCloverUri, to: cloverUri });
+  const photoUri = await keepPhoto(input.tempPhotoUri, `${PHOTO_DIR}${id}.jpg`);
+  const cloverUri = input.tempCloverUri ? await keepPhoto(input.tempCloverUri, `${PHOTO_DIR}${id}-clover.jpg`) : undefined;
   const { tempPhotoUri: _ignored, tempCloverUri: _ignoredClover, ...rest } = input;
   const find: Find = {
     ...rest,

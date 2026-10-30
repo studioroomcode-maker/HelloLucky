@@ -30,7 +30,7 @@ export async function photoRotation(uri: string) {
 
 /** Loads a photo (path or file://) upright, as the user saw it. */
 export async function loadUpright(path: string) {
-  const uri = path.startsWith('file://') ? path : `file://${path}`;
+  const uri = /^[a-z]+:/.test(path) ? path : `file://${path}`;
   const image = await Images.loadFromFileAsync(uri.replace(/^file:\/\//, ''));
   // The camera writes sensor-landscape pixels plus an EXIF turn; the decoder ignores EXIF, so apply it here.
   // With outputOrientation="preview" that turn always matches what the user saw on screen.
@@ -87,5 +87,5 @@ export async function wideScan(path: string, onProgress: (done: number, total: n
     .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
     .map((b) => ({ x: b.x / width, y: b.y / height, width: b.width / width, height: b.height / height, confidence: b.confidence }));
   const file = await saved;
-  return { candidates, uri: file.startsWith('file://') ? file : `file://${file}` };
+  return { candidates, uri: /^[a-z]+:/.test(file) ? file : `file://${file}` };
 }

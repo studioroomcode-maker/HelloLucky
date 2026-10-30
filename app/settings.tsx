@@ -8,6 +8,7 @@ import { FONT, usePalette, type Palette } from '@/constants/theme';
 import { CHEVRON_FORWARD, lang, t } from '@/src/i18n';
 import { nickname, randomNickname } from '@/src/nicknames';
 import { exportBackup, restoreBackup } from '@/src/services/backup';
+import { IS_TOSS } from '@/src/config/toss';
 import { deleteAllFinds, updateSettings, useFinds, useSettings } from '@/src/services/findsStore';
 import { unshareAll } from '@/src/services/sharing';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
@@ -184,6 +185,8 @@ export default function SettingsScreen() {
           </View>
         </Modal>
 
+        {/* Toss bundle: light only, and no files to back up to (TOSS.md). */}
+        {IS_TOSS ? null : (
         <View style={[card, styles.themeCard]}>
           <View style={styles.themeHead}>
             <Ionicons name="contrast-outline" size={22} color={palette.muted} />
@@ -206,6 +209,7 @@ export default function SettingsScreen() {
             })}
           </View>
         </View>
+        )}
 
         <View style={card}>
           <Row palette={palette} icon="help-circle-outline" label={t.howItWorks} onPress={() => router.push('/onboarding')} />
@@ -213,6 +217,7 @@ export default function SettingsScreen() {
           <Row palette={palette} icon="shield-checkmark-outline" label={t.privacy} onPress={() => router.push('/privacy')} />
         </View>
 
+        {IS_TOSS ? null : (
         <View style={card}>
           <Row
             palette={palette}
@@ -230,6 +235,7 @@ export default function SettingsScreen() {
             right={backingUp === 'import' ? <ActivityIndicator color={palette.primary} /> : undefined}
           />
         </View>
+        )}
 
         {finds.length > 0 ? (
           <View style={card}>

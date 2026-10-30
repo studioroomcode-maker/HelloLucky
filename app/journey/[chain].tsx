@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FONT, usePalette } from '@/constants/theme';
 import { JourneyVideo, type VideoLayer } from '@/modules/journey-video';
-import { SHARE_URL } from '@/src/config/links';
+import { shareLine } from '@/src/config/links';
 import { copyShareText } from '@/src/shareText';
 import { ARROW, lang, stringsForCountry, t } from '@/src/i18n';
 import { arcDegrees, greatCirclePoint } from '@/src/journeyMap';
@@ -244,8 +244,8 @@ export default function JourneyMap() {
     setSharing(true);
     try {
       const url = await captureCard();
-      await copyShareText(t.shareLink(SHARE_URL));
-      await Share.open({ url, type: 'image/png', message: t.shareLink(SHARE_URL), failOnCancel: false });
+      await copyShareText(shareLine(t));
+      await Share.open({ url, type: 'image/png', message: shareLine(t), failOnCancel: false });
     } catch (error) {
       console.warn('journey: share failed', error);
     } finally {

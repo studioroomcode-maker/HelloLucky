@@ -35,6 +35,7 @@ import { projectToView } from '@/src/services/detector/frameMapping';
 import { useCloverFrameProcessor, type FrameDetections } from '@/src/services/detector/useCloverFrameProcessor';
 import { findInPhoto } from '@/src/services/detector/wideScan';
 import { saveCapture } from '@/src/services/capture';
+import { stillPhoto } from '@/src/services/stillPhoto';
 import { PrimaryButton } from '@/src/ui/PrimaryButton';
 import { LuckBurst } from '@/src/ui/LuckBurst';
 import { TrackBox } from '@/src/ui/TrackBox';
@@ -65,7 +66,8 @@ export default function Scan() {
       <PermissionGate
         blocked={blocked}
         onPress={async () => {
-          if (blocked) {
+          // The web (Toss) bundle has no settings to open: ask again, with photos as the way around.
+          if (blocked && !stillPhoto) {
             Linking.openSettings();
           } else {
             setBlocked(!(await requestPermission()));
@@ -94,6 +96,14 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => Pro
 function PermissionGate({ blocked, onPress }: { blocked: boolean; onPress: () => void }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const fromPhoto = async (how: 'camera' | 'album') => {
+    try {
+      const path = await stillPhoto?.take(how);
+      if (path) router.replace({ pathname: '/wide', params: { path } });
+    } catch (error) {
+      Alert.alert(error instanceof Error ? error.message : t.cameraError);
+    }
+  };
   return (
     <View style={[styles.gate, { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }]}>
       <CloseButton onPress={() => router.back()} />
@@ -102,7 +112,15 @@ function PermissionGate({ blocked, onPress }: { blocked: boolean; onPress: () =>
         <Text style={styles.gateTitle}>{t.cameraPermissionTitle}</Text>
         <Text style={styles.gateText}>{t.cameraPermissionBody}</Text>
       </View>
-      <PrimaryButton label={blocked ? t.openSettings : t.cameraPermissionButton} onPress={onPress} />
+      <View style={styles.gateButtons}>
+        <PrimaryButton label={blocked && !stillPhoto ? t.openSettings : t.cameraPermissionButton} onPress={onPress} />
+        {stillPhoto && blocked ? (
+          <>
+            <PrimaryButton variant="secondary" icon="camera-outline" label={stillPhoto.camera} onPress={() => fromPhoto('camera')} />
+            <PrimaryButton variant="secondary" icon="images-outline" label={stillPhoto.album} onPress={() => fromPhoto('album')} />
+          </>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -426,6 +444,7 @@ const styles = StyleSheet.create({
   viewfinder: { width: '100%', aspectRatio: 3 / 4, overflow: 'hidden' },
   gate: { flex: 1, backgroundColor: '#0D130F', paddingHorizontal: 24 },
   gateBody: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
+  gateButtons: { gap: 10 },
   gateTitle: { color: '#fff', fontSize: 22, fontFamily: FONT.cute, textAlign: 'center' },
   gateText: { fontFamily: FONT.body, color: 'rgba(255,255,255,0.8)', fontSize: 16, lineHeight: 24, textAlign: 'center' },
   roundBtn: {

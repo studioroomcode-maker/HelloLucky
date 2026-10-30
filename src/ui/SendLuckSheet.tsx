@@ -9,6 +9,7 @@ import { FONT, usePalette } from '@/constants/theme';
 import { lang, t } from '@/src/i18n';
 import { letterMessage, randomKey } from '@/src/letters';
 import { nickname } from '@/src/nicknames';
+import { IS_TOSS } from '@/src/config/toss';
 import { useSettings } from '@/src/services/findsStore';
 import { notificationsGranted, enableLuckNotifications } from '@/src/services/notifications';
 import { myNickname, sendLuckyLetter, sharingAvailable, type Place } from '@/src/services/sharing';
@@ -86,8 +87,8 @@ export function SendLuckSheet({
       onClose();
       setMessage(randomKey(t, topic));
       setCard(pickCard());
-      // Ask for push once the user has felt what a lucky letter is.
-      const ask = !(await notificationsGranted());
+      // Ask for push once the user has felt what a lucky letter is. The Toss bundle has no push (TOSS.md).
+      const ask = !IS_TOSS && !(await notificationsGranted());
       Alert.alert(t.strangerSent, ask ? t.notifyAskBody : undefined, ask
         ? [
             { text: t.notifyNo, style: 'cancel' },

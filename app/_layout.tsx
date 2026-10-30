@@ -8,6 +8,7 @@ import { BRAND_FONT, useIsDark, usePalette } from '@/constants/theme';
 import { loadStore, useStoreLoaded } from '@/src/services/findsStore';
 import { useJourneyTaps } from '@/src/services/notifications';
 import { TitleScreen } from '@/src/ui/TitleScreen';
+import '@/src/web/setup';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
