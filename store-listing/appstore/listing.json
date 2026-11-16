@@ -1,7 +1,7 @@
 {
   "_comment": "App Store 등록정보 — node ../../../HelloDashboard/tools/apple-signing.mjs listing listing.json (이 폴더에서). 문구 원본은 ../play/listing.md 와 같다. 무료, 앱 안 구입 없음. 스크린샷 폴더가 비어 있으면 올리지 않는다.",
   "bundleId": "com.studioroomkr.HelloLucky",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "copyright": "2026 Studioroom",
   "primaryCategory": "LIFESTYLE",
   "secondaryCategory": "ENTERTAINMENT",
@@ -26,6 +26,146 @@
       "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
       "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
       "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "ja": {
+      "name": "Hello Luck: 四つ葉のクローバー探し",
+      "subtitle": "AIで四つ葉のクローバー探し",
+      "promotionalText": "クローバー畑にカメラを向けるだけ。AIが四つ葉のクローバーを見つけます",
+      "description": "散歩道の草むらで、四つ葉のクローバーを探したことはありますか？\nHello Luck は、クローバー畑にカメラを向けるだけで、スマホの中の AI が四つ葉の候補をリアルタイムで教えてくれるアプリです。\n\n■ リアルタイムで探す\n• カメラ画面の上に、四つ葉の候補をすぐに表示します\n• 手がゆれても枠が追いかけ、確かになったらお知らせします\n• ひろく探す — 広い草むらを 1 枚撮ると、すみずみまで分けて丁寧に調べます\n\n■ 幸運の記録帳\n• 見つけた四つ葉を写真・場所・メモと一緒に保存\n• 見つけるたびに、今日のひとこと運勢が届きます\n• 集めるほど「幸運の鉢」がタネから花畑まで育ち、隠れたバッジも開きます\n\n■ 幸運は分けるもの\n• 友だちに幸運カードを写真で送れます\n• 「知らない誰かに」幸運を送ると、世界のどこかの誰かに届きます\n• 受け取った幸運を送り継ぐと、あなたの幸運がどこまで旅したか地図で見られます\n• 幸運マップ — 世界中の人が四つ葉を見つけた場所に出会えます\n\n■ あなたの情報はあなたのスマホに\n• カメラ映像は端末の中だけで分析し、どこにも送りません\n• 元の写真とメモは端末の外に出ません（幸運マップには四つ葉の部分だけを切り取った小さな写真が載ります）\n• 会員登録・広告・課金はありません\n• 幸運マップには、自分で選んだ記録の場所と日付だけが載ります。幸運の手紙には決まった文面と都市名だけが入ります\n\n※ 認識の精度は、光・距離・草の状態によって変わることがあります。\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "クローバー,四つ葉,幸運,ラッキー,散歩,自然,カメラ,AI,運勢,お守り,手紙,地図",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "zh-Hans": {
+      "name": "Hello Luck: AI寻找四叶草",
+      "subtitle": "用AI寻找四叶草",
+      "promotionalText": "把相机对准三叶草丛，手机里的 AI 帮你找到四叶草。把好运记下来，也送给陌生人",
+      "description": "散步时，你在草地上找过四叶草吗？\nHello Luck 只需把相机对准三叶草丛，手机里的 AI 就会实时标出可能的四叶草。\n\n■ 实时寻找\n• 在相机画面上直接标出四叶草候选\n• 手抖也会跟着框住，确定时会提醒你\n• 整片扫描 — 拍一张大片草地，逐块仔细检查\n\n■ 幸运手账\n• 把找到的四叶草连同照片、地点和备注一起保存\n• 每次找到都附赠一句今日运势\n• 收集越多，“我的幸运花盆”就从种子长成花田，隐藏徽章也会解锁\n\n■ 好运要分享\n• 把幸运卡片照片发给朋友\n• 把好运送给“陌生人”，它会抵达世界某个角落的某个人\n• 把收到的好运继续传下去，在旅程地图上看看你的好运走了多远\n• 幸运地图 — 看看世界各地的人在哪里找到了四叶草\n\n■ 你的信息留在你的手机里\n• 相机画面只在设备上分析，不会上传\n• 原始照片和备注不会离开手机（幸运地图上只显示裁剪出的四叶草小图）\n• 无需注册、无广告、无付费\n• 幸运地图上只显示你亲自选择的记录的地点和日期；幸运信件只包含固定文字和城市名\n\n※ 识别准确度会因光线、距离和草的状态而有所不同。\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "四叶草,三叶草,幸运,好运,散步,自然,相机,AI,运势,护身符,地图",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "zh-Hant": {
+      "name": "Hello Luck: 尋找四葉幸運草",
+      "subtitle": "用AI尋找四葉幸運草",
+      "promotionalText": "把相機對準幸運草叢，手機裡的 AI 幫你找到四葉幸運草。記錄好運，也送給陌生人",
+      "description": "散步時，你在草地上找過四葉幸運草嗎？\nHello Luck 只要把相機對準幸運草叢，手機裡的 AI 就會即時標出可能的四葉幸運草。\n\n■ 即時尋找\n• 在相機畫面上直接標出四葉草候選\n• 手晃動也會跟著框住，確定時會提醒你\n• 整片掃描 — 拍一張大片草地，逐塊仔細檢查\n\n■ 幸運手帳\n• 把找到的四葉草連同照片、地點和備註一起保存\n• 每次找到都附上一句今日運勢\n• 收集越多，「我的幸運盆栽」就從種子長成花田，隱藏徽章也會解鎖\n\n■ 好運要分享\n• 把幸運卡片照片傳給朋友\n• 把好運送給「陌生人」，它會抵達世界某個角落的某個人\n• 把收到的好運繼續傳下去，在旅程地圖上看看你的好運走了多遠\n• 幸運地圖 — 看看世界各地的人在哪裡找到了四葉草\n\n■ 你的資料留在你的手機裡\n• 相機畫面只在裝置上分析，不會上傳\n• 原始照片和備註不會離開手機（幸運地圖上只顯示裁切出的四葉草小圖）\n• 免註冊、無廣告、無付費\n• 幸運地圖上只顯示你親自選擇的紀錄的地點和日期；幸運信件只包含固定文字和城市名稱\n\n※ 辨識準確度會因光線、距離和草的狀態而不同。\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "四葉草,幸運草,幸運,好運,散步,自然,相機,AI,運勢,護身符,地圖",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "es-MX": {
+      "name": "Hello Luck: Trébol de 4 hojas",
+      "subtitle": "Encuentra tréboles con IA",
+      "promotionalText": "Apunta la cámara al trébol y la IA encuentra tu trébol de cuatro hojas",
+      "description": "¿Alguna vez buscaste un trébol de cuatro hojas en un paseo?\nCon Hello Luck, la IA de tu teléfono te señala en vivo los posibles tréboles de cuatro hojas mientras recorres un trebolar con la cámara.\n\n■ Búscalo en vivo\n• Los candidatos aparecen marcados directamente en la cámara\n• El recuadro te sigue aunque te tiemble la mano y te avisa cuando está seguro\n• Escaneo amplio: toma una foto de un trebolar grande y se revisa parte por parte\n\n■ Tu diario de la suerte\n• Guarda cada hallazgo con foto, lugar y una nota\n• Cada hallazgo trae una frase de la suerte para el día\n• Tu maceta de la suerte crece de semilla a jardín en flor, y se desbloquean insignias ocultas\n\n■ La suerte es para compartir\n• Envía una tarjeta de la suerte a un amigo\n• Envía suerte «a un desconocido» y llegará a alguien en algún lugar del mundo\n• Pasa la suerte que recibiste y mira en el mapa del viaje hasta dónde llega\n• Mapa de la suerte: descubre dónde encontraron su suerte personas de todo el mundo\n\n■ Tus datos se quedan en tu teléfono\n• La cámara se analiza en tu dispositivo y nunca se sube\n• Las fotos originales y las notas nunca salen de tu teléfono (el Mapa de la suerte solo muestra un pequeño recorte del trébol)\n• Sin registro, sin anuncios, sin compras\n• En el Mapa de la suerte solo aparecen el lugar y la fecha de los hallazgos que tú elijas; las cartas de la suerte solo llevan un mensaje predefinido y el nombre de una ciudad\n\nLa precisión depende de la luz, la distancia y el estado del pasto.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "trébol,cuatro hojas,suerte,fortuna,amuleto,paseo,naturaleza,cámara,IA,buena suerte",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "es-ES": {
+      "name": "Hello Luck: Trébol de 4 hojas",
+      "subtitle": "Encuentra tréboles con IA",
+      "promotionalText": "Apunta la cámara al trébol y la IA encuentra tu trébol de cuatro hojas",
+      "description": "¿Alguna vez has buscado un trébol de cuatro hojas durante un paseo?\nCon Hello Luck, la IA de tu móvil te señala en directo los posibles tréboles de cuatro hojas mientras recorres un trebolar con la cámara.\n\n■ Búscalo en directo\n• Los candidatos aparecen marcados directamente en la cámara\n• El recuadro te sigue aunque te tiemble la mano y te avisa cuando está seguro\n• Escaneo amplio: haz una foto de un trebolar grande y se revisa parte por parte\n\n■ Tu diario de la suerte\n• Guarda cada hallazgo con foto, lugar y una nota\n• Cada hallazgo trae una frase de la suerte para el día\n• Tu maceta de la suerte crece de semilla a jardín en flor, y se desbloquean insignias ocultas\n\n■ La suerte es para compartir\n• Envía una tarjeta de la suerte a un amigo\n• Envía suerte «a un desconocido» y llegará a alguien en algún lugar del mundo\n• Pasa la suerte que has recibido y mira en el mapa del viaje hasta dónde llega\n• Mapa de la suerte: descubre dónde han encontrado su suerte personas de todo el mundo\n\n■ Tus datos se quedan en tu móvil\n• La cámara se analiza en tu dispositivo y nunca se sube\n• Las fotos originales y las notas nunca salen de tu móvil (el Mapa de la suerte solo muestra un pequeño recorte del trébol)\n• Sin registro, sin anuncios, sin compras\n• En el Mapa de la suerte solo aparecen el lugar y la fecha de los hallazgos que tú elijas; las cartas de la suerte solo llevan un mensaje predefinido y el nombre de una ciudad\n\nLa precisión depende de la luz, la distancia y el estado de la hierba.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "trébol,cuatro hojas,suerte,fortuna,amuleto,paseo,naturaleza,cámara,IA,buena suerte",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "pt-BR": {
+      "name": "Hello Luck: Trevo de 4 folhas",
+      "subtitle": "Ache trevos de 4 folhas com IA",
+      "promotionalText": "Aponte a câmera para o trevo e a IA encontra seu trevo de quatro folhas",
+      "description": "Você já procurou um trevo de quatro folhas durante uma caminhada?\nCom o Hello Luck, a IA do seu celular mostra ao vivo os possíveis trevos de quatro folhas enquanto você passa a câmera por um gramado de trevos.\n\n■ Encontre ao vivo\n• Os candidatos aparecem marcados direto na câmera\n• O quadro acompanha mesmo se a mão tremer e avisa quando tiver certeza\n• Busca ampla: tire uma foto de um gramado grande e ele é verificado parte por parte\n\n■ Seu diário da sorte\n• Salve cada achado com foto, local e uma anotação\n• Cada achado vem com uma frase de sorte para o dia\n• Seu vasinho da sorte cresce de semente a jardim florido, e medalhas escondidas são desbloqueadas\n\n■ Sorte é para compartilhar\n• Envie um cartão da sorte para um amigo\n• Envie sorte \"para um desconhecido\" e ela chega a alguém em algum lugar do mundo\n• Passe adiante a sorte que recebeu e veja no mapa da jornada até onde ela viaja\n• Mapa da Sorte: veja onde pessoas do mundo todo encontraram sua sorte\n\n■ Seus dados ficam no seu celular\n• A câmera é analisada no aparelho e nunca é enviada\n• Fotos originais e anotações nunca saem do celular (o Mapa da Sorte mostra só um pequeno recorte do trevo)\n• Sem cadastro, sem anúncios, sem compras\n• No Mapa da Sorte aparecem só o local e a data dos achados que você escolher; as cartas da sorte levam só uma mensagem pronta e o nome de uma cidade\n\nA precisão depende da luz, da distância e da grama.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "trevo,quatro folhas,sorte,amuleto,passeio,natureza,câmera,IA,fortuna,boa sorte",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "fr-FR": {
+      "name": "Hello Luck: trèfle 4 feuilles",
+      "subtitle": "Trouvez des trèfles avec l'IA",
+      "promotionalText": "Pointez la caméra sur le trèfle : l'IA trouve votre trèfle à quatre feuilles",
+      "description": "Avez-vous déjà cherché un trèfle à quatre feuilles en promenade ?\nAvec Hello Luck, l'IA de votre téléphone repère en direct les trèfles à quatre feuilles possibles pendant que vous balayez un carré de trèfles avec la caméra.\n\n■ Cherchez en direct\n• Les candidats sont signalés directement sur l'image de la caméra\n• Le cadre suit même si votre main tremble, et vous prévient dès qu'il est sûr\n• Scan large : prenez une photo d'une grande pelouse, elle est examinée zone par zone\n\n■ Votre carnet de chance\n• Enregistrez chaque trouvaille avec une photo, le lieu et une note\n• Chaque trouvaille est accompagnée d'une petite phrase porte-bonheur du jour\n• Votre pot de chance grandit de la graine au champ de fleurs, et des badges cachés se débloquent\n\n■ La chance, ça se partage\n• Envoyez une carte porte-bonheur à un ami\n• Envoyez de la chance « à un inconnu » : elle arrive chez quelqu'un, quelque part dans le monde\n• Transmettez la chance reçue et suivez son voyage sur la carte\n• Carte de la chance : découvrez où les gens du monde entier ont trouvé leur chance\n\n■ Vos données restent sur votre téléphone\n• L'image de la caméra est analysée sur l'appareil et n'est jamais envoyée\n• Les photos originales et les notes ne quittent jamais votre téléphone (la Carte de la chance n'affiche qu'un petit gros plan du trèfle)\n• Sans inscription, sans pub, sans achat\n• Seuls le lieu et la date des trouvailles que vous choisissez apparaissent sur la Carte de la chance ; les lettres porte-bonheur ne contiennent qu'un message prédéfini et un nom de ville\n\nLa précision dépend de la lumière, de la distance et de l'herbe.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "trèfle,quatre feuilles,chance,porte-bonheur,balade,nature,caméra,IA,fortune",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "de-DE": {
+      "name": "Hello Luck: Glücksklee finden",
+      "subtitle": "Vierblättrigen Klee mit KI",
+      "promotionalText": "Kamera auf den Klee halten – die KI findet dein vierblättriges Kleeblatt",
+      "description": "Hast du beim Spazierengehen schon einmal nach einem vierblättrigen Kleeblatt gesucht?\nMit Hello Luck zeigt dir die KI in deinem Handy live mögliche vierblättrige Kleeblätter an, während du die Kamera über eine Kleewiese schwenkst.\n\n■ Live finden\n• Kandidaten werden direkt im Kamerabild markiert\n• Der Rahmen folgt, auch wenn die Hand wackelt, und meldet sich, sobald er sicher ist\n• Weit scannen: Ein Foto einer großen Wiese wird Stück für Stück geprüft\n\n■ Dein Glückstagebuch\n• Speichere jeden Fund mit Foto, Ort und Notiz\n• Zu jedem Fund gibt es einen Glücksspruch für den Tag\n• Dein Glückstopf wächst vom Samen bis zur Blumenwiese, und versteckte Abzeichen werden freigeschaltet\n\n■ Glück ist zum Teilen da\n• Schick einem Freund eine Glückskarte\n• Schick Glück „an einen Fremden“ – es kommt bei jemandem irgendwo auf der Welt an\n• Gib empfangenes Glück weiter und sieh auf der Reisekarte, wie weit es kommt\n• Glückskarte: Entdecke, wo Menschen auf der ganzen Welt ihr Glück gefunden haben\n\n■ Deine Daten bleiben auf deinem Handy\n• Das Kamerabild wird auf dem Gerät analysiert und nie hochgeladen\n• Originalfotos und Notizen verlassen nie dein Handy (auf der Glückskarte erscheint nur ein kleiner Ausschnitt des Kleeblatts)\n• Keine Anmeldung, keine Werbung, keine Käufe\n• Auf der Glückskarte erscheinen nur Ort und Datum der Funde, die du selbst auswählst; Glücksbriefe enthalten nur einen vorgegebenen Text und einen Städtenamen\n\nDie Genauigkeit hängt von Licht, Abstand und Gras ab.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "Kleeblatt,vierblättrig,Glück,Glücksbringer,Spaziergang,Natur,Kamera,KI,Klee",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "it": {
+      "name": "Hello Luck: trova quadrifogli",
+      "subtitle": "Scanner IA per quadrifogli",
+      "promotionalText": "Inquadra il trifoglio e l'IA trova il tuo quadrifoglio. Poi passa la fortuna",
+      "description": "Hai mai cercato un quadrifoglio durante una passeggiata?\nCon Hello Luck, l'IA del tuo telefono ti indica in tempo reale i possibili quadrifogli mentre passi la fotocamera su un prato di trifogli.\n\n■ Trovalo in tempo reale\n• I candidati vengono segnalati direttamente sull'inquadratura\n• Il riquadro ti segue anche se la mano trema e ti avvisa quando è sicuro\n• Scansione ampia: scatta una foto di un grande prato e viene controllato zona per zona\n\n■ Il tuo diario della fortuna\n• Salva ogni scoperta con foto, luogo e una nota\n• Ogni scoperta arriva con una frase portafortuna del giorno\n• Il tuo vasetto della fortuna cresce da seme a prato fiorito, e si sbloccano badge nascosti\n\n■ La fortuna si condivide\n• Invia a un amico una cartolina portafortuna\n• Invia fortuna «a uno sconosciuto» e arriverà a qualcuno, da qualche parte nel mondo\n• Passa la fortuna che hai ricevuto e guarda sulla mappa del viaggio fin dove arriva\n• Mappa della Fortuna: scopri dove le persone di tutto il mondo hanno trovato la loro fortuna\n\n■ I tuoi dati restano sul tuo telefono\n• L'immagine della fotocamera viene analizzata sul dispositivo e non viene mai caricata\n• Le foto originali e le note non lasciano mai il telefono (sulla Mappa della Fortuna compare solo un piccolo ritaglio del quadrifoglio)\n• Niente registrazione, niente pubblicità, niente acquisti\n• Sulla Mappa della Fortuna compaiono solo luogo e data delle scoperte che scegli tu; le lettere portafortuna contengono solo un messaggio predefinito e il nome di una città\n\nLa precisione dipende da luce, distanza e stato dell'erba.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "quadrifoglio,trifoglio,fortuna,portafortuna,passeggiata,natura,fotocamera,IA",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "ru": {
+      "name": "Hello Luck: Четырёхлистник",
+      "subtitle": "Поиск клевера с помощью ИИ",
+      "promotionalText": "Наведите камеру на клевер — ИИ найдёт четырёхлистный клевер. Делитесь удачей",
+      "description": "Вы когда-нибудь искали четырёхлистный клевер на прогулке?\nHello Luck — это приложение, в котором ИИ прямо в телефоне в реальном времени показывает возможные четырёхлистники, пока вы ведёте камерой над клевером.\n\n■ Поиск в реальном времени\n• Кандидаты отмечаются прямо на изображении с камеры\n• Рамка следует за листком, даже если рука дрожит, и сообщает, когда уверена\n• Широкий поиск: сфотографируйте большую поляну — она будет проверена по частям\n\n■ Дневник удачи\n• Сохраняйте каждую находку с фото, местом и заметкой\n• К каждой находке прилагается предсказание на день\n• Ваш горшочек удачи растёт от семечка до цветущей поляны, а скрытые значки открываются\n\n■ Удачей нужно делиться\n• Отправьте другу открытку удачи\n• Отправьте удачу «незнакомцу» — она дойдёт до кого-то где-то в мире\n• Передайте полученную удачу дальше и смотрите на карте, как далеко она путешествует\n• Карта удачи: узнайте, где люди по всему миру нашли свою удачу\n\n■ Ваши данные остаются в телефоне\n• Изображение с камеры анализируется на устройстве и никуда не отправляется\n• Оригинальные фото и заметки не покидают телефон (на Карте удачи показывается только маленький фрагмент с клевером)\n• Без регистрации, без рекламы, без покупок\n• На Карте удачи видны только место и дата выбранных вами находок; письма удачи содержат только готовый текст и название города\n\nТочность распознавания зависит от освещения, расстояния и состояния травы.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "клевер,четырёхлистник,удача,талисман,прогулка,природа,камера,ИИ,везение",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "id": {
+      "name": "Hello Luck: Semanggi 4 Daun",
+      "subtitle": "Cari semanggi 4 daun dengan AI",
+      "promotionalText": "Arahkan kamera ke semanggi, AI menemukan semanggi berdaun empat untukmu",
+      "description": "Pernah mencari semanggi berdaun empat saat jalan-jalan?\nDengan Hello Luck, AI di dalam ponselmu menandai semanggi berdaun empat secara langsung saat kamu menyapukan kamera di atas hamparan semanggi.\n\n■ Cari secara langsung\n• Kandidat langsung ditandai di layar kamera\n• Kotak tetap mengikuti walau tangan goyang, dan memberi tahu saat sudah yakin\n• Pindai luas: foto satu hamparan rumput yang luas, lalu diperiksa bagian demi bagian\n\n■ Jurnal keberuntungan\n• Simpan setiap temuan dengan foto, tempat, dan catatan\n• Setiap temuan disertai satu kalimat ramalan untuk hari ini\n• Pot keberuntunganmu tumbuh dari biji hingga taman bunga, dan lencana tersembunyi terbuka\n\n■ Keberuntungan untuk dibagi\n• Kirim kartu keberuntungan ke teman\n• Kirim keberuntungan \"ke orang asing\" dan ia akan sampai ke seseorang di belahan dunia lain\n• Teruskan keberuntungan yang kamu terima dan lihat di peta perjalanan sejauh apa ia melangkah\n• Peta Keberuntungan: lihat di mana orang-orang di seluruh dunia menemukan keberuntungan mereka\n\n■ Datamu tetap di ponselmu\n• Gambar kamera dianalisis di perangkat dan tidak pernah diunggah\n• Foto asli dan catatan tidak pernah keluar dari ponsel (Peta Keberuntungan hanya menampilkan potongan kecil semanggi)\n• Tanpa daftar, tanpa iklan, tanpa pembelian\n• Di Peta Keberuntungan hanya tampil tempat dan tanggal temuan yang kamu pilih; surat keberuntungan hanya berisi pesan bawaan dan nama kota\n\nAkurasi bergantung pada cahaya, jarak, dan kondisi rumput.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "semanggi,daun empat,keberuntungan,hoki,jalan-jalan,alam,kamera,AI,jimat",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "vi": {
+      "name": "Hello Luck: Tìm cỏ bốn lá",
+      "subtitle": "AI tìm cỏ bốn lá may mắn",
+      "promotionalText": "Hướng camera vào bãi cỏ ba lá, AI sẽ tìm cỏ bốn lá may mắn cho bạn",
+      "description": "Bạn đã bao giờ đi tìm cỏ bốn lá khi dạo bộ chưa?\nVới Hello Luck, AI ngay trong điện thoại sẽ đánh dấu trực tiếp những cây cỏ bốn lá có thể có khi bạn lia camera qua bãi cỏ ba lá.\n\n■ Tìm trực tiếp\n• Ứng viên được đánh dấu ngay trên màn hình camera\n• Khung vẫn bám theo dù tay bạn rung, và báo khi đã chắc chắn\n• Quét rộng: chụp một tấm ảnh bãi cỏ lớn, ứng dụng sẽ kiểm tra từng phần\n\n■ Sổ may mắn\n• Lưu mỗi lần tìm thấy kèm ảnh, địa điểm và ghi chú\n• Mỗi lần tìm thấy đều kèm một câu vận may cho hôm nay\n• Chậu may mắn của bạn lớn dần từ hạt giống đến vườn hoa, và mở khóa huy hiệu ẩn\n\n■ May mắn là để chia sẻ\n• Gửi thiệp may mắn cho bạn bè\n• Gửi may mắn \"cho một người lạ\" và nó sẽ đến với ai đó ở đâu đó trên thế giới\n• Gửi tiếp may mắn bạn nhận được và xem trên bản đồ hành trình nó đã đi xa đến đâu\n• Bản đồ May mắn: xem mọi người trên khắp thế giới đã tìm thấy may mắn ở đâu\n\n■ Dữ liệu của bạn ở lại trong điện thoại\n• Hình ảnh camera được phân tích trên thiết bị và không bao giờ tải lên\n• Ảnh gốc và ghi chú không bao giờ rời khỏi điện thoại (Bản đồ May mắn chỉ hiện một ảnh nhỏ cắt phần cỏ bốn lá)\n• Không cần đăng ký, không quảng cáo, không mua hàng\n• Bản đồ May mắn chỉ hiện địa điểm và ngày của những lần tìm thấy do bạn chọn; thư may mắn chỉ có lời nhắn soạn sẵn và tên thành phố\n\nĐộ chính xác phụ thuộc vào ánh sáng, khoảng cách và tình trạng cỏ.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "cỏ bốn lá,cỏ ba lá,may mắn,bùa may,đi dạo,thiên nhiên,camera,AI,vận may",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "th": {
+      "name": "Hello Luck: หาโคลเวอร์สี่ใบ",
+      "subtitle": "AI ช่วยหาโคลเวอร์นำโชค",
+      "promotionalText": "ส่องกล้องไปที่ดงโคลเวอร์ แล้ว AI จะช่วยหาโคลเวอร์สี่ใบให้คุณ",
+      "description": "เคยลองหาโคลเวอร์สี่ใบตอนเดินเล่นไหม?\nHello Luck ให้ AI ในมือถือของคุณชี้จุดที่น่าจะเป็นโคลเวอร์สี่ใบแบบเรียลไทม์ ขณะที่คุณส่องกล้องไปบนดงโคลเวอร์\n\n■ ค้นหาแบบเรียลไทม์\n• แสดงจุดที่น่าจะใช่บนภาพกล้องทันที\n• กรอบจะตามไปแม้มือสั่น และบอกเมื่อมั่นใจแล้ว\n• สแกนกว้าง: ถ่ายรูปสนามหญ้ากว้างหนึ่งรูป แล้วระบบจะตรวจทีละส่วน\n\n■ สมุดบันทึกโชค\n• บันทึกทุกครั้งที่เจอพร้อมรูป สถานที่ และโน้ต\n• ทุกครั้งที่เจอจะได้คำทำนายประจำวันหนึ่งประโยค\n• ยิ่งสะสม กระถางโชคของคุณจะโตจากเมล็ดจนเป็นสวนดอกไม้ และปลดล็อกเหรียญลับ\n\n■ โชคดีมีไว้แบ่งปัน\n• ส่งการ์ดโชคดีให้เพื่อน\n• ส่งโชค \"ให้คนแปลกหน้า\" แล้วมันจะไปถึงใครสักคนที่ไหนสักแห่งในโลก\n• ส่งต่อโชคที่ได้รับ แล้วดูบนแผนที่การเดินทางว่าโชคของคุณไปไกลแค่ไหน\n• แผนที่โชคดี: ดูว่าผู้คนทั่วโลกเจอโชคของพวกเขาที่ไหน\n\n■ ข้อมูลของคุณอยู่ในมือถือของคุณ\n• ภาพจากกล้องวิเคราะห์ในเครื่องเท่านั้น ไม่มีการอัปโหลด\n• รูปต้นฉบับและโน้ตไม่ออกจากมือถือ (แผนที่โชคดีแสดงเพียงรูปเล็กที่ครอปเฉพาะโคลเวอร์)\n• ไม่ต้องสมัคร ไม่มีโฆษณา ไม่มีการซื้อ\n• แผนที่โชคดีแสดงเพียงสถานที่และวันที่ของบันทึกที่คุณเลือกเอง จดหมายโชคดีมีแค่ข้อความสำเร็จรูปและชื่อเมือง\n\nความแม่นยำขึ้นอยู่กับแสง ระยะ และสภาพหญ้า\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "โคลเวอร์,สี่ใบ,โชคดี,นำโชค,เดินเล่น,ธรรมชาติ,กล้อง,AI,ดวง",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
+    },
+    "ar-SA": {
+      "name": "Hello Luck: البرسيم الرباعي",
+      "subtitle": "البرسيم الرباعي بكاميرا ذكية",
+      "promotionalText": "وجّه الكاميرا نحو البرسيم ليجد الذكاء الاصطناعي البرسيم رباعي الأوراق",
+      "description": "هل بحثت يومًا عن برسيم رباعي الأوراق أثناء نزهة؟\nمع Hello Luck، يُشير الذكاء الاصطناعي داخل هاتفك مباشرةً إلى أوراق البرسيم الرباعية المحتملة بينما تمرّر الكاميرا فوق البرسيم.\n\n■ ابحث مباشرةً\n• تظهر الاحتمالات مُعلَّمة على صورة الكاميرا فورًا\n• يتبعها الإطار حتى لو اهتزت يدك، ويُنبّهك عندما يتأكد\n• مسح واسع: التقط صورة واحدة لمساحة عشب كبيرة لتُفحص جزءًا جزءًا\n\n■ دفتر الحظ\n• احفظ كل اكتشاف مع صورة ومكان وملاحظة\n• يأتي مع كل اكتشاف سطر حظ لليوم\n• ينمو أصيص حظك من بذرة إلى حقل أزهار، وتُفتح شارات مخفية\n\n■ الحظ للمشاركة\n• أرسل بطاقة حظ إلى صديق\n• أرسل الحظ «إلى شخص غريب» ليصل إلى أحدهم في مكان ما من العالم\n• مرّر الحظ الذي تلقيته وشاهد على خريطة الرحلة إلى أي مدى سافر\n• خريطة الحظ: اكتشف أين وجد الناس حول العالم حظهم\n\n■ بياناتك تبقى في هاتفك\n• تُحلَّل صورة الكاميرا على جهازك ولا تُرفع أبدًا\n• الصور الأصلية والملاحظات لا تغادر هاتفك (تعرض خريطة الحظ صورة صغيرة مقتطعة للبرسيم فقط)\n• بلا تسجيل، بلا إعلانات، بلا مشتريات\n• لا يظهر على خريطة الحظ إلا مكان وتاريخ الاكتشافات التي تختارها؛ ورسائل الحظ تحمل رسالة جاهزة واسم مدينة فقط\n\nتعتمد الدقة على الإضاءة والمسافة وحالة العشب.\n\nAI model trained in part on \"4 Leaf Clover Detect\" by test-ara07 and \"Hunting for Four Leaf Clovers\" by adam-fonagy (Roboflow Universe, CC BY 4.0), modified.",
+      "keywords": "برسيم,رباعي,حظ,تميمة,نزهة,طبيعة,كاميرا,ذكاء اصطناعي",
+      "supportUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "marketingUrl": "https://studioroomcode-maker.github.io/HelloLucky/",
+      "privacyPolicyUrl": "https://studioroomcode-maker.github.io/HelloLucky/privacy-policy.html"
     }
   },
   "review": {
@@ -46,6 +186,48 @@
       "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/ko"
     },
     "en-US": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "ja": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "zh-Hans": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "zh-Hant": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "es-MX": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "es-ES": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "pt-BR": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "fr-FR": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "de-DE": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "it": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "ru": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "id": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "vi": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "th": {
+      "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
+    },
+    "ar-SA": {
       "APP_IPHONE_67": "../assets/appstore/screenshots-6.9/en"
     }
   }
