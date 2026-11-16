@@ -15,11 +15,11 @@ assets: `icon-512.png`, `feature-graphic-<ko|en>-1024x500.png`, `screenshots/<ko
 ### 앱 이름 (30자)
 **ko**
 ```
-Hello Luck: 행운 찾기
+Hello Luck: 네잎클로버 찾기
 ```
 **en**
 ```
-Hello Luck: Find Your Luck
+Hello Luck: Four Leaf Clover
 ```
 
 ### 간단한 설명 (80자)

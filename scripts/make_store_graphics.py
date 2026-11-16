@@ -52,8 +52,11 @@ def banner(w: int, h: int, lines: list[str], line_px: int) -> Image.Image:
 
 
 def main():
-    banner(1024, 500, ["카메라로 네잎클로버 찾기", "AI가 기기 안에서 바로 찾아줘요"], 32).save(
-        ROOT / "play" / "feature-graphic-1024x500.png"
+    ko = banner(1024, 500, ["카메라로 네잎클로버 찾기", "AI가 기기 안에서 바로 찾아줘요"], 32)
+    ko.save(ROOT / "play" / "feature-graphic-1024x500.png")
+    ko.save(ROOT / "play" / "feature-graphic-ko-1024x500.png")
+    banner(1024, 500, ["Find four-leaf clovers", "with on-device AI"], 34).save(
+        ROOT / "play" / "feature-graphic-en-1024x500.png"
     )
     banner(1200, 675, ["카메라로 네잎클로버 찾기"], 40).save(ROOT / "toss" / "banner-1200x675.png")
     print("store banners ->", ROOT)
