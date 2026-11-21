@@ -28,3 +28,12 @@ export function integrate(prev: MotionSample, rate: { x: number; y: number }, t:
   const dt = Math.min(0.05, Math.max(0, (t - prev.t) / 1000)); // ignore gaps (backgrounding)
   return { t, x: prev.x + focal * rate.y * dt, y: prev.y + focal * rate.x * dt };
 }
+
+/** Average on-screen motion speed (dp/s) over the recent `windowMs` ending at `t`. */
+export function motionSpeed(history: readonly MotionSample[], t: number, windowMs = 150): number {
+  if (history.length < 2) return 0;
+  const end = motionAt(history, t);
+  const start = motionAt(history, t - windowMs);
+  const dt = windowMs / 1000;
+  return dt > 0 ? Math.hypot(end.x - start.x, end.y - start.y) / dt : 0;
+}

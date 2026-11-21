@@ -30,7 +30,7 @@ import {
   createEmptyDetectionTrackerSnapshot,
   type DetectionTrackerSnapshot,
 } from '@/src/services/detectionTracker';
-import { focalLength, integrate, motionAt, type MotionSample } from '@/src/services/detector/cameraMotion';
+import { focalLength, integrate, motionAt, motionSpeed, type MotionSample } from '@/src/services/detector/cameraMotion';
 import { projectToView } from '@/src/services/detector/frameMapping';
 import { useCloverFrameProcessor, type FrameDetections } from '@/src/services/detector/useCloverFrameProcessor';
 import { findInPhoto } from '@/src/services/detector/wideScan';
@@ -145,6 +145,7 @@ function Scanner() {
   const [zoom, setZoom] = useState(1);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState({ width: 0, height: 0 });
+  const viewRef = useRef({ width: 0, height: 0 });
   const [frame, setFrame] = useState({ width: 0, height: 0 });
   const [tracking, setTracking] = useState<DetectionTrackerSnapshot>(createEmptyDetectionTrackerSnapshot);
 
@@ -153,9 +154,23 @@ function Scanner() {
   const history = useRef<MotionSample[]>([{ t: Date.now(), x: 0, y: 0 }]);
   const focal = useRef(0);
   const [anchor, setAnchor] = useState({ x: 0, y: 0 });
+  const prevAnchor = useRef<{ x: number; y: number } | undefined>(undefined);
 
   const onDetections = useCallback((result: FrameDetections) => {
-    const next = advanceDetectionTracker(tracker.current, result.boxes, DETECTOR.tracker);
+    // The boxes describe a frame captured ~100 ms ago (inference + pipeline); pin them to the motion at that moment.
+    const captureTime = Date.now() - 100;
+    const currentAnchor = motionAt(history.current, captureTime);
+    const prev = prevAnchor.current;
+    prevAnchor.current = currentAnchor;
+    const viewWidth = viewRef.current.width;
+    const scale = viewWidth > 0 ? result.imageWidth / viewWidth : 0;
+    const shift =
+      prev && scale > 0
+        ? { dx: (currentAnchor.x - prev.x) * scale, dy: (currentAnchor.y - prev.y) * scale }
+        : undefined;
+    const holdLock = viewWidth > 0 && motionSpeed(history.current, captureTime, 150) > viewWidth * DETECTOR.maxLockPanRate;
+
+    const next = advanceDetectionTracker(tracker.current, result.boxes, DETECTOR.tracker, { shift, holdLock });
     tracker.current = next.state;
     const locked = next.stableTracks.length > 0;
     if (locked && !wasLocked.current) {
@@ -164,8 +179,7 @@ function Scanner() {
     }
     wasLocked.current = locked;
     setFrame({ width: result.imageWidth, height: result.imageHeight });
-    // The boxes describe a frame captured ~100 ms ago (inference + pipeline); pin them to the motion at that moment.
-    setAnchor(motionAt(history.current, Date.now() - 100));
+    setAnchor(currentAnchor);
     setTracking(next);
   }, []);
 
@@ -226,6 +240,7 @@ function Scanner() {
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
+    viewRef.current = { width, height };
     setView({ width, height });
   };
 

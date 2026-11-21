@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { focalLength, integrate, motionAt } from '../src/services/detector/cameraMotion.ts';
+import { focalLength, integrate, motionAt, motionSpeed } from '../src/services/detector/cameraMotion.ts';
 
 test('focal length follows view size, field of view and zoom', () => {
   const f = focalLength(891, 76, 1);
@@ -23,4 +23,13 @@ test('motion at a past moment uses the latest sample before it', () => {
   assert.deepEqual(motionAt(h, 500), { x: 20, y: 2 });
   assert.deepEqual(motionAt(h, -5), { x: 0, y: 0 });
   assert.deepEqual(motionAt([], 5), { x: 0, y: 0 });
+});
+
+test('motionSpeed estimates recent scene speed in dp/s', () => {
+  const h = [
+    { t: 0, x: 0, y: 0 },
+    { t: 100, x: 30, y: 40 }, // 50 dp in 0.1 s → 500 dp/s over 100 ms window
+  ];
+  assert.ok(Math.abs(motionSpeed(h, 100, 100) - 500) < 1e-6);
+  assert.equal(motionSpeed([], 100, 100), 0);
 });

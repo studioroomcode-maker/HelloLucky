@@ -60,6 +60,53 @@ export function mergeBoxes(boxes: CloverDetectionBox[], iouThreshold = 0.4): Clo
   return kept;
 }
 
+/** Maps a box detected on a `size × size` square rotated clockwise by `angle` back to the upright square. */
+export function unrotateBox(box: CloverDetectionBox, size: number, angle: 0 | 90 | 180 | 270): CloverDetectionBox {
+  switch (angle) {
+    case 90:
+      return { x: box.y, y: size - box.x, width: box.height, height: box.width, confidence: box.confidence };
+    case 180:
+      return { x: size - box.x, y: size - box.y, width: box.width, height: box.height, confidence: box.confidence };
+    case 270:
+      return { x: size - box.y, y: box.x, width: box.height, height: box.width, confidence: box.confidence };
+    default:
+      return box;
+  }
+}
+
+/**
+ * Multi-view TTA consensus: groups detections from distinct rotated views that overlap (IoU >= `iouThreshold`),
+ * keeping only clusters agreed on by at least `minVotes` views and averaging their geometry and confidence.
+ */
+export function ttaConsensus(views: CloverDetectionBox[][], minVotes = 2, iouThreshold = 0.35): CloverDetectionBox[] {
+  const tagged = views
+    .flatMap((boxes, view) => boxes.map((box) => ({ box, view })))
+    .sort((a, b) => b.box.confidence - a.box.confidence);
+  const clusters: { rep: CloverDetectionBox; boxes: CloverDetectionBox[]; views: Set<number> }[] = [];
+  for (const { box, view } of tagged) {
+    const match = clusters.find((c) => !c.views.has(view) && iou(c.rep, box) >= iouThreshold);
+    if (match) {
+      match.boxes.push(box);
+      match.views.add(view);
+    } else {
+      clusters.push({ rep: box, boxes: [box], views: new Set([view]) });
+    }
+  }
+  return clusters
+    .filter((c) => c.views.size >= minVotes)
+    .map((c) => {
+      const n = c.boxes.length;
+      return {
+        x: c.boxes.reduce((s, b) => s + b.x, 0) / n,
+        y: c.boxes.reduce((s, b) => s + b.y, 0) / n,
+        width: c.boxes.reduce((s, b) => s + b.width, 0) / n,
+        height: c.boxes.reduce((s, b) => s + b.height, 0) / n,
+        confidence: c.boxes.reduce((s, b) => s + b.confidence, 0) / n,
+      };
+    })
+    .sort((a, b) => b.confidence - a.confidence);
+}
+
 /** A box as fractions (0–1) of the upright image, centre-based like the detector's. */
 export type FractionBox = { x: number; y: number; width: number; height: number };
 
@@ -79,7 +126,7 @@ export function cloverSquare(box: FractionBox, width: number, height: number, pa
  * The detection that is the live lock: the nearest one within 2× the lock's longer side (the hand may move between
  * lock and shutter, but a clover farther off is a different one). Without a lock, the first (most confident).
  */
-export function nearLive(found: FractionBox[], live: FractionBox | undefined, width: number, height: number) {
+export function nearLive<T extends FractionBox>(found: T[], live: FractionBox | undefined, width: number, height: number): T | undefined {
   if (!live) return found[0];
   const reach = 2 * Math.max(live.width * width, live.height * height);
   const distance = (b: FractionBox) => Math.hypot((b.x - live.x) * width, (b.y - live.y) * height);

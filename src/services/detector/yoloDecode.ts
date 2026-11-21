@@ -49,6 +49,8 @@ export type YoloDecodeConfig = {
   maxBoxes: number;
   /** 이 클래스 인덱스만 유지 (없으면 전체) */
   keepClassIndex?: number;
+  /** 다중 클래스 모델에서 1위·2위 클래스 점수 최소 차이 (경합 오탐 방지) */
+  minClassMargin?: number;
 };
 
 function iou(a: DecodedBox, b: DecodedBox): number {
@@ -96,20 +98,25 @@ export function decodeYolo(
     iouThreshold,
     maxBoxes,
     keepClassIndex,
+    minClassMargin,
   } = config;
 
   const scale = coordsAreNormalized ? inputSize : 1;
   const candidates: DecodedBox[] = [];
 
   for (let i = 0; i < numAnchors; i++) {
-    // 이 앵커에서 가장 높은 클래스 점수를 찾는다.
+    // 이 앵커에서 가장 높은 클래스 점수와 2위 점수를 찾는다.
     let bestScore = 0;
+    let secondScore = 0;
     let bestClass = 0;
     for (let c = 0; c < numClasses; c++) {
       const score = output[(4 + c) * numAnchors + i];
       if (score > bestScore) {
+        secondScore = bestScore;
         bestScore = score;
         bestClass = c;
+      } else if (score > secondScore) {
+        secondScore = score;
       }
     }
 
@@ -117,6 +124,9 @@ export function decodeYolo(
       continue;
     }
     if (keepClassIndex !== undefined && bestClass !== keepClassIndex) {
+      continue;
+    }
+    if (minClassMargin !== undefined && numClasses > 1 && bestScore - secondScore < minClassMargin) {
       continue;
     }
 

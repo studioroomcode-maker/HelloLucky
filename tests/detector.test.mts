@@ -46,6 +46,30 @@ test('decodeYolo keeps confident boxes, scales to pixels and applies NMS', () =>
   assert.ok(Math.abs(boxes[1].y - 192) < 1e-3);
 });
 
+test('decodeYolo drops ambiguous anchors when four_leaf barely beats three_leaf', () => {
+  const out = new Float32Array(6 * N);
+  const put = (i: number, cx: number, cy: number, s0: number, s1: number) => {
+    out[i] = cx;
+    out[N + i] = cy;
+    out[2 * N + i] = 0.08;
+    out[3 * N + i] = 0.08;
+    out[4 * N + i] = s0;
+    out[5 * N + i] = s1;
+  };
+  put(10, 0.25, 0.25, 0.4, 0.35); // margin 0.05 < 0.10 → dropped
+  put(20, 0.75, 0.75, 0.4, 0.2); // margin 0.20 >= 0.10 → kept
+  put(30, 0.5, 0.5, 0.3, 0.5); // three_leaf wins → dropped
+
+  const boxes = decodeYolo(out, {
+    ...cfg,
+    numClasses: 2,
+    minConfidence: 0.25,
+    minClassMargin: 0.1,
+  });
+  assert.equal(boxes.length, 1);
+  assert.equal(boxes[0].x, 480);
+});
+
 test('orientation → clockwise upright rotation (Android back camera reports landscape-right)', () => {
   assert.equal(uprightRotation('portrait'), 0);
   assert.equal(uprightRotation('landscape-right'), 90);
@@ -118,6 +142,48 @@ test('tracker locks after the required streak and drops stale tracks', () => {
   }
   assert.equal(snap.stableTracks.length, 0);
   assert.equal(snap.candidateTracks.length, 1);
+});
+
+test('tracker sliding window blocks intermittent false hits and supports motion shift / holdLock', () => {
+  const config = {
+    requiredStreak: 4,
+    confirmWindow: 6,
+    minLockConfidence: 0.35,
+    maxMissedFrames: 3,
+    iouThreshold: 0.2,
+    smoothingFactor: 0.7,
+    maxTracks: 5,
+  };
+  const det = { x: 200, y: 200, width: 50, height: 50, confidence: 0.38 };
+
+  // Intermittent false alarm: hit, 3 misses, hit, 3 misses, hit, 3 misses, hit → never locks.
+  let state = createDetectionTrackerState();
+  let snap;
+  for (const frame of [[det], [], [], [], [det], [], [], [], [det], [], [], [], [det]]) {
+    snap = advanceDetectionTracker(state, frame, config);
+    state = snap.state;
+  }
+  assert.equal(snap!.stableTracks.length, 0, 'sparse hits across 13 frames must not lock');
+
+  // Motion shift keeps a panning clover matched even when raw IoU would be 0.
+  state = createDetectionTrackerState();
+  snap = advanceDetectionTracker(state, [det], config);
+  state = snap.state;
+  const moved = { ...det, x: det.x + 80 };
+  snap = advanceDetectionTracker(state, [moved], config, { shift: { dx: 80, dy: 0 } });
+  assert.equal(snap.tracks.length, 1);
+  assert.equal(snap.tracks[0].streak, 2);
+
+  // holdLock keeps tracking without confirming a lock during rapid panning.
+  state = createDetectionTrackerState();
+  for (let i = 0; i < 4; i++) {
+    snap = advanceDetectionTracker(state, [det], config, { holdLock: true });
+    state = snap.state;
+  }
+  assert.equal(snap!.tracks[0].streak, 4);
+  assert.equal(snap!.stableTracks.length, 0, 'rapid motion holds lock');
+  snap = advanceDetectionTracker(state, [det], config, { holdLock: false });
+  assert.equal(snap.stableTracks.length, 1, 'steady frame confirms immediately');
 });
 
 test('every language has the same fortunes, pot stages and badges', async () => {

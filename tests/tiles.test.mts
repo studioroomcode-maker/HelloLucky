@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { mergeBoxes, nearLive, tilePlan } from '../src/services/detector/tiles.ts';
+import { mergeBoxes, nearLive, tilePlan, ttaConsensus, unrotateBox } from '../src/services/detector/tiles.ts';
 
 test('tiles cover the whole image with overlap and stay inside it', () => {
   for (const [w, h] of [[2016, 2688], [1512, 2016], [960, 960], [3024, 4032]]) {
@@ -46,4 +46,47 @@ test('the photo check keeps only the clover near the live lock', () => {
   assert.equal(nearLive([far, near], live, 4000, 3000), near);
   assert.equal(nearLive([far], live, 4000, 3000), undefined);
   assert.equal(nearLive([far, near], undefined, 4000, 3000), far); // no lock: most confident
+});
+
+test('unrotateBox maps rotated square detections back to upright coordinates', () => {
+  const size = 960;
+  // Original box at (200, 100), w=80, h=40.
+  // 90° CW: (size - 100, 200) = (860, 200), w=40, h=80.
+  assert.deepEqual(unrotateBox({ x: 860, y: 200, width: 40, height: 80, confidence: 0.7 }, size, 90), {
+    x: 200,
+    y: 100,
+    width: 80,
+    height: 40,
+    confidence: 0.7,
+  });
+  // 180°: (760, 860), w=80, h=40.
+  assert.deepEqual(unrotateBox({ x: 760, y: 860, width: 80, height: 40, confidence: 0.7 }, size, 180), {
+    x: 200,
+    y: 100,
+    width: 80,
+    height: 40,
+    confidence: 0.7,
+  });
+  // 270° CW: (100, 760), w=40, h=80.
+  assert.deepEqual(unrotateBox({ x: 100, y: 760, width: 40, height: 80, confidence: 0.7 }, size, 270), {
+    x: 200,
+    y: 100,
+    width: 80,
+    height: 40,
+    confidence: 0.7,
+  });
+});
+
+test('ttaConsensus keeps clusters agreed on by at least minVotes distinct views', () => {
+  const v0 = [
+    { x: 480, y: 480, width: 100, height: 100, confidence: 0.6 },
+    { x: 100, y: 100, width: 60, height: 60, confidence: 0.8 }, // one-view false hit
+  ];
+  const v90 = [{ x: 484, y: 478, width: 102, height: 98, confidence: 0.5 }];
+  const v180: typeof v0 = [];
+  const res = ttaConsensus([v0, v90, v180], 2, 0.35);
+  assert.equal(res.length, 1);
+  assert.equal(res[0].x, 482);
+  assert.equal(res[0].y, 479);
+  assert.ok(Math.abs(res[0].confidence - 0.55) < 1e-9);
 });

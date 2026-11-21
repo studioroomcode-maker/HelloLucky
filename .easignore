@@ -63,6 +63,7 @@ training/cutouts/
 !assets/model/README.md
 # The shipped on-device model must be committed (EAS builds only see tracked files).
 !assets/model/clover.tflite
+!assets/model/clover_verifier.tflite
 
 # Python
 __pycache__/
@@ -82,6 +83,8 @@ docs/
 
 training/third_party/
 training/yolox_data/
+training/verifier_crops/
+output/
 training/*.pth
 training/YOLOX_outputs/
 

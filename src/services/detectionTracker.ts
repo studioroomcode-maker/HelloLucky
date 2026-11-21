@@ -9,6 +9,8 @@ export type CloverDetectionBox = {
 
 export type DetectionTrackerConfig = {
   requiredStreak: number;
+  /** Recent frame window size over which `requiredStreak` hits must occur (defaults to requiredStreak + 2). */
+  confirmWindow?: number;
   /** Smoothed confidence a track needs before it counts as found (candidates show below it). */
   minLockConfidence: number;
   maxMissedFrames: number;
@@ -17,9 +19,19 @@ export type DetectionTrackerConfig = {
   maxTracks: number;
 };
 
+export type DetectionTrackerStepOptions = {
+  /** Camera-motion shift (upright frame px) since the previous frame, applied to existing tracks before matching. */
+  shift?: { dx: number; dy: number };
+  /** When true (e.g. rapid panning / motion blur), keep tracking but do not confirm a new lock. */
+  holdLock?: boolean;
+};
+
 export type DetectionTrack = CloverDetectionBox & {
   id: string;
+  /** Number of hits inside the recent confirmation window. */
   streak: number;
+  /** Recent per-frame confidences (null = missed frame), capped at confirmWindow entries. */
+  recentScores: (number | null)[];
   missedFrames: number;
   isStable: boolean;
 };
@@ -122,14 +134,42 @@ function sortStateTracks(left: DetectionTrack, right: DetectionTrack) {
   return sortActiveTracks(left, right);
 }
 
+function pushRecent(recent: readonly (number | null)[], value: number | null, windowSize: number): (number | null)[] {
+  const next = [...recent, value];
+  return next.length > windowSize ? next.slice(next.length - windowSize) : next;
+}
+
+function summarizeRecent(recent: readonly (number | null)[]) {
+  let hits = 0;
+  let sum = 0;
+  for (let i = 0; i < recent.length; i++) {
+    const score = recent[i];
+    if (score !== null) {
+      hits += 1;
+      sum += score;
+    }
+  }
+  return { hits, avg: hits > 0 ? sum / hits : 0 };
+}
+
 export function advanceDetectionTracker(
   state: DetectionTrackerState,
   detections: CloverDetectionBox[],
   config: DetectionTrackerConfig,
+  options?: DetectionTrackerStepOptions,
 ): DetectionTrackerSnapshot {
+  const windowSize = Math.max(config.requiredStreak, config.confirmWindow ?? config.requiredStreak + 2);
+  const dx = options?.shift?.dx ?? 0;
+  const dy = options?.shift?.dy ?? 0;
+  const holdLock = options?.holdLock ?? false;
+
+  const predictedTracks = state.tracks.map((track) =>
+    dx === 0 && dy === 0 ? track : { ...track, x: track.x + dx, y: track.y + dy },
+  );
+
   const pairCandidates: PairCandidate[] = [];
 
-  state.tracks.forEach((track, trackIndex) => {
+  predictedTracks.forEach((track, trackIndex) => {
     detections.forEach((detection, detectionIndex) => {
       const score = computeIou(track, detection);
 
@@ -160,12 +200,13 @@ export function advanceDetectionTracker(
 
   const nextTracks: DetectionTrack[] = [];
 
-  state.tracks.forEach((track, trackIndex) => {
+  predictedTracks.forEach((track, trackIndex) => {
     const match = matches.get(trackIndex);
 
     if (match) {
-      // A frame or two lost to flicker (screen moiré, a leaf in motion) pauses the streak instead of restarting it.
-      const streak = track.streak + 1;
+      // Confirm only from hits within the recent sliding window, so intermittent false hits cannot accumulate.
+      const recentScores = pushRecent(track.recentScores, match.confidence, windowSize);
+      const { hits, avg } = summarizeRecent(recentScores);
       const confidence = blend(track.confidence, match.confidence, config.smoothingFactor);
 
       nextTracks.push({
@@ -175,9 +216,14 @@ export function advanceDetectionTracker(
         width: blend(track.width, match.width, config.smoothingFactor),
         height: blend(track.height, match.height, config.smoothingFactor),
         confidence,
-        streak,
+        streak: hits,
+        recentScores,
         missedFrames: 0,
-        isStable: streak >= config.requiredStreak && confidence >= config.minLockConfidence,
+        isStable:
+          !holdLock &&
+          hits >= config.requiredStreak &&
+          confidence >= config.minLockConfidence &&
+          avg >= config.minLockConfidence,
       });
 
       return;
@@ -186,8 +232,12 @@ export function advanceDetectionTracker(
     const missedFrames = track.missedFrames + 1;
 
     if (missedFrames <= config.maxMissedFrames) {
+      const recentScores = pushRecent(track.recentScores, null, windowSize);
+      const { hits } = summarizeRecent(recentScores);
       nextTracks.push({
         ...track,
+        streak: hits,
+        recentScores,
         missedFrames,
         isStable: false,
       });
@@ -201,12 +251,14 @@ export function advanceDetectionTracker(
       return;
     }
 
+    const recentScores: (number | null)[] = [detection.confidence];
     nextTracks.push({
       ...detection,
       id: `track-${nextTrackId}`,
       streak: 1,
+      recentScores,
       missedFrames: 0,
-      isStable: config.requiredStreak <= 1 && detection.confidence >= config.minLockConfidence,
+      isStable: !holdLock && config.requiredStreak <= 1 && detection.confidence >= config.minLockConfidence,
     });
 
     nextTrackId += 1;
