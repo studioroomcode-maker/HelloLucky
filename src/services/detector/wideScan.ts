@@ -17,7 +17,6 @@ import {
   photoWindow,
   tilePlan,
   toModelInput,
-  ttaConsensus,
   unrotateBox,
   type FractionBox,
 } from './tiles';
@@ -54,96 +53,144 @@ export async function loadUpright(path: string) {
 }
 
 /**
- * Runs 3-view rotation TTA (0°/90°/180°) on a square crop of `image` and returns detections
- * confirmed by at least `DETECTOR.tta.minVotes` views, in upright photo fractions (0–1).
+ * Stage-2 crop classifier: inspects a tight 1.5× close-up around `box` at 0° and 180°
+ * and returns the mean P(four_leaf) in [0, 1]. Falls back to 0.5 if the verifier model is unavailable.
  */
-async function confirmSquareTta(
-  model: DetectorModel,
-  image: UprightImage,
-  rect: { left: number; top: number; side: number },
-): Promise<WideCandidate[]> {
-  const { width, height } = image;
-  const size = DETECTOR.inputSize;
-  const square = await (await image.cropAsync(rect.left, rect.top, rect.left + rect.side, rect.top + rect.side)).resizeAsync(size, size);
-  const views: CloverDetectionBox[][] = [];
-  for (const angle of DETECTOR.tta.angles) {
-    const view = angle ? await square.rotateAsync(angle) : square;
-    const [output] = await model.run([toModelInput(await view.toRawPixelDataAsync(), size).buffer as ArrayBuffer]);
-    const boxes = decodeYolo(new Float32Array(output), DETECTOR.decode)
-      .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
-      .map((b) => unrotateBox(b, size, angle));
-    views.push(boxes);
+async function verifyCrop(verifier: DetectorModel | undefined, image: UprightImage, box: FractionBox): Promise<number> {
+  if (!verifier) return 0.5;
+  try {
+    const { inputSize, cropPad } = DETECTOR.verifier;
+    const rect = cloverSquare(box, image.width, image.height, cropPad);
+    const crop = await (await image.cropAsync(rect.left, rect.top, rect.left + rect.side, rect.top + rect.side)).resizeAsync(
+      inputSize,
+      inputSize,
+    );
+    const [out0] = await verifier.run([toModelInput(await crop.toRawPixelDataAsync(), inputSize).buffer as ArrayBuffer]);
+    const rotated = await crop.rotateAsync(180);
+    const [out180] = await verifier.run([toModelInput(await rotated.toRawPixelDataAsync(), inputSize).buffer as ArrayBuffer]);
+    return (new Float32Array(out0)[0] + new Float32Array(out180)[0]) / 2;
+  } catch (error) {
+    console.warn('detector: verifier failed, falling back to stage-1 score', error);
+    return 0.5;
   }
-  const k = rect.side / size;
-  return ttaConsensus(views, DETECTOR.tta.minVotes, DETECTOR.tta.iouThreshold).map((b) => ({
-    x: (rect.left + b.x * k) / width,
-    y: (rect.top + b.y * k) / height,
-    width: (b.width * k) / width,
-    height: (b.height * k) / height,
-    confidence: b.confidence,
-  }));
 }
 
 /**
- * Stage-2 crop classifier: inspects a tight 1.5× close-up around `box` at 0° and 180°
- * and returns the mean P(four_leaf) in [0, 1].
+ * Cooperative inspection of a square region:
+ * 1) Runs the upright 0° view first (fast path).
+ * 2) If 0° misses or is borderline (< minLockConfidence), checks 90° and 180° rotated views to rescue tilted clovers.
+ * 3) Confirms if the detector is confident (>= minLockConfidence) and not vetoed by the Stage-2 verifier (>= minProbability),
+ *    OR if a borderline detector hit (>= minConfidence) is rescued by the Stage-2 verifier (>= rescueProbability).
  */
-async function verifyCrop(verifier: DetectorModel, image: UprightImage, box: FractionBox): Promise<number> {
-  const { inputSize, cropPad } = DETECTOR.verifier;
-  const rect = cloverSquare(box, image.width, image.height, cropPad);
-  const crop = await (await image.cropAsync(rect.left, rect.top, rect.left + rect.side, rect.top + rect.side)).resizeAsync(
-    inputSize,
-    inputSize,
-  );
-  const [out0] = await verifier.run([toModelInput(await crop.toRawPixelDataAsync(), inputSize).buffer as ArrayBuffer]);
-  const rotated = await crop.rotateAsync(180);
-  const [out180] = await verifier.run([toModelInput(await rotated.toRawPixelDataAsync(), inputSize).buffer as ArrayBuffer]);
-  return (new Float32Array(out0)[0] + new Float32Array(out180)[0]) / 2;
+async function inspectSquareCooperative(
+  model: DetectorModel,
+  verifier: DetectorModel | undefined,
+  image: UprightImage,
+  rect: { left: number; top: number; side: number },
+  target?: FractionBox,
+  reachFactor = 2.5,
+  minReachFraction = 0.15,
+): Promise<WideCandidate | undefined> {
+  const { width, height } = image;
+  const size = DETECTOR.inputSize;
+  const k = rect.side / size;
+  const square = await (await image.cropAsync(rect.left, rect.top, rect.left + rect.side, rect.top + rect.side)).resizeAsync(size, size);
+
+  const runAngle = async (angle: 0 | 90 | 180) => {
+    const view = angle ? await square.rotateAsync(angle) : square;
+    const [output] = await model.run([toModelInput(await view.toRawPixelDataAsync(), size).buffer as ArrayBuffer]);
+    const boxes = decodeYolo(new Float32Array(output), DETECTOR.decode)
+      .map((b) => unrotateBox(b, size, angle))
+      .map((b) => ({
+        x: (rect.left + b.x * k) / width,
+        y: (rect.top + b.y * k) / height,
+        width: (b.width * k) / width,
+        height: (b.height * k) / height,
+        confidence: b.confidence,
+      }));
+    return nearLive(boxes, target, width, height, reachFactor, minReachFraction);
+  };
+
+  let best = await runAngle(0);
+  if (!best || best.confidence < DETECTOR.tracker.minLockConfidence) {
+    for (const angle of [90, 180] as const) {
+      const candidate = await runAngle(angle);
+      if (candidate && (!best || candidate.confidence > best.confidence)) {
+        best = candidate;
+      }
+    }
+  }
+  if (!best) return undefined;
+
+  const prob = await verifyCrop(verifier, image, best);
+  const { minLockConfidence } = DETECTOR.tracker;
+  const { minProbability, rescueProbability } = DETECTOR.verifier;
+  if (best.confidence >= minLockConfidence && prob >= minProbability) return best;
+  if (best.confidence >= DETECTOR.decode.minConfidence && prob >= rescueProbability) return best;
+  return undefined;
 }
 
 /**
  * Second look at a shutter photo, so a find is judged on what was actually saved: a live lock can be a passing
- * false hit (grass flickering by while walking). Looks close up around the `live` lock first with 3-view rotation TTA
- * and the Stage-2 crop verifier, then falls back to the live window, returning fractions or undefined.
+ * false hit (grass flickering by while walking). Looks close up around the `live` lock first (3×, then 5× if the hand
+ * shifted on shutter tap), then falls back to the live window, returning fractions or undefined.
  */
 export async function findInPhoto(path: string, live?: FractionBox): Promise<FractionBox | undefined> {
-  const [model, verifier, image] = await Promise.all([loadDetector(), loadVerifier(), loadUpright(path)]);
+  const [model, verifier, image] = await Promise.all([
+    loadDetector(),
+    loadVerifier().catch(() => undefined),
+    loadUpright(path),
+  ]);
   const { width, height } = image;
   const size = DETECTOR.inputSize;
 
-  const confirmCloseUp = async (target: FractionBox) => {
-    const confirmed = await confirmSquareTta(model, image, cloverSquare(target, width, height, 3));
-    const match = nearLive(confirmed, target, width, height);
-    if (!match) return undefined;
-    const prob = await verifyCrop(verifier, image, match);
-    return prob >= DETECTOR.verifier.minProbability ? match : undefined;
-  };
-
   if (live) {
-    const closeMatch = await confirmCloseUp(live);
-    if (closeMatch) return closeMatch;
+    const close3x = await inspectSquareCooperative(model, verifier, image, cloverSquare(live, width, height, 3), live, 3, 0.15);
+    if (close3x) return close3x;
+    const close5x = await inspectSquareCooperative(model, verifier, image, cloverSquare(live, width, height, 5), live, 3.5, 0.25);
+    if (close5x) return close5x;
   }
 
   // Fallback: look at the wider square the live scanner saw (catches a hand that moved between lock and shutter),
-  // then confirm that hit with the same 3× rotation TTA + Stage-2 verifier close-up.
+  // then confirm that hit with a 3× close-up.
   const win = photoWindow(width, height, live);
   const square = await (await image.cropAsync(win.left, win.top, win.left + win.side, win.top + win.side)).resizeAsync(size, size);
   const [output] = await model.run([toModelInput(await square.toRawPixelDataAsync(), size).buffer as ArrayBuffer]);
   const k = win.side / size;
-  const found = decodeYolo(new Float32Array(output), DETECTOR.decode)
-    .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
-    .map((b) => ({
-      x: (win.left + b.x * k) / width,
-      y: (win.top + b.y * k) / height,
-      width: (b.width * k) / width,
-      height: (b.height * k) / height,
-    }));
-  const fallback = nearLive(found, live, width, height);
-  return fallback ? confirmCloseUp(fallback) : undefined;
+  const found = decodeYolo(new Float32Array(output), DETECTOR.decode).map((b) => ({
+    x: (win.left + b.x * k) / width,
+    y: (win.top + b.y * k) / height,
+    width: (b.width * k) / width,
+    height: (b.height * k) / height,
+    confidence: b.confidence,
+  }));
+  const fallback = nearLive(found, live, width, height, 4, 0.35);
+  if (!fallback) return undefined;
+  const closeFallback = await inspectSquareCooperative(
+    model,
+    verifier,
+    image,
+    cloverSquare(fallback, width, height, 3),
+    fallback,
+    2.5,
+    0.18,
+  );
+  if (closeFallback) return closeFallback;
+  if (
+    fallback.confidence >= DETECTOR.tracker.minLockConfidence &&
+    (await verifyCrop(verifier, image, fallback)) >= DETECTOR.verifier.minProbability
+  ) {
+    return fallback;
+  }
+  return undefined;
 }
 
 export async function wideScan(path: string, onProgress: (done: number, total: number) => void): Promise<WideResult> {
-  const [model, verifier, original] = await Promise.all([loadDetector(), loadVerifier(), loadUpright(path)]);
+  const [model, verifier, original] = await Promise.all([
+    loadDetector(),
+    loadVerifier().catch(() => undefined),
+    loadUpright(path),
+  ]);
   const image = await original.resizeAsync(Math.round(original.width * SCALE), Math.round(original.height * SCALE));
   const { width, height } = image;
   const saved = image.saveToTemporaryFileAsync('jpg', 92);
@@ -162,24 +209,43 @@ export async function wideScan(path: string, onProgress: (done: number, total: n
     }
   }
 
-  // Stage 2: re-verify top 1st-stage candidates on full-resolution 3× close-ups with rotation TTA + crop verifier.
+  // Stage 2: refine and verify top 1st-stage candidates on full-resolution 3× close-ups (rescuing borderline tile hits
+  // and filtering only clear three-leaf false alarms).
   const coarse = mergeBoxes(found)
-    .filter((b) => b.confidence >= DETECTOR.tracker.minLockConfidence)
     .slice(0, MAX_WIDE_VERIFY)
     .map((b) => ({ x: b.x / width, y: b.y / height, width: b.width / width, height: b.height / height, confidence: b.confidence }));
 
   const verified: CloverDetectionBox[] = [];
   for (const cand of coarse) {
-    const confirmed = await confirmSquareTta(model, original, cloverSquare(cand, original.width, original.height, 3));
-    const match = nearLive(confirmed, cand, original.width, original.height);
-    if (match && (await verifyCrop(verifier, original, match)) >= DETECTOR.verifier.minProbability) {
+    const closeMatch = await inspectSquareCooperative(
+      model,
+      verifier,
+      original,
+      cloverSquare(cand, original.width, original.height, 3),
+      cand,
+      2.5,
+      0.15,
+    );
+    if (closeMatch) {
       verified.push({
-        x: match.x * width,
-        y: match.y * height,
-        width: match.width * width,
-        height: match.height * height,
-        confidence: match.confidence,
+        x: closeMatch.x * width,
+        y: closeMatch.y * height,
+        width: closeMatch.width * width,
+        height: closeMatch.height * height,
+        confidence: Math.max(cand.confidence, closeMatch.confidence),
       });
+    } else if (cand.confidence >= DETECTOR.tracker.minLockConfidence) {
+      // Keep confident tile detections unless the Stage-2 verifier strongly vetoes them as three-leafs.
+      const prob = await verifyCrop(verifier, original, cand);
+      if (prob >= DETECTOR.verifier.minProbability) {
+        verified.push({
+          x: cand.x * width,
+          y: cand.y * height,
+          width: cand.width * width,
+          height: cand.height * height,
+          confidence: cand.confidence,
+        });
+      }
     }
   }
 

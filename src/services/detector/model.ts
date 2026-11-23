@@ -19,20 +19,23 @@ export function loadDetector(): Promise<TensorflowModel> {
   return sharedDetector;
 }
 
-/** Stage-2 crop classifier (~2.5 MB) shared by post-capture and wide-scan verification. */
+/** Stage-2 crop classifier (~3 MB): runs on CPU (XNNPACK, ~4 ms) so it never contends with the detector's GPU delegate. */
 export function loadVerifier(): Promise<TensorflowModel> {
-  sharedVerifier ??= loadAsset(VERIFIER, 'verifier').catch((error) => {
+  sharedVerifier ??= loadAsset(VERIFIER, 'verifier', false).catch((error) => {
     sharedVerifier = undefined;
     throw error;
   });
   return sharedVerifier;
 }
 
-async function loadAsset(assetModule: number, label: string): Promise<TensorflowModel> {
+async function loadAsset(assetModule: number, label: string, useHardwareDelegate = true): Promise<TensorflowModel> {
   // fast-tflite can't read Android release raw resources itself; expo-asset copies it to a file:// URI.
   const [asset] = await Asset.loadAsync(assetModule);
   if (!asset.localUri) throw new Error(`${label}: model asset has no local file`);
   const source = { url: asset.localUri };
+  if (!useHardwareDelegate) {
+    return loadTensorflowModel(source, []);
+  }
   const accelerated = Platform.OS === 'ios' ? 'core-ml' : 'android-gpu';
   try {
     return await loadTensorflowModel(source, [accelerated]);

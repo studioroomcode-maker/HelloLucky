@@ -2,7 +2,7 @@
   "expo": {
     "name": "Hello Luck",
     "slug": "HelloLucky",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "hellolucky",
@@ -28,7 +28,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.studioroomkr.HelloLucky",
-      "buildNumber": "14",
+      "buildNumber": "15",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -43,7 +43,7 @@
     },
     "android": {
       "package": "com.studioroomkr.HelloLucky",
-      "versionCode": 14,
+      "versionCode": 15,
       "adaptiveIcon": {
         "backgroundColor": "#20893C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

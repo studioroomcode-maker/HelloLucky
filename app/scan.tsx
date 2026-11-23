@@ -30,7 +30,7 @@ import {
   createEmptyDetectionTrackerSnapshot,
   type DetectionTrackerSnapshot,
 } from '@/src/services/detectionTracker';
-import { focalLength, integrate, motionAt, motionSpeed, type MotionSample } from '@/src/services/detector/cameraMotion';
+import { focalLength, integrate, motionAt, type MotionSample } from '@/src/services/detector/cameraMotion';
 import { projectToView } from '@/src/services/detector/frameMapping';
 import { useCloverFrameProcessor, type FrameDetections } from '@/src/services/detector/useCloverFrameProcessor';
 import { findInPhoto } from '@/src/services/detector/wideScan';
@@ -145,7 +145,6 @@ function Scanner() {
   const [zoom, setZoom] = useState(1);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState({ width: 0, height: 0 });
-  const viewRef = useRef({ width: 0, height: 0 });
   const [frame, setFrame] = useState({ width: 0, height: 0 });
   const [tracking, setTracking] = useState<DetectionTrackerSnapshot>(createEmptyDetectionTrackerSnapshot);
 
@@ -154,23 +153,9 @@ function Scanner() {
   const history = useRef<MotionSample[]>([{ t: Date.now(), x: 0, y: 0 }]);
   const focal = useRef(0);
   const [anchor, setAnchor] = useState({ x: 0, y: 0 });
-  const prevAnchor = useRef<{ x: number; y: number } | undefined>(undefined);
 
   const onDetections = useCallback((result: FrameDetections) => {
-    // The boxes describe a frame captured ~100 ms ago (inference + pipeline); pin them to the motion at that moment.
-    const captureTime = Date.now() - 100;
-    const currentAnchor = motionAt(history.current, captureTime);
-    const prev = prevAnchor.current;
-    prevAnchor.current = currentAnchor;
-    const viewWidth = viewRef.current.width;
-    const scale = viewWidth > 0 ? result.imageWidth / viewWidth : 0;
-    const shift =
-      prev && scale > 0
-        ? { dx: (currentAnchor.x - prev.x) * scale, dy: (currentAnchor.y - prev.y) * scale }
-        : undefined;
-    const holdLock = viewWidth > 0 && motionSpeed(history.current, captureTime, 150) > viewWidth * DETECTOR.maxLockPanRate;
-
-    const next = advanceDetectionTracker(tracker.current, result.boxes, DETECTOR.tracker, { shift, holdLock });
+    const next = advanceDetectionTracker(tracker.current, result.boxes, DETECTOR.tracker);
     tracker.current = next.state;
     const locked = next.stableTracks.length > 0;
     if (locked && !wasLocked.current) {
@@ -179,7 +164,8 @@ function Scanner() {
     }
     wasLocked.current = locked;
     setFrame({ width: result.imageWidth, height: result.imageHeight });
-    setAnchor(currentAnchor);
+    // The boxes describe a frame captured ~100 ms ago (inference + pipeline); pin them to the motion at that moment.
+    setAnchor(motionAt(history.current, Date.now() - 100));
     setTracking(next);
   }, []);
 
@@ -240,7 +226,6 @@ function Scanner() {
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
-    viewRef.current = { width, height };
     setView({ width, height });
   };
 
@@ -269,21 +254,23 @@ function Scanner() {
     if (!camera.current || saving) return;
     setSaving(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    // Snapshot the best tracked clover BEFORE takePhoto() and pause live inference immediately so a slight
+    // finger jiggle during shutter lag cannot erase the track or race with the shared TFLite interpreter.
+    const candidates = [...tracking.stableTracks, ...tracking.candidateTracks, ...tracker.current.tracks];
+    const best = frame.width
+      ? candidates.sort((a, b) => Number(b.isStable) - Number(a.isStable) || b.streak - a.streak || b.confidence - a.confidence)[0]
+      : undefined;
+    const live = best && {
+      x: best.x / frame.width,
+      y: best.y / frame.height,
+      width: best.width / frame.width,
+      height: best.height / frame.height,
+    };
+    paused.value = true;
     try {
       // The torch already lights the scene; a capture flash would fight it.
       const photo = await camera.current.takePhoto({ flash: 'off', enableShutterSound: false });
-      // The strongest locked clover, as fractions of the upright frame (the photo shares its 4:3).
-      const best = frame.width ? [...tracking.stableTracks].sort((a, b) => b.confidence - a.confidence)[0] : undefined;
-      const live = best && {
-        x: best.x / frame.width,
-        y: best.y / frame.height,
-        width: best.width / frame.width,
-        height: best.height / frame.height,
-      };
       // The saved photo decides: a lock it doesn't confirm was a passing false hit, and its own box sits on the clover.
-      // Loading the photo takes far longer than one live inference, so a frame already running finishes first.
-      paused.value = true;
-      // A check that fails confirms nothing: it lands in the catch below (save error), never saving the unchecked lock.
       const box = await findInPhoto(photo.path, live);
       // Only a confirmed four-leaf clover becomes a find; anything else is dropped unsaved.
       if (!box) {

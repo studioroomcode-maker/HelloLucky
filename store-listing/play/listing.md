@@ -99,17 +99,15 @@ AI model trained in part on "4 Leaf Clover Detect" by test-ara07 and "Hunting fo
 ## 5. 버전 출시 노트 (500자)
 **ko**
 ```
-🍀 1.0.8 업데이트
-· 네잎클로버 인식 AI를 대폭 업그레이드했어요 (정확도 향상 및 겹친 세잎 오탐 감소)
-· 촬영 후 확인과 넓게 훑기에 2단계 정밀 판별 AI와 다각도 검증을 추가했어요
-· 카메라를 빠르게 움직일 때 흔들림으로 인한 오탐을 줄이고 추적 안정성을 높였어요
-· 편지 신고·차단 등 커뮤니티 안전 기능을 강화했어요
+🍀 1.0.9 업데이트
+· 네잎클로버 인식률과 촬영 확인 성공률을 크게 높였어요
+· 셔터를 누를 때 손이 살짝 흔들리거나 후보(?) 상태에서 찍어도 놓치지 않고 더 잘 확인해요
+· 2단계 정밀 AI가 기울어진 네잎클로버는 구제하고 겹친 세잎 오탐만 걸러내요
 ```
 **en**
 ```
-🍀 What's new in 1.0.8
-· Major upgrade to the on-device four-leaf clover AI (higher accuracy, fewer overlapping three-leaf false positives)
-· Added a second-stage close-up verifier AI and multi-angle check for shutter and wide-scan confirmations
-· Smoother live tracking with motion-blur protection when panning quickly
-· Added letter report & block safety improvements
+🍀 What's new in 1.0.9
+· Significantly improved four-leaf clover detection and shutter confirmation rates
+· Reliable photo confirmation even when your hand moves slightly on the shutter or when tapping on a candidate (?)
+· Cooperative 2-stage AI rescues tilted four-leaf clovers while filtering out overlapping three-leaf false alarms
 ```
